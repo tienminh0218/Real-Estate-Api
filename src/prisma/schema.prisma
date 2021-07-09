@@ -33,6 +33,7 @@ model Broker{
   district		String	@db.VarChar(255)
   city	String	@db.VarChar(255)
   properties	Property[]
+  comments_Broker   	Comment_Broker[]
   news		News?
 }
 
@@ -43,10 +44,11 @@ model Company{
   companyName    	String?	@db.VarChar(255)
   district		String	@db.VarChar(255)
   city	String	@db.VarChar(255)
+  comments_Company   	Comment_Company[]
   projects Project[]
 }
 
-model Category_Property{
+model categoryProperty{
   id String @default(uuid()) @id
   nameCategory String
   properties Property[]
@@ -54,13 +56,14 @@ model Category_Property{
 
 model Property{
   id      	String      @default(uuid()) @id
-  category Category_Property @relation(fields: [categoryId],references:[id])
+  category categoryProperty @relation(fields: [categoryId],references:[id])
   categoryId String
   location  String
   coordinates String
   price   Int
   status Int @default(0)
   boughtBy String
+  comments_Property Comment_Property[]
   broker    Broker     @relation(fields: [userId], references: [id])
   brokerId  String
   user    User?     @relation(fields: [userId], references: [id])
@@ -68,13 +71,14 @@ model Property{
   project Project @relation(fields: [projectId],references:[id])
   projectId String
 }
-
+	
 model Project{
   id String @default(uuid()) @id
   projectName String @db.VarChar(255)
-  location  String
-  coordinates String
+  district		String	@db.VarChar(255)
+  city	String	@db.VarChar(255)
   properties Property[]
+  comments_project Comment_Project[]
   company Company @relation(fields: [companyId],references:[id])
   companyId String
 }
@@ -86,7 +90,8 @@ model Comment_Broker {
   content   String
   user    User     @relation(fields: [userId], references: [id])
   userId  String
-  brokerBeCommented String
+  broker    Broker     @relation(fields: [userId], references: [id])
+  brokerId  String
 }
 
 model Comment_Company {
@@ -96,27 +101,30 @@ model Comment_Company {
   content   String
   user    User     @relation(fields: [userId], references: [id])
   userId  String
-  companyBeCommented String
+  company Company @relation(fields: [companyId],references:[id])
+  companyId String
 }
 
 model Comment_Property{
   id        String      @default(uuid()) @id
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  content   String?
+  content   String
   user    User     @relation(fields: [userId], references: [id])
   userId  String
-  propertyBeCommented String
+  property Property @relation(fields: [propertyId],references:[id])
+  propertyId String
 }
 
 model Comment_Project{
   id        String      @default(uuid()) @id
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  content   String?
+  content   String
   user    User     @relation(fields: [userId], references: [id])
   userId  String
-  projectBeCommented String
+  project Project @relation(fields: [projectId],references:[id])
+  projectId String
 }
 
 model News {
@@ -125,7 +133,7 @@ model News {
   updatedAt DateTime @updatedAt
   title     String   @db.VarChar(255)
   content   String
-  author    Broker     @relation(fields: [authorId], references: [id])
+  author    Broker?  @relation(fields: [authorId], references: [id])
   authorId  String
 }
 
