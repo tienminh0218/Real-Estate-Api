@@ -20,7 +20,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
 
   await app.listen(PORT, () => {
-    Logger.log(`Listening on port: http://localhost/${PORT}/${GLOBAL_PREFIX}`);
+    Logger.log(`Listening on port: http://localhost:${PORT}/${GLOBAL_PREFIX}`);
   });
 }
 bootstrap();
