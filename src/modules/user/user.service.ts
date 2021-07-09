@@ -50,6 +50,7 @@ export class UserService {
           fullName,
           role,
         },
+
       });
     } catch (error) {
       this.logger.error(`${error.message}`);
