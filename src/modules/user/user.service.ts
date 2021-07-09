@@ -39,13 +39,13 @@ export class UserService {
 
   async createUser(data: Prisma.UserCreateInput): Promise<any> {
     try {
-      const { username, password, fullName } = data;
+      const { username, password, fullName , role} = data;
       const existedUser = await this.user({ username });
 
       if (existedUser) throw new Error('Username already exist');
 
       return this.prisma.user.create({
-        data: { username, password, fullName },
+        data: { username, password, fullName ,role},
       });
     } catch (error) {
       this.logger.error(`${error.message}`);
