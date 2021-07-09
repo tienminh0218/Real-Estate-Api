@@ -1,0 +1,131 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+
+model User {
+  id      	String      @default(uuid()) @id
+  username	String	@unique @db.VarChar(255)
+  password	String	@db.VarChar(255)
+  role		Int @default(0)
+  fullName    	String?	@db.VarChar(255)
+  broker  Broker?
+  company Company?
+  comments_project Comment_Project[]
+  comments_Broker   	Comment_Broker[]
+  comments_Company   	Comment_Company[]
+  comments_Property Comment_Property[]
+  properties	Property[]
+}
+
+model Broker{
+  id String @default(uuid()) @id
+  user User @relation(fields: [userId], references:[id])
+  userId String
+  district		String	@db.VarChar(255)
+  city	String	@db.VarChar(255)
+  properties	Property[]
+  news		News?
+}
+
+model Company{
+  id String @default(uuid()) @id
+  user User @relation(fields: [userId], references:[id])
+  userId String
+  companyName    	String?	@db.VarChar(255)
+  district		String	@db.VarChar(255)
+  city	String	@db.VarChar(255)
+  projects Project[]
+}
+
+model Category_Property{
+  id String @default(uuid()) @id
+  nameCategory String
+  properties Property[]
+}
+
+model Property{
+  id      	String      @default(uuid()) @id
+  category Category_Property @relation(fields: [categoryId],references:[id])
+  categoryId String
+  location  String
+  coordinates String
+  price   Int
+  status Int @default(0)
+  boughtBy String
+  broker    Broker     @relation(fields: [userId], references: [id])
+  brokerId  String
+  user    User?     @relation(fields: [userId], references: [id])
+  userId  String
+  project Project @relation(fields: [projectId],references:[id])
+  projectId String
+}
+
+model Project{
+  id String @default(uuid()) @id
+  projectName String @db.VarChar(255)
+  location  String
+  coordinates String
+  properties Property[]
+  company Company @relation(fields: [companyId],references:[id])
+  companyId String
+}
+
+model Comment_Broker {
+  id        String      @default(uuid()) @id
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  content   String
+  user    User     @relation(fields: [userId], references: [id])
+  userId  String
+  brokerBeCommented String
+}
+
+model Comment_Company {
+  id        String      @default(uuid()) @id
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  content   String
+  user    User     @relation(fields: [userId], references: [id])
+  userId  String
+  companyBeCommented String
+}
+
+model Comment_Property{
+  id        String      @default(uuid()) @id
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  content   String?
+  user    User     @relation(fields: [userId], references: [id])
+  userId  String
+  propertyBeCommented String
+}
+
+model Comment_Project{
+  id        String      @default(uuid()) @id
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  content   String?
+  user    User     @relation(fields: [userId], references: [id])
+  userId  String
+  projectBeCommented String
+}
+
+model News {
+  id      	String      @default(uuid()) @id
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  title     String   @db.VarChar(255)
+  content   String
+  author    Broker     @relation(fields: [authorId], references: [id])
+  authorId  String
+}
+
