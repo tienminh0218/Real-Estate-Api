@@ -18,7 +18,7 @@ export class NewsService {
         author: { connect: { id: id } },
       },
       include: {
-        author: true, // Include all posts in the returned object
+        author: true, // Include all author in the returned object
       },
     });
   }
