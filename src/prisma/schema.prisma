@@ -33,8 +33,8 @@ model Broker{
   district		String	@db.VarChar(255)
   city	String	@db.VarChar(255)
   properties	Property[]
+  news		News[]
   comments_Broker   	Comment_Broker[]
-  news		News?
 }
 
 model Company{
@@ -133,7 +133,7 @@ model News {
   updatedAt DateTime @updatedAt
   title     String   @db.VarChar(255)
   content   String
-  author    Broker?  @relation(fields: [authorId], references: [id])
+  author    Broker?     @relation(fields: [authorId], references: [id])
   authorId  String
 }
 
