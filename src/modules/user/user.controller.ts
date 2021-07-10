@@ -20,21 +20,19 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get('get-all')
+  @HttpCode(200)
   async getUsers(): Promise<User[]> {
     return await this.userService.users({});
   }
 
   @Get(':id')
+  @HttpCode(200)
   async getUserById(@Param('id') id: string): Promise<User> {
     return await this.userService.user({ id });
   }
 
-  @Post()
-  async createUser(@Body() payload: CreateUserDto): Promise<User> {
-    return this.userService.createUser(payload);
-  }
-
   @Put(':id')
+  @HttpCode(204)
   async updateUserById(
     @Param('id') id: string,
     @Body() payload: UpdateUserDto,
