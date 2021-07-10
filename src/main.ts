@@ -6,7 +6,7 @@ import { Logger } from '@nestjs/common';
 
 async function bootstrap() {
   const PORT = process.env.PORT || 3000;
-  const GLOBAL_PREFIX = process.env.GLOBAL_PREFIX;
+  const GLOBAL_PREFIX = process.env.GLOBAL_PREFIX || 'api';
 
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix(GLOBAL_PREFIX);

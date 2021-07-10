@@ -3,11 +3,13 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   Param,
   Post,
   Put,
   Res,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { UserService } from './user.service';
 import { User } from '@prisma/client';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -41,9 +43,12 @@ export class UserController {
   }
 
   @Delete(':id')
-  async deleteUserById(@Param('id') id: string, @Res() res): Promise<any> {
+  @HttpCode(204)
+  async deleteUserById(
+    @Param('id') id: string,
+    @Res() res: Response,
+  ): Promise<any> {
     const result = await this.userService.deleteUser({ id });
-    if (result)
-      return res.json({ statusCode: 204, message: 'Deleted success' });
+    if (result) return res.json({});
   }
 }

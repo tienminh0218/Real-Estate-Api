@@ -1,12 +1,9 @@
-import {
-  BadRequestException,
-  HttpException,
-  Injectable,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from './../prisma/prisma.service';
 import { User, Prisma } from '@prisma/client';
+import { hashPassword } from '../../utils/hash-password';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
@@ -37,15 +34,23 @@ export class UserService {
     });
   }
 
-  async createUser(data: Prisma.UserCreateInput): Promise<any> {
+  async createUser(data: CreateUserDto): Promise<any> {
     try {
-      const { username, password, fullName } = data;
+      const { username, password: rawPassword, fullName, role } = data;
       const existedUser = await this.user({ username });
 
       if (existedUser) throw new Error('Username already exist');
 
+      const passwordHashed = await hashPassword(rawPassword);
+
       return this.prisma.user.create({
-        data: { username, password, fullName },
+        data: {
+          username,
+          password: passwordHashed,
+          fullName,
+          role,
+        },
+
       });
     } catch (error) {
       this.logger.error(`${error.message}`);
@@ -55,7 +60,7 @@ export class UserService {
 
   async updateUser(params: {
     where: Prisma.UserWhereUniqueInput;
-    data: Prisma.UserUpdateInput;
+    data: UpdateUserDto;
   }): Promise<User> {
     try {
       const { where, data } = params;
