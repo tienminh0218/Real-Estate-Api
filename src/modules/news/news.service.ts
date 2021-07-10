@@ -9,18 +9,28 @@ export class NewsService {
     private readonly logger: Logger,
   ) {}
 
-  createNews(data: Prisma.NewsCreateInput, id: string): Promise<any> {
-    const { title, content } = data;
-    return this.prismaService.news.create({
-      data: {
-        title: title,
-        content: content,
-        author: { connect: { id: id } },
-      },
-      include: {
-        author: true, // Include all posts in the returned object
-      },
-    });
+  async createNews(data: Prisma.NewsCreateInput, id: string): Promise<any> {
+    try {
+      const { title, content } = data;
+      const news = await this.prismaService.news.create({
+        data: {
+          title: title,
+          content: content,
+          author: { connect: { id: id } },
+        },
+        include: {
+          author: true,
+        },
+      });
+
+      return news;
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          throw new BadRequestException('Author not found');
+        }
+      }
+    }
   }
 
   getAllNews(): Promise<News[]> {
