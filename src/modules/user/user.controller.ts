@@ -31,11 +31,11 @@ export class UserController {
     return await this.userService.user({ id });
   }
 
-  @Post()
-  @HttpCode(201)
-  async createUser(@Body() payload: CreateUserDto): Promise<User> {
-    return this.userService.createUser(payload);
-  }
+  // @Post()
+  // @HttpCode(201)
+  // async createUser(@Body() payload: CreateUserDto): Promise<User> {
+  //   return this.userService.createUser(payload);
+  // }
 
   @Put(':id')
   @HttpCode(204)
