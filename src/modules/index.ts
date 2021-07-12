@@ -1,8 +1,8 @@
-import { CommentModule } from './comment/comment.module';
-import { NewsModule } from './news/news.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
+import { NewsModule } from './news/news.module';
+import { CommentModule } from './comment/comment.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { UserModule } from './user/user.module';
 import { ProjectsModule } from './projects/projects.module';
@@ -19,6 +19,7 @@ import { PropertyModule } from './property/property.module';
     CommentModule,
     AuthModule,
     PropertyModule,
+    CommentModule,
   ],
 })
 export class AppModule {}

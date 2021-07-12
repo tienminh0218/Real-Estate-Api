@@ -18,6 +18,8 @@ model User {
   password	String	@db.VarChar(255)
   role		Int @default(0)
   fullName    	String?	@db.VarChar(255)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   broker  Broker?
   company Company?
   comments_project Comment_Project[]

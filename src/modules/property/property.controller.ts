@@ -29,7 +29,7 @@ export class PropertyController {
 
   @Post()
   async createProperty(@Body() payload: CreatePropertyDto): Promise<Property> {
-    return this.propertyService.createProperty(payload);
+    return this.propertyService.createProperty(payload, true);
   }
 
   @Put(':id')

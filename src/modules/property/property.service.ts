@@ -35,8 +35,17 @@ export class PropertyService {
     });
   }
 
-  async createProperty(payload: CreatePropertyDto): Promise<Property> {
+  async createProperty(
+    payload: CreatePropertyDto,
+    isInclude: boolean,
+  ): Promise<Property> {
     const { categoryId, brokerId, projectId, ...data } = payload;
+
+    const include = {
+      category: isInclude,
+      broker: isInclude,
+      project: isInclude,
+    };
 
     return this.prismaService.property.create({
       data: {
@@ -45,6 +54,7 @@ export class PropertyService {
         broker: { connect: { id: brokerId } },
         project: { connect: { id: projectId } },
       },
+      include,
     });
   }
 

@@ -7,12 +7,12 @@ import {
   Param,
   Post,
   Put,
+  Query,
   Res,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { UserService } from './user.service';
 import { User } from '@prisma/client';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('user')
@@ -21,8 +21,8 @@ export class UserController {
 
   @Get('get-all')
   @HttpCode(200)
-  async getUsers(): Promise<User[]> {
-    return await this.userService.users({});
+  async getUsers(@Query() opionalPag): Promise<User[]> {
+    return await this.userService.users({}, opionalPag);
   }
 
   @Get(':id')

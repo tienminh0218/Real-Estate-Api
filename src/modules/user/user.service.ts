@@ -4,6 +4,7 @@ import { User, Prisma } from '@prisma/client';
 import { hashPassword } from '../../utils/hash-password';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { PaginationType } from '../../utils/pagination-optional';
 
 @Injectable()
 export class UserService {
@@ -14,24 +15,38 @@ export class UserService {
   ): Promise<User | null> {
     return this.prisma.user.findUnique({
       where: userWhereUniqueInput,
+      include: {
+        company: true,
+      },
     });
   }
 
-  async users(params: {
-    skip?: number;
-    take?: number;
-    cursor?: Prisma.UserWhereUniqueInput;
-    where?: Prisma.UserWhereInput;
-    orderBy?: Prisma.UserOrderByInput;
-  }): Promise<User[]> {
-    const { skip, take, cursor, where, orderBy } = params;
-    return this.prisma.user.findMany({
-      skip,
-      take,
-      cursor,
-      where,
-      orderBy,
-    });
+  async users(
+    params: {
+      where?: Prisma.UserWhereInput;
+    },
+    optionalPag: PaginationType<
+      Prisma.UserWhereUniqueInput,
+      Prisma.UserOrderByInput
+    >,
+  ): Promise<User[]> {
+    try {
+      const { where } = params;
+      const { skip, take, cursor, orderBy } = optionalPag;
+
+      return this.prisma.user.findMany({
+        skip: Number(skip) || undefined,
+        take: Number(take) || undefined,
+        cursor,
+        where,
+        orderBy,
+        include: {
+          company: true,
+        },
+      });
+    } catch (error) {
+      this.logger.error(error.message);
+    }
   }
 
   async createUser(data: CreateUserDto): Promise<any> {
@@ -50,7 +65,6 @@ export class UserService {
           fullName,
           role,
         },
-
       });
     } catch (error) {
       this.logger.error(`${error.message}`);
