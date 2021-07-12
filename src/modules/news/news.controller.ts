@@ -5,6 +5,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   Param,
   Post,
   Put,
@@ -34,6 +35,7 @@ export class NewsController {
     return this.newsService.updateNews(data, { id });
   }
 
+  @HttpCode(204)
   @Delete('/:id')
   deleteNews(@Param('id') id: string) {
     return this.newsService.deleteNews({ id });
