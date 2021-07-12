@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { Prisma, Company } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { CreateCompanyDto } from './dto/create-company.dto';
 
 @Injectable()
 export class CompaniesService {
@@ -16,7 +17,7 @@ export class CompaniesService {
         })
     }
 
-    async createCompany(id: string, data: Prisma.CompanyCreateInput): Promise<any> {
+    async createCompany(id: string, data: CreateCompanyDto): Promise<any> {
         try {
             const { companyName, district, city } = data;
             const existCompanyName = await this.company({ companyName })
