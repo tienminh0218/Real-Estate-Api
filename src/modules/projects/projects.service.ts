@@ -2,6 +2,7 @@
 import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Project, Company, Prisma } from '@prisma/client';
+import { CreateProjectDto } from './dto/create-project.dto';
 
 @Injectable()
 export class ProjectsService {
@@ -16,7 +17,7 @@ export class ProjectsService {
     })
   }
 
-  async createProject(data: Prisma.ProjectCreateInput, id: string): Promise<any> {
+  async createProject(data: CreateProjectDto, id: string): Promise<any> {
     try {
       const { projectName, district, city } = data;
       const existProjectName = await this.project({ projectName })
