@@ -7,6 +7,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { UserModule } from './user/user.module';
 import { ProjectsModule } from './projects/projects.module';
 import { AuthModule } from './auth/auth.module';
+import { CompaniesModule } from './companies/companies.module';
 import { PropertyModule } from './property/property.module';
 
 @Module({
@@ -18,8 +19,8 @@ import { PropertyModule } from './property/property.module';
     NewsModule,
     CommentModule,
     AuthModule,
+    CompaniesModule,
     PropertyModule,
-    CommentModule,
   ],
 })
 export class AppModule {}
