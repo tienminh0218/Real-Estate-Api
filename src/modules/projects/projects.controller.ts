@@ -8,34 +8,43 @@ import {
   Put,
   Delete,
 } from '@nestjs/common';
-import {
-  Project as ProjectModel,
-  Company as CompanyModel,
-} from '@prisma/client';
+import { Project as ProjectModel, Company as CompanyModel } from '@prisma/client';
+import { CreateProjectDto } from './dto/create-project.dto';
 
 @Controller('projects')
 export class ProjectsController {
-  constructor(private readonly projectsService: ProjectsService) {}
+  constructor(private readonly projectsService: ProjectsService) { }
+
+  @Post(':id')
+  async createProject(@Body() data: CreateProjectDto, @Param('id') id: string) {
+    return this.projectsService.createProject(data, id);
+  }
+
+  @Put(':id')
+  async updateProjectById(
+    @Param('id') id: string,
+    @Body() payload: CreateProjectDto,
+  ): Promise<ProjectModel> {
+    return await this.projectsService.updateProject({ where: { id }, data: payload });
+  }
+
+  @Delete('/:id')
+  async deleteProject(@Param('id') id: string): Promise<ProjectModel> {
+    return this.projectsService.deleteProject({ id });
+  }
 
   @Get('infoComp/:id')
   async infoCom(@Param('id') id: string): Promise<CompanyModel> {
-    return this.projectsService.info_comp(id);
+    return this.projectsService.infoComp(id);
   }
 
-  // @Post('createCom')
-  // async createcom(@Body() dataComp: CompanyModel): Promise <CompanyModel>{
-  //     return this.projectsService.createComp(dataComp);
-  // }
-  // @Post('createPro')
-  // async createpro(@Body() dataPro: ProjectModel): Promise <ProjectModel>{
-  //     return this.projectsService.createProj(dataPro);
-  // }
   @Get('listProject/:id')
-  async list_project(@Param('id') id: string): Promise<ProjectModel[]> {
-    return this.projectsService.list_project(id);
+  async listProject(@Param('id') id: string): Promise<ProjectModel[]> {
+    return this.projectsService.listProject(id);
   }
+
   @Get('listProjectCity/:city')
   async listProjectCity(@Param('city') city: string): Promise<ProjectModel[]> {
-    return this.projectsService.list_project_city(city);
+    return this.projectsService.listProjectCity(city);
   }
 }
