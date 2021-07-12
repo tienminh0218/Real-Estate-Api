@@ -1,3 +1,4 @@
+import { CommentModule } from './comment/comment.module';
 import { NewsModule } from './news/news.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
@@ -14,6 +15,7 @@ import { AuthModule } from './auth/auth.module';
     UserModule,
     ProjectsModule,
     NewsModule,
+    CommentModule,
     AuthModule,
   ],
 })
