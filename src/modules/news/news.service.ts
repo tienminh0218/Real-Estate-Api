@@ -73,7 +73,7 @@ export class NewsService {
     try {
       const existedNews = await this.getNewsById(where);
       if (!existedNews) throw new Error('News not found');
-      this.prismaService.news.delete({ where });
+      await this.prismaService.news.delete({ where });
     } catch (error) {
       this.logger.error(`${error.message}`);
       throw new BadRequestException(error.message);

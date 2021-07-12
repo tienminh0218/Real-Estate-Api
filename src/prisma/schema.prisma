@@ -68,7 +68,7 @@ model Property{
   broker    Broker     @relation(fields: [brokerId], references: [id])
   brokerId  String
   user    User?     @relation(fields: [userId], references: [id])
-  userId  String
+  userId  String?
   project Project @relation(fields: [projectId],references:[id])
   projectId String
 }
