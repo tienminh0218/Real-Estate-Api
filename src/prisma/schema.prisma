@@ -63,12 +63,11 @@ model Property{
   coordinates String
   price   Int
   status Int @default(0)
-  boughtBy String
   comments_Property Comment_Property[]
   broker    Broker     @relation(fields: [brokerId], references: [id])
   brokerId  String
   user    User?     @relation(fields: [userId], references: [id])
-  userId  String
+  userId  String?
   project Project @relation(fields: [projectId],references:[id])
   projectId String
 }
