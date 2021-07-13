@@ -9,8 +9,6 @@ export class CompaniesController {
         private companiesService: CompaniesService,
     ) { }
 
-
-
     @Post('/:id')
     async createProject(@Body() data: CreateCompanyDto, @Param('id') id: string): Promise<any> {
         return this.companiesService.createCompany(id, data);
