@@ -7,13 +7,14 @@ import {
   Param,
   Post,
   Put,
+  Query,
   Res,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { UserService } from './user.service';
 import { User } from '@prisma/client';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { IncludeUserType } from '../../utils/optional-query';
 
 @Controller('user')
 export class UserController {
@@ -21,18 +22,17 @@ export class UserController {
 
   @Get('get-all')
   @HttpCode(200)
-  async getUsers(): Promise<User[]> {
-    return await this.userService.users({});
+  async getUsers(@Query() optional: IncludeUserType): Promise<User[] | null> {
+    return await this.userService.users({}, optional);
   }
 
   @Get(':id')
   @HttpCode(200)
-  async getUserById(@Param('id') id: string): Promise<User> {
-    return await this.userService.user({ id });
+  async getUserById(@Param('id') id: string, @Query() optional): Promise<User> {
+    return await this.userService.user({ id }, optional);
   }
 
   @Put(':id')
-  @HttpCode(204)
   async updateUserById(
     @Param('id') id: string,
     @Body() payload: UpdateUserDto,

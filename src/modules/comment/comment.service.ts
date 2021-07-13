@@ -8,7 +8,6 @@ import {
 import { PrismaService } from './../prisma/prisma.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { Injectable, Logger, BadRequestException } from '@nestjs/common';
-import { check } from 'prettier';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 
 @Injectable()
