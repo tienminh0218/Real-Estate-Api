@@ -5,7 +5,6 @@ import {
   Get,
   HttpCode,
   Param,
-  Post,
   Put,
   Query,
   Res,
@@ -14,7 +13,6 @@ import { Response } from 'express';
 import { UserService } from './user.service';
 import { User } from '@prisma/client';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { IncludeUserType } from '../../utils/optional-query';
 
 @Controller('user')
 export class UserController {

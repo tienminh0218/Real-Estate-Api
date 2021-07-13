@@ -1,16 +1,4 @@
-export interface IncludeUserType {
-  broker?: boolean;
-  company?: boolean;
-  comments_project?: boolean;
-  comments_Broker?: boolean;
-  comments_Company?: boolean;
-  comments_Property?: boolean;
-  properties?: boolean;
-
-  length: () => number;
-}
-
-export interface PaginationType<X, Y> extends IncludeUserType {
+export interface PaginationType<X, Y> {
   skip?: number;
   take?: number;
   cursor?: X;

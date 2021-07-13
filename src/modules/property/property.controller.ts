@@ -8,6 +8,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { Property } from '@prisma/client';
 import { UpdatePropertyDto } from './dto/update-property.dto';
@@ -18,18 +19,21 @@ export class PropertyController {
   constructor(private readonly propertyService: PropertyService) {}
 
   @Get('get-all')
-  async getAllProperty(): Promise<Property[]> {
-    return await this.propertyService.propertys({});
+  async getAllProperty(@Query() optional): Promise<Property[]> {
+    return await this.propertyService.propertys({}, optional);
   }
 
   @Get(':id')
-  async getPropertyById(@Param('id') id: string): Promise<Property> {
-    return await this.propertyService.property({ id });
+  async getPropertyById(
+    @Param('id') id: string,
+    @Query() optional,
+  ): Promise<Property> {
+    return await this.propertyService.property({ id }, optional);
   }
 
   @Post()
   async createProperty(@Body() payload: CreatePropertyDto): Promise<Property> {
-    return this.propertyService.createProperty(payload, true);
+    return await this.propertyService.createProperty(payload);
   }
 
   @Put(':id')

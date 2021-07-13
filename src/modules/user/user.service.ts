@@ -5,10 +5,8 @@ import { hashPassword } from '../../utils/hash-password';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PaginationType } from '../../utils/optional-query';
-import {
-  convertBooleanObject,
-  IncludeUserType,
-} from '../../utils/optional-query';
+import { convertBooleanObject } from '../../utils/optional-query';
+import { IncludeUserType } from './types/Include-user.type';
 
 @Injectable()
 export class UserService {
@@ -38,7 +36,7 @@ export class UserService {
 
   async user(
     userWhereUniqueInput: Prisma.UserWhereUniqueInput,
-    optional: IncludeUserType = {} as IncludeUserType,
+    optional = {},
   ): Promise<User | null> {
     try {
       const include = this.getIncludeUser(optional);
@@ -57,7 +55,7 @@ export class UserService {
     params: {
       where?: Prisma.UserWhereInput;
     },
-    optional: PaginationType<
+    optional: IncludeUserType<
       Prisma.UserWhereUniqueInput,
       Prisma.UserOrderByInput
     >,
