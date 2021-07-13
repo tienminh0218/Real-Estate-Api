@@ -4,35 +4,69 @@ import { User, Prisma } from '@prisma/client';
 import { hashPassword } from '../../utils/hash-password';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { PaginationType } from '../../utils/pagination-optional';
+import { PaginationType } from '../../utils/optional-query';
+import {
+  convertBooleanObject,
+  IncludeUserType,
+} from '../../utils/optional-query';
 
 @Injectable()
 export class UserService {
   constructor(private prisma: PrismaService, private readonly logger: Logger) {}
 
+  getIncludeUser(obj: any) {
+    const {
+      broker,
+      company,
+      comments_project,
+      comments_Broker,
+      comments_Company,
+      comments_Property,
+      properties,
+    } = obj;
+
+    return convertBooleanObject({
+      broker,
+      company,
+      comments_project,
+      comments_Broker,
+      comments_Company,
+      comments_Property,
+      properties,
+    });
+  }
+
   async user(
     userWhereUniqueInput: Prisma.UserWhereUniqueInput,
+    optional: IncludeUserType = {} as IncludeUserType,
   ): Promise<User | null> {
-    return this.prisma.user.findUnique({
-      where: userWhereUniqueInput,
-      include: {
-        company: true,
-      },
-    });
+    try {
+      const include = this.getIncludeUser(optional);
+
+      return this.prisma.user.findUnique({
+        where: userWhereUniqueInput,
+        include,
+      });
+    } catch (error) {
+      this.logger.error(error.message);
+      throw new BadRequestException(error.message);
+    }
   }
 
   async users(
     params: {
       where?: Prisma.UserWhereInput;
     },
-    optionalPag: PaginationType<
+    optional: PaginationType<
       Prisma.UserWhereUniqueInput,
       Prisma.UserOrderByInput
     >,
   ): Promise<User[]> {
     try {
       const { where } = params;
-      const { skip, take, cursor, orderBy } = optionalPag;
+      const { skip, take, cursor, orderBy, ...rest } = optional;
+
+      const include = this.getIncludeUser(rest);
 
       return this.prisma.user.findMany({
         skip: Number(skip) || undefined,
@@ -40,12 +74,11 @@ export class UserService {
         cursor,
         where,
         orderBy,
-        include: {
-          company: true,
-        },
+        include,
       });
     } catch (error) {
       this.logger.error(error.message);
+      throw new BadRequestException(error.message);
     }
   }
 
@@ -82,8 +115,13 @@ export class UserService {
 
       if (!existedUser) throw new Error('Accout Not Found');
 
+      const passwordHashed = await hashPassword(data.password);
+
       return this.prisma.user.update({
-        data,
+        data: {
+          ...data,
+          password: passwordHashed,
+        },
         where,
       });
     } catch (error) {

@@ -4,6 +4,7 @@ import {
   MaxLength,
   MinLength,
   IsNumber,
+  Matches,
 } from 'class-validator';
 
 export class UpdateUserDto {
@@ -15,4 +16,13 @@ export class UpdateUserDto {
   @IsNumber()
   @IsOptional()
   role?: number;
+
+  @IsString()
+  @MinLength(4)
+  @MaxLength(20)
+  @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
+    message: 'password to weak',
+  })
+  @IsOptional()
+  password?: string;
 }

@@ -50,6 +50,7 @@ export class PropertyService {
     return this.prismaService.property.create({
       data: {
         ...data,
+        status: 1,
         category: { connect: { id: categoryId } },
         broker: { connect: { id: brokerId } },
         project: { connect: { id: projectId } },

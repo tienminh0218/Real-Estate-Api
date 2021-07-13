@@ -61,7 +61,6 @@ model Property {
   coordinates       String
   price             Int
   status            Int                @default(0)
-  boughtBy          String
   comments_Property Comment_Property[]
   broker            Broker             @relation(fields: [brokerId], references: [id])
   brokerId          String
