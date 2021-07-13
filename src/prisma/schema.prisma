@@ -38,7 +38,7 @@ model Broker {
 
 model Company {
   id               String            @id @default(uuid())
-  user             User              @relation(fields: [userId], references: [id])
+  user             User?             @relation(fields: [userId], references: [id])
   userId           String
   companyName      String?           @unique @db.VarChar(255)
   district         String            @db.VarChar(255)
@@ -78,7 +78,7 @@ model Project {
   city             String            @db.VarChar(255)
   properties       Property[]
   comments_project Comment_Project[]
-  company          Company           @relation(fields: [companyId], references: [id])
+  company          Company?          @relation(fields: [companyId], references: [id])
   companyId        String
 }
 
