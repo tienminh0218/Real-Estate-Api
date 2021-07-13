@@ -22,7 +22,7 @@ export class UserController {
 
   @Get('get-all')
   @HttpCode(200)
-  async getUsers(@Query() optional: IncludeUserType): Promise<User[] | null> {
+  async getUsers(@Query() optional): Promise<User[] | null> {
     return await this.userService.users({}, optional);
   }
 
