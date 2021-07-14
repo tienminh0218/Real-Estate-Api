@@ -42,19 +42,18 @@ export class CategoryPropertyService {
         return this.prisma.categoryProperty.findMany();
     }
 
-    async createCategoryProperty(data: CreateCategoryPropertyDto, id: string): Promise<any> {
+    async createCategoryProperty(data: CreateCategoryPropertyDto): Promise<any> {
         try {
             const { nameCategory } = data;
             const existNameCategory = await this.categoryProperty({ nameCategory });
             if (existNameCategory) throw new Error('NameCategory already exist');
             return this.prisma.categoryProperty.create({
                 data: {
-                    nameCategory,
-                    user: { connect: { id: id } },
+                    nameCategory
                 },
-                include: {
-                    user: true,
-                },
+                // include: {
+                //     user: true,
+                // },
             });
         } catch (error) {
             this.logger.error(`${error.message}`);
