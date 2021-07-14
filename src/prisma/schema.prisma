@@ -60,8 +60,6 @@ model categoryProperty {
   updatedAt    DateTime   @updatedAt
   nameCategory String     @unique @db.VarChar(255)
   properties   Property[]
-  User         User?      @relation(fields: [userId], references: [id])
-  userId       String?
 }
 
 model Property {
