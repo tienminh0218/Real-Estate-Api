@@ -9,6 +9,7 @@ import { ProjectsModule } from './projects/projects.module';
 import { AuthModule } from './auth/auth.module';
 import { CompaniesModule } from './companies/companies.module';
 import { PropertyModule } from './property/property.module';
+import {CategoryPropertyModule} from './categoryProperty/categoryproperty.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { PropertyModule } from './property/property.module';
     AuthModule,
     CompaniesModule,
     PropertyModule,
+    CategoryPropertyModule
   ],
 })
 export class AppModule {}
