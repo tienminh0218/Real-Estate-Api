@@ -298,7 +298,7 @@ FakesAssemblies/
 # Node.js Tools for Visual Studio
 .ntvs_analysis.dat
 node_modules/
-src/prisma/migrations
+src/prisma/migrations/
 
 # Typescript v1 declaration files
 typings/

@@ -14,11 +14,11 @@ import { Property } from '@prisma/client';
 import { UpdatePropertyDto } from './dto/update-property.dto';
 import { CreatePropertyDto } from './dto/create-property.dto';
 
-@Controller('property')
+@Controller('properties')
 export class PropertyController {
   constructor(private readonly propertyService: PropertyService) {}
 
-  @Get('get-all')
+  @Get()
   async getAllProperty(@Query() optional): Promise<Property[]> {
     return await this.propertyService.propertys({}, optional);
   }
@@ -29,6 +29,16 @@ export class PropertyController {
     @Query() optional,
   ): Promise<Property> {
     return await this.propertyService.property({ id }, optional);
+  }
+
+  @Get('user/:id')
+  async getPropertiesUser(@Param('id') id: string): Promise<any> {
+    return await this.propertyService.getPropertiesOfUser(id);
+  }
+
+  @Get('project/:id')
+  async getPropertiesProject(@Param('id') id: string): Promise<any> {
+    return await this.propertyService.getPropertiesOfProject(id);
   }
 
   @Post()

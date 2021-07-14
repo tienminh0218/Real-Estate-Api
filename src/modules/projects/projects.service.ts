@@ -9,9 +9,11 @@ export class ProjectsService {
 
   async project(
     projectWhereUniqueInput: Prisma.ProjectWhereUniqueInput,
+    include = undefined,
   ): Promise<Project | null> {
     return this.prisma.project.findUnique({
       where: projectWhereUniqueInput,
+      include,
     });
   }
 

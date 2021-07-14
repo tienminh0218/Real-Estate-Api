@@ -4,42 +4,38 @@ import { User, Prisma } from '@prisma/client';
 import { hashPassword } from '../../utils/hash-password';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { PaginationType } from '../../utils/optional-query';
-import { convertBooleanObject } from '../../utils/optional-query';
-import { IncludeUserType } from './types/Include-user.type';
+import { generateIncludeQuery } from '../../utils/generate-include';
+import {
+  OptionalQueryUsers,
+  OptionalQueryUser,
+} from './types/optional-query.type';
 
 @Injectable()
 export class UserService {
   constructor(private prisma: PrismaService, private readonly logger: Logger) {}
 
-  getIncludeUser(obj: any) {
-    const {
-      broker,
-      company,
-      comments_project,
-      comments_Broker,
-      comments_Company,
-      comments_Property,
-      properties,
-    } = obj;
+  getIncludeUser(listIncludeQuery: string[]) {
+    if (!listIncludeQuery) return;
 
-    return convertBooleanObject({
-      broker,
-      company,
-      comments_project,
-      comments_Broker,
-      comments_Company,
-      comments_Property,
-      properties,
-    });
+    const listRelation = [
+      'broker',
+      'company',
+      'comments_project',
+      'comments_Broker',
+      'comments_Company',
+      'comments_Property',
+      'properties',
+    ];
+
+    return generateIncludeQuery(listRelation, listIncludeQuery);
   }
 
   async user(
     userWhereUniqueInput: Prisma.UserWhereUniqueInput,
-    optional = {},
+    optional: OptionalQueryUser = {},
   ): Promise<User | null> {
     try {
-      const include = this.getIncludeUser(optional);
+      const include = this.getIncludeUser(optional?.include?.split(','));
 
       return this.prisma.user.findUnique({
         where: userWhereUniqueInput,
@@ -55,16 +51,16 @@ export class UserService {
     params: {
       where?: Prisma.UserWhereInput;
     },
-    optional: IncludeUserType<
+    optional: OptionalQueryUsers<
       Prisma.UserWhereUniqueInput,
       Prisma.UserOrderByInput
-    >,
+    > = {},
   ): Promise<User[]> {
     try {
       const { where } = params;
       const { skip, take, cursor, orderBy, ...rest } = optional;
 
-      const include = this.getIncludeUser(rest);
+      const include = this.getIncludeUser(rest?.include?.split(','));
 
       return this.prisma.user.findMany({
         skip: Number(skip) || undefined,

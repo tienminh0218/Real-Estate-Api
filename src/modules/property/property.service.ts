@@ -1,28 +1,47 @@
+import { ProjectsService } from './../projects/projects.service';
+import { UserService } from './../user/user.service';
 import { PrismaService } from './../prisma/prisma.service';
-import { Injectable, Logger, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  BadRequestException,
+  Inject,
+  forwardRef,
+} from '@nestjs/common';
 import { Prisma, Property } from '@prisma/client';
 import { CreatePropertyDto } from './dto/create-property.dto';
-import { convertBooleanObject } from '../../utils/optional-query';
-import { IncludePropertyType } from './types/include-property.type.';
+import { generateIncludeQuery } from '../../utils/generate-include';
+import {
+  OptionalQueryProperties,
+  OptionalQueryProperty,
+} from './types/optional-query.type';
+import { UpdatePropertyDto } from './dto/update-property.dto';
 
 @Injectable()
 export class PropertyService {
   constructor(
+    @Inject(forwardRef(() => UserService))
+    private readonly userService: UserService,
+    @Inject(forwardRef(() => ProjectsService))
+    private readonly projectsService: ProjectsService,
     private readonly prismaService: PrismaService,
     private readonly logger: Logger,
   ) {}
 
-  getIncludeProperty(obj) {
-    const { category, comments_Property, broker, user } = obj;
-    return convertBooleanObject({ category, comments_Property, broker, user });
+  getIncludeProperty(listIncludeQuery: string[]) {
+    if (!listIncludeQuery) return;
+
+    const listRelation = ['category', 'comments_Property', 'broker', 'user'];
+
+    return generateIncludeQuery(listRelation, listIncludeQuery);
   }
 
   async property(
     propertyWhereUniqueInput: Prisma.PropertyWhereUniqueInput,
-    optional = {},
+    optional: OptionalQueryProperty = {},
   ): Promise<Property | null> {
     try {
-      const include = this.getIncludeProperty(optional);
+      const include = this.getIncludeProperty(optional?.include?.split(','));
 
       return this.prismaService.property.findUnique({
         where: propertyWhereUniqueInput,
@@ -38,7 +57,7 @@ export class PropertyService {
     params: {
       where?: Prisma.PropertyWhereInput;
     },
-    optional: IncludePropertyType<
+    optional: OptionalQueryProperties<
       Prisma.PropertyWhereUniqueInput,
       Prisma.PropertyOrderByInput
     > = {},
@@ -46,11 +65,11 @@ export class PropertyService {
     try {
       const { where } = params;
       const { skip, take, cursor, orderBy } = optional;
-      const include = this.getIncludeProperty(optional);
+      const include = this.getIncludeProperty(optional?.include?.split(','));
 
       return this.prismaService.property.findMany({
-        skip,
-        take,
+        skip: Number(skip) || undefined,
+        take: Number(take) || undefined,
         cursor,
         where,
         orderBy,
@@ -62,36 +81,76 @@ export class PropertyService {
     }
   }
 
+  async getPropertiesOfUser(id: string) {
+    try {
+      return this.userService.user({ id }, { include: 'properties' });
+    } catch (error) {
+      this.logger.error(error.message);
+      throw new BadRequestException(error);
+    }
+  }
+
+  async getPropertiesOfProject(id: string) {
+    return this.projectsService.project({ id }, { properties: true });
+  }
+
   async createProperty(payload: CreatePropertyDto): Promise<Property> {
     try {
       const { categoryId, brokerId, projectId, location, coordinates, price } =
         payload;
 
-      return this.prismaService.property.create({
+      const result = await this.prismaService.property.create({
         data: {
           location,
           coordinates,
           price,
-          status: 1,
           category: { connect: { id: categoryId } },
           broker: { connect: { id: brokerId } },
           project: { connect: { id: projectId } },
         },
       });
+
+      return result;
     } catch (error) {
-      this.logger.error(error);
+      this.logger.error(error.message);
+      if (error.code === 'P2025') {
+        throw new BadRequestException('Not found relationship');
+      }
     }
   }
 
   async updateProperty(params: {
     where: Prisma.PropertyWhereUniqueInput;
-    data: Prisma.PropertyUpdateInput;
+    data: UpdatePropertyDto;
   }): Promise<Property> {
-    const { where, data } = params;
-    return this.prismaService.property.update({
-      data,
-      where,
-    });
+    try {
+      const { where, data } = params;
+      const {
+        categoryId,
+        location,
+        coordinates,
+        price,
+        status,
+        brokerId,
+        userId,
+      } = data;
+
+      return this.prismaService.property.update({
+        where,
+        data: {
+          location,
+          coordinates,
+          price,
+          status,
+          category: categoryId && { connect: { id: categoryId } },
+          broker: brokerId && { connect: { id: brokerId } },
+          user: userId && { connect: { id: userId } },
+        },
+      });
+    } catch (error) {
+      this.logger.error(error.message);
+      throw new BadRequestException(error.message);
+    }
   }
 
   async deleteProperty(
