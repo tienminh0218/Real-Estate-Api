@@ -8,6 +8,7 @@ import { UserModule } from './user/user.module';
 import { ProjectsModule } from './projects/projects.module';
 import { AuthModule } from './auth/auth.module';
 import { CompaniesModule } from './companies/companies.module';
+import { CatePropertyModule } from './categoryProperty/categoryProperty.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { CompaniesModule } from './companies/companies.module';
     CommentModule,
     AuthModule,
     CompaniesModule,
+    CatePropertyModule
   ],
 })
 export class AppModule { }

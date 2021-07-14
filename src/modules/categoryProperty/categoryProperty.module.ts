@@ -9,4 +9,4 @@ import { CategoryPropertyService } from './categoryProperty.service';
     providers: [CategoryPropertyService, PrismaService, Logger],
     controllers: [CategoryPropertyController]
 })
-export class CompaniesModule { }
+export class CatePropertyModule { }
