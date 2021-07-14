@@ -8,15 +8,21 @@ import {
   Put,
   Delete,
 } from '@nestjs/common';
-import { Project as ProjectModel, Company as CompanyModel } from '@prisma/client';
+import {
+  Project as ProjectModel,
+  Company as CompanyModel,
+} from '@prisma/client';
 import { CreateProjectDto } from './dto/create-project.dto';
 
 @Controller('projects')
 export class ProjectsController {
-  constructor(private readonly projectsService: ProjectsService) { }
+  constructor(private readonly projectsService: ProjectsService) {}
 
   @Post(':id')
-  async createProject(@Body() data: CreateProjectDto, @Param('id') id: string): Promise<any> {
+  async createProject(
+    @Body() data: CreateProjectDto,
+    @Param('id') id: string,
+  ): Promise<any> {
     return this.projectsService.createProject(data, id);
   }
 
@@ -25,7 +31,10 @@ export class ProjectsController {
     @Param('id') id: string,
     @Body() payload: CreateProjectDto,
   ): Promise<ProjectModel> {
-    return await this.projectsService.updateProject({ where: { id }, data: payload });
+    return await this.projectsService.updateProject({
+      where: { id },
+      data: payload,
+    });
   }
 
   @Delete('/:id')
@@ -46,5 +55,10 @@ export class ProjectsController {
   @Get('listProjectCity/:city')
   async listProjectCity(@Param('city') city: string): Promise<ProjectModel[]> {
     return this.projectsService.listProjectCity(city);
+  }
+
+  @Get()
+  async getAllProject(): Promise<ProjectModel[]> {
+    return await this.projectsService.projects({});
   }
 }

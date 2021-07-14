@@ -23,12 +23,9 @@ export class PropertyController {
     return await this.propertyService.propertys({}, optional);
   }
 
-  @Get(':id')
-  async getPropertyById(
-    @Param('id') id: string,
-    @Query() optional,
-  ): Promise<Property> {
-    return await this.propertyService.property({ id }, optional);
+  @Get('priceAndLocation')
+  async filterProperties(@Query() data: any): Promise<any> {
+    return await this.propertyService.getRangeProperties(data);
   }
 
   @Get('user/:id')
@@ -39,6 +36,14 @@ export class PropertyController {
   @Get('project/:id')
   async getPropertiesProject(@Param('id') id: string): Promise<any> {
     return await this.propertyService.getPropertiesOfProject(id);
+  }
+
+  @Get(':id')
+  async getPropertyById(
+    @Param('id') id: string,
+    @Query() optional,
+  ): Promise<Property> {
+    return await this.propertyService.property({ id }, optional);
   }
 
   @Post()

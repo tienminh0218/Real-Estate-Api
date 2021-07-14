@@ -83,15 +83,44 @@ export class PropertyService {
 
   async getPropertiesOfUser(id: string) {
     try {
-      return this.userService.user({ id }, { include: 'properties' });
+      return this.userService.users({
+        where: { id },
+        include: { properties: true, broker: true },
+      });
     } catch (error) {
-      this.logger.error(error.message);
+      this.logger.error(error);
       throw new BadRequestException(error);
     }
   }
 
   async getPropertiesOfProject(id: string) {
-    return this.projectsService.project({ id }, { properties: true });
+    try {
+      return this.projectsService.projects({
+        where: { id },
+        include: { properties: true },
+      });
+    } catch (error) {
+      this.logger.error(error);
+      throw new BadRequestException(error);
+    }
+  }
+
+  async getRangeProperties(data: any) {
+    try {
+      const { gte, lte, location } = data;
+
+      return this.propertys({
+        where: {
+          AND: [
+            { price: { gte: Number(gte), lte: Number(lte) } },
+            { location },
+          ],
+        },
+      });
+    } catch (error) {
+      this.logger.error(error);
+      throw new BadRequestException(error);
+    }
   }
 
   async createProperty(payload: CreatePropertyDto): Promise<Property> {

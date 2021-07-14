@@ -12,7 +12,7 @@ import {
 
 @Injectable()
 export class UserService {
-  constructor(private prisma: PrismaService, private readonly logger: Logger) { }
+  constructor(private prisma: PrismaService, private readonly logger: Logger) {}
 
   getIncludeUser(listIncludeQuery: string[]) {
     if (!listIncludeQuery) return;
@@ -50,6 +50,11 @@ export class UserService {
   async users(
     params: {
       where?: Prisma.UserWhereInput;
+      // skip?: number;
+      // take?: number;
+      // cursor?: Prisma.UserWhereUniqueInput;
+      // orderBy?: Prisma.UserOrderByInput;
+      include?: Prisma.UserInclude;
     },
     optional: OptionalQueryUsers<
       Prisma.UserWhereUniqueInput,
@@ -60,7 +65,8 @@ export class UserService {
       const { where } = params;
       const { skip, take, cursor, orderBy, ...rest } = optional;
 
-      const include = this.getIncludeUser(rest?.include?.split(','));
+      const includeQuery = this.getIncludeUser(rest?.include?.split(','));
+      const include = params.include || includeQuery;
 
       return this.prisma.user.findMany({
         skip: Number(skip) || undefined,
