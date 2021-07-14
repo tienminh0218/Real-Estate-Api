@@ -5,7 +5,6 @@ import {
   Get,
   HttpCode,
   Param,
-  Post,
   Put,
   Query,
   Res,
@@ -14,13 +13,12 @@ import { Response } from 'express';
 import { UserService } from './user.service';
 import { User } from '@prisma/client';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { IncludeUserType } from '../../utils/optional-query';
 
-@Controller('user')
+@Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) { }
 
-  @Get('get-all')
+  @Get()
   @HttpCode(200)
   async getUsers(@Query() optional): Promise<User[] | null> {
     return await this.userService.users({}, optional);
