@@ -25,4 +25,13 @@ export class UpdatePropertyDto {
   @IsOptional()
   @IsNumber()
   status?: number;
+
+  @IsOptional()
+  userId?: string;
+
+  @IsOptional()
+  categoryId?: string;
+
+  @IsOptional()
+  brokerId?: string;
 }

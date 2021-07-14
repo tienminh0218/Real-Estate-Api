@@ -15,6 +15,27 @@ export class ProjectsService {
     });
   }
 
+  async projects(params: {
+    where?: Prisma.ProjectWhereInput;
+    skip?: number;
+    take?: number;
+    cursor?: Prisma.ProjectWhereUniqueInput;
+    orderBy?: Prisma.ProjectOrderByInput;
+    include?: Prisma.ProjectInclude;
+  }): Promise<Project[]> {
+    try {
+      const { where, include } = params;
+
+      return this.prisma.project.findMany({
+        where,
+        include,
+      });
+    } catch (error) {
+      this.logger.error(error);
+      throw new BadRequestException(error);
+    }
+  }
+
   async createProject(data: CreateProjectDto, id: string): Promise<any> {
     try {
       const { projectName, district, city } = data;

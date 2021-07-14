@@ -1,39 +1,40 @@
 import { Controller, Body, Get, Post, Param, Delete, Put } from '@nestjs/common';
 import { CategoryPropertyService } from './categoryProperty.service';
-import { categoryProperty } from '@prisma/client';
+import { categoryProperty, Company as CompanyModel } from '@prisma/client';
 import { CreateCategoryPropertyDto } from './dto/create-categoryProperty.dto';
 
 @Controller('category')
 export class CategoryPropertyController {
     constructor(
-        private categoryProService: CategoryPropertyService,
+        private categoryPropertyService: CategoryPropertyService,
     ) { }
 
-    @Post('/:id')
-    async createCategory(@Body() data: CreateCategoryPropertyDto): Promise<any> {
-        return this.categoryProService.createCategoryProperty(data);
-    }
-
     @Get()
-    getAllCategory(): Promise<categoryProperty[]> {
-        return this.categoryProService.getAllCategory();
+    getAllNews(): Promise<categoryProperty[]> {
+        return this.categoryPropertyService.getAllCategory();
     }
 
     @Get('/:id')
-    getCategoryById(@Param('id') id: string): Promise<categoryProperty> {
-        return this.categoryProService.getCategoryById({ id });
+    getNewsById(@Param('id') id: string): Promise<categoryProperty> {
+        return this.categoryPropertyService.getCategoryById({ id });
     }
+
+    @Post('/:id')
+    async createProject(@Body() data: CreateCategoryPropertyDto, @Param('id') id: string): Promise<any> {
+        return this.categoryPropertyService.createCategoryProperty(data, id);
+    }
+
     @Put(':id')
-    async updateCategoryById(
+    async updateCompanyById(
         @Param('id') id: string,
         @Body() payload: CreateCategoryPropertyDto,
     ): Promise<categoryProperty> {
-        return await this.categoryProService.updateCategory({ where: { id }, data: payload });
+        return await this.categoryPropertyService.updateCategory({ where: { id }, data: payload });
     }
 
     @Delete('/:id')
-    async deleteCategory(@Param('id') id: string): Promise<categoryProperty> {
-        return this.categoryProService.deleteCategory({ id });
+    async deleteCompany(@Param('id') id: string): Promise<categoryProperty> {
+        return this.categoryPropertyService.deleteCategory({ id });
     }
 
 
