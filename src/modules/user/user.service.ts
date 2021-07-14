@@ -12,7 +12,7 @@ import {
 
 @Injectable()
 export class UserService {
-  constructor(private prisma: PrismaService, private readonly logger: Logger) {}
+  constructor(private prisma: PrismaService, private readonly logger: Logger) { }
 
   getIncludeUser(listIncludeQuery: string[]) {
     if (!listIncludeQuery) return;

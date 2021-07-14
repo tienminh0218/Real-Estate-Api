@@ -8,6 +8,7 @@ import { UserModule } from './user/user.module';
 import { ProjectsModule } from './projects/projects.module';
 import { AuthModule } from './auth/auth.module';
 import { CompaniesModule } from './companies/companies.module';
+import { CatePropertyModule } from './categoryProperty/categoryProperty.module';
 import { PropertyModule } from './property/property.module';
 
 @Module({
@@ -21,6 +22,7 @@ import { PropertyModule } from './property/property.module';
     AuthModule,
     CompaniesModule,
     PropertyModule,
+    CatePropertyModule
   ],
 })
-export class AppModule {}
+export class AppModule { }

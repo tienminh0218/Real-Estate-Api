@@ -7,7 +7,7 @@ export class NewsService {
   constructor(
     private prismaService: PrismaService,
     private readonly logger: Logger,
-  ) {}
+  ) { }
 
   async createNews(data: Prisma.NewsCreateInput, id: string): Promise<any> {
     try {

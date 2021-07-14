@@ -16,7 +16,7 @@ export class ProjectsController {
   constructor(private readonly projectsService: ProjectsService) { }
 
   @Post(':id')
-  async createProject(@Body() data: CreateProjectDto, @Param('id') id: string) {
+  async createProject(@Body() data: CreateProjectDto, @Param('id') id: string): Promise<any> {
     return this.projectsService.createProject(data, id);
   }
 
