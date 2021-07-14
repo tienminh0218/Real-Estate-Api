@@ -5,20 +5,21 @@ import { CreateCompanyDto } from './dto/create-company.dto';
 
 @Injectable()
 export class CompaniesService {
-  constructor(private logger: Logger, private prisma: PrismaService) {}
+  constructor(
+    private logger: Logger,
+    private prisma: PrismaService,
+  ) { }
 
-  async company(
-    companyWhereUniqueInput: Prisma.CompanyWhereUniqueInput,
-  ): Promise<Company | null> {
+
+  async company(companyWhereUniqueInput: Prisma.CompanyWhereUniqueInput): Promise<Company | null> {
     return this.prisma.company.findUnique({
       where: companyWhereUniqueInput,
-    });
+    })
   }
-
   async createCompany(id: string, data: CreateCompanyDto): Promise<any> {
     try {
       const { companyName, district, city } = data;
-      const existCompanyName = await this.company({ companyName });
+      const existCompanyName = await this.company({ companyName })
       if (existCompanyName) throw new Error('companyName already exist');
 
       return this.prisma.company.create({
@@ -35,7 +36,8 @@ export class CompaniesService {
     } catch (error) {
       this.logger.error(`${error.message}`);
       throw new BadRequestException(error.message);
-    }
+
+    };
   }
 
   async updateCompany(params: {
@@ -48,17 +50,18 @@ export class CompaniesService {
       if (!existedCompany) throw new Error('Company not found');
       return this.prisma.company.update({
         data,
-        where,
-      });
+        where
+      })
     } catch (error) {
       this.logger.error(`${error.message}`);
       throw new BadRequestException(error.message);
     }
+
   }
 
   async deleteCompany(where: Prisma.CompanyWhereUniqueInput): Promise<Company> {
     return this.prisma.company.delete({
-      where,
-    });
+      where
+    })
   }
 }

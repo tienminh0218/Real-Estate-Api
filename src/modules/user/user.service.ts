@@ -12,7 +12,7 @@ import {
 
 @Injectable()
 export class UserService {
-  constructor(private prisma: PrismaService, private readonly logger: Logger) {}
+  constructor(private prisma: PrismaService, private readonly logger: Logger) { }
 
   getIncludeUser(obj: any) {
     const {

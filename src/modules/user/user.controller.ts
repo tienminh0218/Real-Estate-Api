@@ -18,7 +18,7 @@ import { IncludeUserType } from '../../utils/optional-query';
 
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) { }
 
   @Get('get-all')
   @HttpCode(200)
