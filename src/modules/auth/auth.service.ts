@@ -28,7 +28,6 @@ export class AuthService {
   }
 
   async login(user: User): Promise<any> {
-    console.log(user);
     const { username, id } = user;
 
     const cookies = await this.getCookieWithJwtToken(username, id);

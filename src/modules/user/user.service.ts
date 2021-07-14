@@ -4,34 +4,82 @@ import { User, Prisma } from '@prisma/client';
 import { hashPassword } from '../../utils/hash-password';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { PaginationType } from '../../utils/optional-query';
+import {
+  convertBooleanObject,
+  IncludeUserType,
+} from '../../utils/optional-query';
 
 @Injectable()
 export class UserService {
   constructor(private prisma: PrismaService, private readonly logger: Logger) { }
 
-  async user(
-    userWhereUniqueInput: Prisma.UserWhereUniqueInput,
-  ): Promise<User | null> {
-    return this.prisma.user.findUnique({
-      where: userWhereUniqueInput,
+  getIncludeUser(obj: any) {
+    const {
+      broker,
+      company,
+      comments_project,
+      comments_Broker,
+      comments_Company,
+      comments_Property,
+      properties,
+    } = obj;
+
+    return convertBooleanObject({
+      broker,
+      company,
+      comments_project,
+      comments_Broker,
+      comments_Company,
+      comments_Property,
+      properties,
     });
   }
 
-  async users(params: {
-    skip?: number;
-    take?: number;
-    cursor?: Prisma.UserWhereUniqueInput;
-    where?: Prisma.UserWhereInput;
-    orderBy?: Prisma.UserOrderByInput;
-  }): Promise<User[]> {
-    const { skip, take, cursor, where, orderBy } = params;
-    return this.prisma.user.findMany({
-      skip,
-      take,
-      cursor,
-      where,
-      orderBy,
-    });
+  async user(
+    userWhereUniqueInput: Prisma.UserWhereUniqueInput,
+    optional: IncludeUserType = {} as IncludeUserType,
+  ): Promise<User | null> {
+    try {
+      const include = this.getIncludeUser(optional);
+
+      return this.prisma.user.findUnique({
+        where: userWhereUniqueInput,
+        include,
+      });
+    } catch (error) {
+      this.logger.error(error.message);
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  async users(
+    params: {
+      where?: Prisma.UserWhereInput;
+    },
+    optional: PaginationType<
+      Prisma.UserWhereUniqueInput,
+      Prisma.UserOrderByInput
+    >,
+  ): Promise<User[]> {
+    try {
+      const { where } = params;
+      const { skip, take, cursor, orderBy, ...rest } = optional;
+
+      const include = this.getIncludeUser(rest);
+
+      return this.prisma.user.findMany({
+        skip: Number(skip) || undefined,
+        take: Number(take) || undefined,
+        cursor,
+        where,
+        orderBy,
+        include,
+      });
+    } catch (error) {
+      this.logger.error(error.message);
+      throw new BadRequestException(error.message);
+    }
   }
 
   async createUser(data: CreateUserDto): Promise<any> {
@@ -50,7 +98,6 @@ export class UserService {
           fullName,
           role,
         },
-
       });
     } catch (error) {
       this.logger.error(`${error.message}`);
@@ -68,8 +115,13 @@ export class UserService {
 
       if (!existedUser) throw new Error('Accout Not Found');
 
+      const passwordHashed = await hashPassword(data.password);
+
       return this.prisma.user.update({
-        data,
+        data: {
+          ...data,
+          password: passwordHashed,
+        },
         where,
       });
     } catch (error) {

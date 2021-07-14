@@ -40,7 +40,7 @@ export class CategoryPropertyService {
 
     getAllCategory(): Promise<categoryProperty[]> {
         return this.prisma.categoryProperty.findMany();
-    } t
+    }
 
     async createCategoryProperty(data: CreateCategoryPropertyDto, id: string): Promise<any> {
         try {
