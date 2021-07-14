@@ -8,28 +8,47 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { Property } from '@prisma/client';
 import { UpdatePropertyDto } from './dto/update-property.dto';
 import { CreatePropertyDto } from './dto/create-property.dto';
 
-@Controller('property')
+@Controller('properties')
 export class PropertyController {
   constructor(private readonly propertyService: PropertyService) {}
 
-  @Get('get-all')
-  async getAllProperty(): Promise<Property[]> {
-    return await this.propertyService.propertys({});
+  @Get()
+  async getAllProperty(@Query() optional): Promise<Property[]> {
+    return await this.propertyService.propertys({}, optional);
+  }
+
+  @Get('priceAndLocation')
+  async filterProperties(@Query() data: any): Promise<any> {
+    return await this.propertyService.getRangeProperties(data);
+  }
+
+  @Get('user/:id')
+  async getPropertiesUser(@Param('id') id: string): Promise<any> {
+    return await this.propertyService.getPropertiesOfUser(id);
+  }
+
+  @Get('project/:id')
+  async getPropertiesProject(@Param('id') id: string): Promise<any> {
+    return await this.propertyService.getPropertiesOfProject(id);
   }
 
   @Get(':id')
-  async getPropertyById(@Param('id') id: string): Promise<Property> {
-    return await this.propertyService.property({ id });
+  async getPropertyById(
+    @Param('id') id: string,
+    @Query() optional,
+  ): Promise<Property> {
+    return await this.propertyService.property({ id }, optional);
   }
 
   @Post()
   async createProperty(@Body() payload: CreatePropertyDto): Promise<Property> {
-    return this.propertyService.createProperty(payload, true);
+    return await this.propertyService.createProperty(payload);
   }
 
   @Put(':id')
