@@ -51,9 +51,6 @@ export class CategoryPropertyService {
                 data: {
                     nameCategory
                 },
-                // include: {
-                //     user: true,
-                // },
             });
         } catch (error) {
             this.logger.error(`${error.message}`);
