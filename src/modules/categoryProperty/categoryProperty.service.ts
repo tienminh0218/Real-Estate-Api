@@ -6,7 +6,7 @@ import { CreateCategoryPropertyDto } from './dto/create-categoryProperty.dto';
 
 @Injectable()
 export class CategoryPropertyService {
-  constructor(private logger: Logger, private prisma: PrismaService) {}
+  constructor(private logger: Logger, private prisma: PrismaService) { }
 
   async categoryProperty(
     categoryPropertyWhereUniqueInput: Prisma.categoryPropertyWhereUniqueInput,
@@ -46,17 +46,14 @@ export class CategoryPropertyService {
     return this.prisma.categoryProperty.findMany();
   }
 
-  async createCategoryProperty(
-    data: CreateCategoryPropertyDto,
-    id: string,
-  ): Promise<any> {
+  async createCategoryProperty(data: CreateCategoryPropertyDto): Promise<any> {
     try {
       const { nameCategory } = data;
       const existNameCategory = await this.categoryProperty({ nameCategory });
       if (existNameCategory) throw new Error('NameCategory already exist');
       return this.prisma.categoryProperty.create({
         data: {
-          nameCategory,
+          nameCategory
         },
       });
     } catch (error) {
@@ -82,6 +79,8 @@ export class CategoryPropertyService {
       throw new BadRequestException(error.message);
     }
   }
+
+
 
   async deleteCategory(
     where: Prisma.categoryPropertyWhereUniqueInput,

@@ -19,9 +19,9 @@ export class CategoryPropertyController {
         return this.categoryPropertyService.getCategoryById({ id });
     }
 
-    @Post('/:id')
-    async createProject(@Body() data: CreateCategoryPropertyDto, @Param('id') id: string): Promise<any> {
-        return this.categoryPropertyService.createCategoryProperty(data, id);
+    @Post()
+    async createProject(@Body() data: CreateCategoryPropertyDto): Promise<any> {
+        return this.categoryPropertyService.createCategoryProperty(data);
     }
 
     @Put(':id')
