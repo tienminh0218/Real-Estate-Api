@@ -15,7 +15,7 @@ import { News } from '@prisma/client';
 
 @Controller('news')
 export class NewsController {
-  constructor(private newsService: NewsService) {}
+  constructor(private newsService: NewsService) { }
   @Post('/:id')
   createNews(
     @Param('id') id: string,
