@@ -1,3 +1,4 @@
+import { BrokerModule } from '././broker/broker.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
@@ -26,6 +27,7 @@ import { PropertyModule } from './property/property.module';
     AuthModule,
     CompaniesModule,
     PropertyModule,
+    BrokerModule,
     CatePropertyModule,
   ],
 })

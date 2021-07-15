@@ -3,6 +3,7 @@ import { AppModule } from './modules';
 import { PrismaService } from './modules/prisma/prisma.service';
 import { ValidationPipe } from '@nestjs/common';
 import { Logger } from '@nestjs/common';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const PORT = process.env.PORT || 3000;
@@ -11,6 +12,9 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix(GLOBAL_PREFIX);
   app.enableCors();
+
+  /// cookie
+  app.use(cookieParser());
 
   /// prisma
   const prismaService: PrismaService = app.get(PrismaService);
