@@ -1,4 +1,11 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { CreateBrokerDto } from './dto/create-broker.dto';
+import { Prisma } from '@prisma/client';
+import {
+  Injectable,
+  Logger,
+  UnauthorizedException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 
@@ -10,10 +17,32 @@ export class BrokerService {
     private readonly jwtService: JwtService,
   ) {}
 
-  createBroker(cookies: any) {
+  async createBroker(cookies: any, data: CreateBrokerDto) {
+    try {
+      const decode = await this.checkToken(cookies);
+      const { district, city } = data;
+      const broker = await this.prismaService.broker.create({
+        data: {
+          district: district,
+          city: city,
+          user: { connect: { id: decode.id } },
+        },
+      });
+      return broker;
+    } catch (error) {
+      throw new BadRequestException('You are already a Broker!!!');
+    }
+  }
+
+  async checkToken(token: any) {
     const secret = process.env.JWT_SECRET;
-    const decode = this.jwtService.decode(cookies);
-    console.log(decode, secret, cookies);
-    // this.jwtService.verify(cookies.token,secret));
+    try {
+      const decode = await this.jwtService.verify(token, { secret: secret });
+
+      // console.log(decode);
+      return decode;
+    } catch (err) {
+      throw new UnauthorizedException('Unauthorized');
+    }
   }
 }

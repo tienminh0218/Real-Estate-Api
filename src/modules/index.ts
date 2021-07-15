@@ -23,11 +23,8 @@ import { PropertyModule } from './property/property.module';
     AuthModule,
     CompaniesModule,
     PropertyModule,
-<<<<<<< HEAD
     BrokerModule,
-=======
-    CatePropertyModule
->>>>>>> 151f63b6a8bde5f10e7c6dae6173e49aaa7a62d0
+    CatePropertyModule,
   ],
 })
-export class AppModule { }
+export class AppModule {}

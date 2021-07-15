@@ -13,13 +13,8 @@ generator client {
 
 model User {
   id                String             @id @default(uuid())
-<<<<<<< HEAD
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-=======
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
->>>>>>> 151f63b6a8bde5f10e7c6dae6173e49aaa7a62d0
   username          String             @unique @db.VarChar(255)
   password          String             @db.VarChar(255)
   role              Int                @default(0)
@@ -35,13 +30,8 @@ model User {
 
 model Broker {
   id              String           @id @default(uuid())
-<<<<<<< HEAD
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-=======
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
->>>>>>> 151f63b6a8bde5f10e7c6dae6173e49aaa7a62d0
   user            User             @relation(fields: [userId], references: [id])
   userId          String
   district        String           @db.VarChar(255)
@@ -53,13 +43,8 @@ model Broker {
 
 model Company {
   id               String            @id @default(uuid())
-<<<<<<< HEAD
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-=======
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
->>>>>>> 151f63b6a8bde5f10e7c6dae6173e49aaa7a62d0
   user             User              @relation(fields: [userId], references: [id])
   userId           String
   companyName      String?           @unique @db.VarChar(255)
@@ -71,26 +56,16 @@ model Company {
 
 model categoryProperty {
   id           String     @id @default(uuid())
-<<<<<<< HEAD
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-=======
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
->>>>>>> 151f63b6a8bde5f10e7c6dae6173e49aaa7a62d0
   nameCategory String     @unique @db.VarChar(255)
   properties   Property[]
 }
 
 model Property {
   id                String             @id @default(uuid())
-<<<<<<< HEAD
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-=======
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
->>>>>>> 151f63b6a8bde5f10e7c6dae6173e49aaa7a62d0
   category          categoryProperty   @relation(fields: [categoryId], references: [id])
   categoryId        String
   location          String
@@ -108,13 +83,8 @@ model Property {
 
 model Project {
   id               String            @id @default(uuid())
-<<<<<<< HEAD
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-=======
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
->>>>>>> 151f63b6a8bde5f10e7c6dae6173e49aaa7a62d0
   projectName      String?           @unique @db.VarChar(255)
   district         String            @db.VarChar(255)
   city             String            @db.VarChar(255)
