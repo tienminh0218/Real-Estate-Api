@@ -1,3 +1,4 @@
+import { BrokerModule } from '././broker/broker.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
@@ -21,6 +22,7 @@ import { PropertyModule } from './property/property.module';
     AuthModule,
     CompaniesModule,
     PropertyModule,
+    BrokerModule,
   ],
 })
 export class AppModule {}

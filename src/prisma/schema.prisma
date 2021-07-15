@@ -12,6 +12,8 @@ generator client {
 
 model User {
   id                String             @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   username          String             @unique @db.VarChar(255)
   password          String             @db.VarChar(255)
   role              Int                @default(0)
@@ -27,6 +29,8 @@ model User {
 
 model Broker {
   id              String           @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   user            User             @relation(fields: [userId], references: [id])
   userId          String
   district        String           @db.VarChar(255)
@@ -38,6 +42,8 @@ model Broker {
 
 model Company {
   id               String            @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   user             User              @relation(fields: [userId], references: [id])
   userId           String
   companyName      String?           @unique @db.VarChar(255)
@@ -49,12 +55,16 @@ model Company {
 
 model categoryProperty {
   id           String     @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   nameCategory String     @unique @db.VarChar(255)
   properties   Property[]
 }
 
 model Property {
   id                String             @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   category          categoryProperty   @relation(fields: [categoryId], references: [id])
   categoryId        String
   location          String
@@ -72,6 +82,8 @@ model Property {
 
 model Project {
   id               String            @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   projectName      String?           @unique @db.VarChar(255)
   district         String            @db.VarChar(255)
   city             String            @db.VarChar(255)
@@ -105,7 +117,7 @@ model Comment_Company {
 
 model Comment_Property {
   id         String   @id @default(uuid())
-  createdAt  DateTime @default(now())
+  createdAt DateTime @default(now())
   updatedAt  DateTime @updatedAt
   content    String
   user       User     @relation(fields: [userId], references: [id])
