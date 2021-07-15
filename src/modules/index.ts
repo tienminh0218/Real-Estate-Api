@@ -1,6 +1,7 @@
 import { BrokerModule } from '././broker/broker.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { GraphQLModule } from '@nestjs/graphql';
 
 import { NewsModule } from './news/news.module';
 import { CommentModule } from './comment/comment.module';
@@ -15,6 +16,9 @@ import { PropertyModule } from './property/property.module';
 @Module({
   imports: [
     ConfigModule.forRoot(),
+    GraphQLModule.forRoot({
+      autoSchemaFile: true,
+    }),
     PrismaModule,
     UserModule,
     ProjectsModule,

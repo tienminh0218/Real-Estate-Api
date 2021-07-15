@@ -5,13 +5,14 @@ import { CreateUserDto } from '../user/dto/create-user.dto';
 import { User } from '@prisma/client';
 import { RequestWithUser } from './interface/requestWithUser';
 import { AuthGuard } from '@nestjs/passport';
+import { JwtAuthGuard } from './guard/jwt';
+import { LocalAuthGuard } from './guard/local';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  // @UseGuards(JwtAuthGuard)
-  @UseGuards(AuthGuard('local'))
+  @UseGuards(LocalAuthGuard)
   @Post('login')
   async login(
     @Res() res: Response,
