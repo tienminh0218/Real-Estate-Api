@@ -14,7 +14,7 @@ const createUser = async () => {
 };
 
 async function main() {
-  //   createUser();
+  createUser();
 }
 
 main()
