@@ -1,15 +1,13 @@
+import { ConfigModule } from '@nestjs/config';
+import { Module, Logger } from '@nestjs/common';
+
 import { AuthModule } from './../auth/auth.module';
 import { PrismaModule } from './../prisma/prisma.module';
-import { Module, Logger } from '@nestjs/common';
 import { BrokerService } from './broker.service';
 import { BrokerController } from './broker.controller';
-import { JwtStrategy } from '../auth/strategies/jwt';
-import { LocalStrategy } from '../auth/strategies/local';
-import { JwtModule } from '@nestjs/jwt';
-import { getJwtConfig } from 'src/config/config.service';
 
 @Module({
-  imports: [PrismaModule, AuthModule],
+  imports: [PrismaModule, AuthModule, ConfigModule],
   providers: [BrokerService, Logger],
   controllers: [BrokerController],
 })

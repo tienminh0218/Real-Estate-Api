@@ -36,13 +36,23 @@ export class AuthController {
       maxAge: this.configService.get<number>('MAX_AGE') * 1000, /// 24h
     });
 
-    return { user };
+    return { token, user };
   }
 
   @Post('register')
-  async register(@Body() payload: CreateUserDto): Promise<any> {
-    const result = await this.authService.register(payload);
-    return result;
+  async register(
+    @Res({ passthrough: true }) res: Response,
+    @Body() payload: CreateUserDto,
+  ): Promise<any> {
+    const { token, user } = await this.authService.register(payload);
+
+    res.cookie(this.configService.get<string>('COOKIE_NAME'), token, {
+      httpOnly: true,
+      secure: true,
+      maxAge: this.configService.get<number>('MAX_AGE') * 1000, /// 24h
+    });
+
+    return { token, user };
   }
 
   @Post('logout')

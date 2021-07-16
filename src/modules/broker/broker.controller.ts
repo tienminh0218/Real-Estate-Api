@@ -1,20 +1,18 @@
-import { CreateBrokerDto } from './dto/create-broker.dto';
-import { AuthGuard } from '@nestjs/passport';
-import { BrokerService } from './broker.service';
 import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
 import { Request } from 'express';
 
+import { CreateBrokerDto } from './dto/create-broker.dto';
+import { BrokerService } from './broker.service';
+import { JwtAuthGuard } from '../auth/guards/jwt';
+import { RequestWithUser } from '../auth/interface/requestWithUser';
+
 @Controller('broker')
-@UseGuards(AuthGuard('local'))
+@UseGuards(JwtAuthGuard)
 export class BrokerController {
   constructor(private readonly brokerService: BrokerService) {}
 
   @Post('create')
-  createBroker(@Req() req: Request, @Body() data: CreateBrokerDto) {
-    // console.log(req.cookies[process.env.COOKIE_NAME]);
-    return this.brokerService.createBroker(
-      req.cookies[process.env.COOKIE_NAME],
-      data,
-    );
+  createBroker(@Req() req: RequestWithUser, @Body() data: CreateBrokerDto) {
+    return this.brokerService.createBroker(req.user, data);
   }
 }
