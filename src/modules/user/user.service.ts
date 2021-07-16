@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
-import { PrismaService } from './../prisma/prisma.service';
 import { User, Prisma } from '@prisma/client';
+
+import { PrismaService } from './../prisma/prisma.service';
 import { hashPassword } from '../../utils/hash-password';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -50,10 +51,10 @@ export class UserService {
   async users(
     params: {
       where?: Prisma.UserWhereInput;
-      // skip?: number;
-      // take?: number;
-      // cursor?: Prisma.UserWhereUniqueInput;
-      // orderBy?: Prisma.UserOrderByInput;
+      skip?: number;
+      take?: number;
+      cursor?: Prisma.UserWhereUniqueInput;
+      orderBy?: Prisma.UserOrderByInput;
       include?: Prisma.UserInclude;
     },
     optional: OptionalQueryUsers<

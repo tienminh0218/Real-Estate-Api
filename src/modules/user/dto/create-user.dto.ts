@@ -8,6 +8,7 @@ import {
   MinLength,
   IsAlphanumeric,
 } from 'class-validator';
+import { Role } from '@prisma/client';
 
 @InputType()
 export class CreateUserDto {
@@ -33,8 +34,8 @@ export class CreateUserDto {
   @Field({ nullable: true })
   fullName?: string;
 
-  @IsNumber()
+  @IsString()
   @IsOptional()
   @Field({ nullable: true })
-  role?: number;
+  role?: Role;
 }
