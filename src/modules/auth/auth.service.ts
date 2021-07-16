@@ -1,3 +1,4 @@
+import { Response } from 'express';
 import { UserService } from './../user/user.service';
 import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import { comparePassword } from '../../utils/hash-password';
@@ -27,22 +28,26 @@ export class AuthService {
     }
   }
 
-  async login(user: User): Promise<any> {
+  async login(user: User, res: Response): Promise<any> {
     const { username, id } = user;
 
-    const cookies = await this.getCookieWithJwtToken(username, id);
+    const cookies = await this.getCookieWithJwtToken(username, id, res);
 
     return { cookies, user };
   }
 
-  async register(data: CreateUserDto): Promise<any> {
+  async register(data: CreateUserDto, res: Response): Promise<any> {
     try {
       const user = await this.userService.createUser(data);
 
-      return this.login(user);
+      return this.login(user, res);
     } catch (error) {
       throw new BadRequestException(error.message);
     }
+  }
+
+  async logout(res: Response) {
+    res.clearCookie(process.env.COOKIE_NAME).send('Logout successfully!!!');
   }
 
   async validateJwt({ username }) {
@@ -58,13 +63,24 @@ export class AuthService {
     }
   }
 
-  async getCookieWithJwtToken(username: string, id: string): Promise<string> {
+  async getCookieWithJwtToken(
+    username: string,
+    id: string,
+    res: Response,
+  ): Promise<void> {
     const payload = { username, id };
+    const cookieName = process.env.COOKIE_NAME;
     const token = this.jwtService.sign(payload);
+
     const {
       signOptions: { expiresIn },
     } = getJwtConfig;
 
-    return `Authentication=${token}; HttpOnly; Path=/; Max-Age=${expiresIn};SameSite=None; Secure`;
+    res
+      .cookie(cookieName, token, {
+        httpOnly: true,
+        expires: new Date(Date.now() + 1000 * 60 * 60 * 24), //24h
+      })
+      .send({ Authentication: token, httpOnly: true, expires: expiresIn });
   }
 }
