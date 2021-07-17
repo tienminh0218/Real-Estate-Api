@@ -13,7 +13,7 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly logger: Logger,
     private readonly jwtService: JwtService,
-  ) {}
+  ) { }
 
   async validateUser(username: string, password: string): Promise<any> {
     try {
@@ -30,9 +30,7 @@ export class AuthService {
 
   async login(user: User, res: Response): Promise<any> {
     const { username, id } = user;
-
     const cookies = await this.getCookieWithJwtToken(username, id, res);
-
     return { cookies, user };
   }
 

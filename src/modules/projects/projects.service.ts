@@ -5,7 +5,7 @@ import { CreateProjectDto } from './dto/create-project.dto';
 
 @Injectable()
 export class ProjectsService {
-  constructor(private prisma: PrismaService, private readonly logger: Logger) {}
+  constructor(private prisma: PrismaService, private readonly logger: Logger) { }
 
   async project(
     projectWhereUniqueInput: Prisma.ProjectWhereUniqueInput,

@@ -1,18 +1,21 @@
-import { Controller, Body, Get, Post, Param, Delete, Put } from '@nestjs/common';
+import { Controller, Body, Get, Post, Param, Delete, Put, UseGuards, Req } from '@nestjs/common';
 import { CompaniesService } from './companies.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { Company as CompanyModel } from '@prisma/client';
+import { AuthGuard } from '@nestjs/passport';
+import { Request } from 'express';
 
 @Controller('companies')
+// @UseGuards(AuthGuard('local'))
 export class CompaniesController {
     constructor(
         private companiesService: CompaniesService,
     ) { }
 
-    @Post('/:id')
-    async createProject(@Body() data: CreateCompanyDto, @Param('id') id: string): Promise<any> {
-        return this.companiesService.createCompany(id, data);
-    }
+    // @Post()
+    // async createCompanycookies(@Req() req: Request, @Body() data: CreateCompanyDto): Promise<any> {
+    //     return this.companiesService.createCompany(req.cookies[process.env.COOKIE_NAME], data);
+    // }
 
     @Put(':id')
     async updateCompanyById(
