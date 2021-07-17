@@ -1,37 +1,63 @@
 import { Response } from 'express';
 import { AuthService } from './auth.service';
-import { Body, Controller, Post, Req, Res, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  Post,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+
 import { CreateUserDto } from '../user/dto/create-user.dto';
-import { User } from '@prisma/client';
 import { RequestWithUser } from './interface/requestWithUser';
-import { AuthGuard } from '@nestjs/passport';
-import { JwtAuthGuard } from './guard/jwt';
-import { LocalAuthGuard } from './guard/local';
+import { LocalAuthGuard } from './guards/local';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly configService: ConfigService,
+  ) {}
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
   async login(
-    @Res() res: Response,
+    @Res({ passthrough: true }) res: Response,
     @Req() req: RequestWithUser,
-    payload,
   ): Promise<any> {
-    return this.authService.login(req.user, res);
+    const { token, user } = await this.authService.login(req.user);
+
+    res.cookie(this.configService.get<string>('COOKIE_NAME'), token, {
+      httpOnly: true,
+      secure: true,
+      maxAge: this.configService.get<number>('MAX_AGE') * 1000, /// 24h
+    });
+
+    return { token, user };
   }
 
   @Post('register')
   async register(
-    @Res() res: Response,
+    @Res({ passthrough: true }) res: Response,
     @Body() payload: CreateUserDto,
-  ): Promise<User> {
-    return await this.authService.register(payload, res);
+  ): Promise<any> {
+    const { token, user } = await this.authService.register(payload);
+
+    res.cookie(this.configService.get<string>('COOKIE_NAME'), token, {
+      httpOnly: true,
+      secure: true,
+      maxAge: this.configService.get<number>('MAX_AGE') * 1000, /// 24h
+    });
+
+    return { token, user };
   }
 
   @Post('logout')
+  @HttpCode(200)
   async logout(@Res() res: Response) {
-    await this.authService.logout(res);
+    return res.clearCookie(this.configService.get<string>('COOKIE_NAME')).end();
   }
 }
