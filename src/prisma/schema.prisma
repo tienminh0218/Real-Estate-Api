@@ -7,25 +7,22 @@ datasource db {
 }
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["referentialActions"]
 }
 
-<<<<<<< HEAD
-=======
 enum Role {
   USER
   ADMIN
 }
 
->>>>>>> main
 model User {
   id                String             @id @default(uuid())
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
   username          String             @unique @db.VarChar(255)
   password          String             @db.VarChar(255)
-  role              Role                @default(USER)
+  role              Role               @default(USER)
   fullName          String?            @db.VarChar(255)
   broker            Broker?
   company           Company?
@@ -33,7 +30,7 @@ model User {
   comments_Broker   Comment_Broker[]
   comments_Company  Comment_Company[]
   comments_Property Comment_Property[]
-  properties        Property[] 
+  properties        Property[]
 }
 
 model Broker {
