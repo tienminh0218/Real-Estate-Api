@@ -7,16 +7,19 @@ import {
   Body,
   Put,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import {
   Project as ProjectModel,
   Company as CompanyModel,
 } from '@prisma/client';
 import { CreateProjectDto } from './dto/create-project.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt';
 
 @Controller('projects')
+@UseGuards(JwtAuthGuard)
 export class ProjectsController {
-  constructor(private readonly projectsService: ProjectsService) {}
+  constructor(private readonly projectsService: ProjectsService) { }
 
   @Post(':id')
   async createProject(

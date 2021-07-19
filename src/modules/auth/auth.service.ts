@@ -13,7 +13,7 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly logger: Logger,
     private readonly jwtService: JwtService,
-  ) {}
+  ) { }
 
   async validateUser(username: string, password: string): Promise<any> {
     try {
