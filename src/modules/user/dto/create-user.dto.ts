@@ -9,15 +9,18 @@ import {
   IsAlphanumeric,
 } from 'class-validator';
 import { Role } from '@prisma/client';
+import { ApiProperty } from '@nestjs/swagger';
 
 @InputType()
 export class CreateUserDto {
+  @ApiProperty()
   @IsAlphanumeric()
   @MinLength(4)
   @MaxLength(20)
   @Field()
   username: string;
 
+  @ApiProperty()
   @IsString()
   @MinLength(4)
   @MaxLength(20)
@@ -27,6 +30,7 @@ export class CreateUserDto {
   @Field()
   password: string;
 
+  @ApiProperty({ required: false })
   @IsString()
   @MinLength(4)
   @IsOptional()
@@ -34,6 +38,7 @@ export class CreateUserDto {
   @Field({ nullable: true })
   fullName?: string;
 
+  @ApiProperty({ required: false })
   @IsString()
   @IsOptional()
   @Field({ nullable: true })

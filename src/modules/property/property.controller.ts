@@ -1,4 +1,3 @@
-import { PropertyService } from './property.service';
 import {
   Body,
   Controller,
@@ -11,16 +10,27 @@ import {
   Query,
 } from '@nestjs/common';
 import { Property } from '@prisma/client';
+import { ApiOkResponse, ApiResponse, ApiTags } from '@nestjs/swagger';
+
+import { PropertyService } from './property.service';
 import { UpdatePropertyDto } from './dto/update-property.dto';
 import { CreatePropertyDto } from './dto/create-property.dto';
+import {
+  OptionalQueryProperty,
+  OptionalQueryProperties,
+} from './types/optional-query.type';
 
+@ApiTags('Properties')
 @Controller('properties')
 export class PropertyController {
   constructor(private readonly propertyService: PropertyService) {}
 
   @Get()
-  async getAllProperty(@Query() optional): Promise<Property[]> {
-    return await this.propertyService.propertys({}, optional);
+  @ApiOkResponse({ description: 'Get all properties' })
+  async getAllProperty(
+    @Query() optional: OptionalQueryProperties,
+  ): Promise<Property[]> {
+    return await this.propertyService.properties({}, optional);
   }
 
   @Get('priceAndLocation')
@@ -34,6 +44,7 @@ export class PropertyController {
   }
 
   @Get('project/:id')
+  @ApiOkResponse({ description: 'Get list property of project' })
   async getPropertiesProject(@Param('id') id: string): Promise<any> {
     return await this.propertyService.getPropertiesOfProject(id);
   }
@@ -48,6 +59,7 @@ export class PropertyController {
 
   @Post()
   async createProperty(@Body() payload: CreatePropertyDto): Promise<Property> {
+    console.log(payload);
     return await this.propertyService.createProperty(payload);
   }
 
