@@ -3,9 +3,10 @@ import { CategoryPropertyService } from './categoryProperty.service';
 import { categoryProperty, Company as CompanyModel } from '@prisma/client';
 import { CreateCategoryPropertyDto } from './dto/create-categoryProperty.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { JwtAuthGuard } from '../auth/guards/jwt';
 
 @Controller('category')
-// @UseGuards(AuthGuard('local'))
+@UseGuards(JwtAuthGuard)
 export class CategoryPropertyController {
     constructor(
         private categoryPropertyService: CategoryPropertyService,

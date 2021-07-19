@@ -2,20 +2,21 @@ import { Controller, Body, Get, Post, Param, Delete, Put, UseGuards, Req } from 
 import { CompaniesService } from './companies.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { Company as CompanyModel } from '@prisma/client';
-import { AuthGuard } from '@nestjs/passport';
+import { RequestWithUser } from '../auth/interface/requestWithUser';
 import { Request } from 'express';
+import { JwtAuthGuard } from '../auth/guards/jwt';
 
 @Controller('companies')
-// @UseGuards(AuthGuard('local'))
+@UseGuards(JwtAuthGuard)
 export class CompaniesController {
     constructor(
         private companiesService: CompaniesService,
     ) { }
 
-    // @Post()
-    // async createCompanycookies(@Req() req: Request, @Body() data: CreateCompanyDto): Promise<any> {
-    //     return this.companiesService.createCompany(req.cookies[process.env.COOKIE_NAME], data);
-    // }
+    @Post()
+    async createCompanycookies(@Req() req: RequestWithUser, @Body() data: CreateCompanyDto) {
+        return this.companiesService.createCompany(req.user, data);
+    }
 
     @Put(':id')
     async updateCompanyById(

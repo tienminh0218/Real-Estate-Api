@@ -18,31 +18,49 @@ export class CompaniesService {
       where: companyWhereUniqueInput,
     })
   }
-  // async createCompany(cookies: any, data: CreateCompanyDto): Promise<any> {
-  //   try {
-  //     const decode = await this.checkToken(cookies);
-  //     console.log(decode);
-  //     const { companyName, district, city } = data;
-  //     const existCompanyName = await this.company({ companyName })
-  //     if (existCompanyName) throw new Error('companyName already exist');
 
-  //     return this.prisma.company.create({
-  //       data: {
-  //         companyName,
-  //         district,
-  //         city,
-  //         user: { connect: { id: decode.id } },
-  //       },
-  //       include: {
-  //         user: true,
-  //       },
-  //     });
-  //   } catch (error) {
-  //     this.logger.error(`${error.message}`);
-  //     throw new BadRequestException(error.message);
+  async companys(params: {
+    where?: Prisma.CompanyWhereInput;
+    skip?: number;
+    take?: number;
+    cursor?: Prisma.CompanyWhereUniqueInput;
+    orderBy?: Prisma.CompanyOrderByInput;
+    include?: Prisma.CompanyInclude;
+  }): Promise<Company[]> {
+    try {
+      const { where, include } = params;
 
-  //   };
-  // }
+      return this.prisma.company.findMany({
+        where,
+        include
+      });
+    } catch (error) {
+      this.logger.error(error);
+      throw new BadRequestException(error);
+    }
+  }
+
+  async createCompany(user: any, data: CreateCompanyDto) {
+    try {
+      const { companyName, district, city } = data;
+      const existCompanyName = await this.company({ companyName })
+      if (existCompanyName) throw new Error('companyName already exist');
+
+      const createComp = this.prisma.company.create({
+        data: {
+          companyName,
+          district,
+          city,
+          user: { connect: { id: user.id } },
+        }
+      });
+      return createComp;
+    } catch (error) {
+      this.logger.error(`${error.message}`);
+      throw new BadRequestException(error.message);
+
+    };
+  }
 
   async updateCompany(params: {
     where: Prisma.CompanyWhereUniqueInput;
@@ -67,17 +85,5 @@ export class CompaniesService {
     return this.prisma.company.delete({
       where
     })
-  }
-
-  async checkToken(token: any) {
-    const secret = process.env.JWT_SECRET;
-    try {
-      const decode = await this.jwtService.verify(token, { secret: secret });
-
-      // console.log(decode);
-      return decode;
-    } catch (err) {
-      throw new UnauthorizedException('Unauthorized');
-    }
   }
 }
