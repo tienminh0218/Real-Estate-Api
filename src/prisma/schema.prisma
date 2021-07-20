@@ -25,7 +25,7 @@ model User {
   role              Role               @default(USER)
   fullName          String?            @db.VarChar(255)
   broker            Broker?
-  company           Company[]
+  companies           Company[]
   comments_project  Comment_Project[]
   comments_Broker   Comment_Broker[]
   comments_Company  Comment_Company[]
@@ -71,6 +71,7 @@ model categoryProperty {
 
 model Property {
   id                String             @id @default(uuid())
+  name              String             @db.VarChar(255)          
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
   category          categoryProperty   @relation(fields: [categoryId], references: [id], onDelete: Cascade)

@@ -57,17 +57,14 @@ export class UserService {
       orderBy?: Prisma.UserOrderByInput;
       include?: Prisma.UserInclude;
     },
-    optional: OptionalQueryUsers<
-      Prisma.UserWhereUniqueInput,
-      Prisma.UserOrderByInput
-    > = {},
+    optional: OptionalQueryUsers = {},
   ): Promise<User[]> {
     try {
       const { where } = params;
-      const { skip, take, cursor, orderBy, ...rest } = optional;
+      const { skip, take, cursor, orderBy, include: includeQuery } = optional;
 
-      const includeQuery = this.getIncludeUser(rest?.include?.split(','));
-      const include = params.include || includeQuery;
+      const include =
+        params.include || this.getIncludeUser(includeQuery?.split(','));
 
       return this.prisma.user.findMany({
         skip: Number(skip) || undefined,
@@ -114,7 +111,7 @@ export class UserService {
       const { where, data } = params;
       const existedUser = await this.user({ id: where.id });
 
-      if (!existedUser) throw new Error('Accout Not Found');
+      if (!existedUser) throw new Error('Account Not Found');
 
       const passwordHashed = await hashPassword(data.password);
 
@@ -135,7 +132,7 @@ export class UserService {
     try {
       const existedUser = await this.user(where);
 
-      if (!existedUser) throw new Error('Accout Not Found');
+      if (!existedUser) throw new Error('Account Not Found');
 
       await this.prisma.user.delete({
         where,

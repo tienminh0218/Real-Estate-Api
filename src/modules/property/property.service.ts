@@ -1,6 +1,3 @@
-import { ProjectsService } from './../projects/projects.service';
-import { UserService } from './../user/user.service';
-import { PrismaService } from './../prisma/prisma.service';
 import {
   Injectable,
   Logger,
@@ -9,6 +6,10 @@ import {
   forwardRef,
 } from '@nestjs/common';
 import { Prisma, Property } from '@prisma/client';
+
+import { ProjectsService } from './../projects/projects.service';
+import { UserService } from './../user/user.service';
+import { PrismaService } from './../prisma/prisma.service';
 import { CreatePropertyDto } from './dto/create-property.dto';
 import { generateIncludeQuery } from '../../utils/generate-include';
 import {
@@ -31,7 +32,13 @@ export class PropertyService {
   getIncludeProperty(listIncludeQuery: string[]) {
     if (!listIncludeQuery) return;
 
-    const listRelation = ['category', 'comments_Property', 'broker', 'user'];
+    const listRelation = [
+      'category',
+      'comments_Property',
+      'broker',
+      'user',
+      'project',
+    ];
 
     return generateIncludeQuery(listRelation, listIncludeQuery);
   }
@@ -53,19 +60,23 @@ export class PropertyService {
     }
   }
 
-  async propertys(
+  async properties(
     params: {
       where?: Prisma.PropertyWhereInput;
+      skip?: number;
+      take?: number;
+      cursor?: Prisma.PropertyWhereUniqueInput;
+      orderBy?: Prisma.PropertyOrderByInput;
+      include?: Prisma.PropertyInclude;
     },
-    optional: OptionalQueryProperties<
-      Prisma.PropertyWhereUniqueInput,
-      Prisma.PropertyOrderByInput
-    > = {},
+    optional: OptionalQueryProperties = {},
   ): Promise<Property[]> {
     try {
       const { where } = params;
-      const { skip, take, cursor, orderBy } = optional;
-      const include = this.getIncludeProperty(optional?.include?.split(','));
+      const { skip, take, cursor, orderBy, include: includeQuery } = optional;
+
+      const include =
+        params.include || this.getIncludeProperty(includeQuery?.split(','));
 
       return this.prismaService.property.findMany({
         skip: Number(skip) || undefined,
@@ -109,7 +120,7 @@ export class PropertyService {
     try {
       const { gte, lte, location } = data;
 
-      return this.propertys({
+      return this.properties({
         where: {
           AND: [
             { price: { gte: Number(gte), lte: Number(lte) } },
@@ -123,13 +134,17 @@ export class PropertyService {
     }
   }
 
-  async createProperty(payload: CreatePropertyDto): Promise<Property> {
+  async createProperty(
+    payload: CreatePropertyDto,
+    projectId: string,
+  ): Promise<Property> {
     try {
-      const { categoryId, brokerId, projectId, location, coordinates, price } =
+      const { categoryId, brokerId, location, coordinates, price, name } =
         payload;
 
       const result = await this.prismaService.property.create({
         data: {
+          name,
           location,
           coordinates,
           price,
@@ -155,6 +170,7 @@ export class PropertyService {
     try {
       const { where, data } = params;
       const {
+        name,
         categoryId,
         location,
         coordinates,
@@ -167,6 +183,7 @@ export class PropertyService {
       return this.prismaService.property.update({
         where,
         data: {
+          name,
           location,
           coordinates,
           price,
