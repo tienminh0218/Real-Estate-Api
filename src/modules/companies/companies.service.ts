@@ -1,13 +1,15 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { Prisma, Company } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class CompaniesService {
   constructor(
     private logger: Logger,
     private prisma: PrismaService,
+    private readonly jwtService: JwtService,
   ) { }
 
 
@@ -16,23 +18,43 @@ export class CompaniesService {
       where: companyWhereUniqueInput,
     })
   }
-  async createCompany(id: string, data: CreateCompanyDto): Promise<any> {
+
+  async companys(params: {
+    where?: Prisma.CompanyWhereInput;
+    skip?: number;
+    take?: number;
+    cursor?: Prisma.CompanyWhereUniqueInput;
+    orderBy?: Prisma.CompanyOrderByInput;
+    include?: Prisma.CompanyInclude;
+  }): Promise<Company[]> {
+    try {
+      const { where, include } = params;
+
+      return this.prisma.company.findMany({
+        where,
+        include
+      });
+    } catch (error) {
+      this.logger.error(error);
+      throw new BadRequestException(error);
+    }
+  }
+
+  async createCompany(user: any, data: CreateCompanyDto) {
     try {
       const { companyName, district, city } = data;
       const existCompanyName = await this.company({ companyName })
       if (existCompanyName) throw new Error('companyName already exist');
 
-      return this.prisma.company.create({
+      const createComp = this.prisma.company.create({
         data: {
           companyName,
           district,
           city,
-          user: { connect: { id: id } },
-        },
-        include: {
-          user: true,
-        },
+          user: { connect: { id: user.id } },
+        }
       });
+      return createComp;
     } catch (error) {
       this.logger.error(`${error.message}`);
       throw new BadRequestException(error.message);
