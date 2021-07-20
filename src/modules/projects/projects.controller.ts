@@ -1,3 +1,4 @@
+import { IsUser } from './../auth/guards/isUser';
 import { ProjectsService } from './projects.service';
 import {
   Controller,
@@ -17,11 +18,11 @@ import { CreateProjectDto } from './dto/create-project.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt';
 
 @Controller('projects')
-@UseGuards(JwtAuthGuard)
 export class ProjectsController {
-  constructor(private readonly projectsService: ProjectsService) { }
+  constructor(private readonly projectsService: ProjectsService) {}
 
   @Post(':id')
+  @UseGuards(JwtAuthGuard, IsUser)
   async createProject(
     @Body() data: CreateProjectDto,
     @Param('id') id: string,
@@ -30,6 +31,7 @@ export class ProjectsController {
   }
 
   @Put(':id')
+  @UseGuards(JwtAuthGuard, IsUser)
   async updateProjectById(
     @Param('id') id: string,
     @Body() payload: CreateProjectDto,

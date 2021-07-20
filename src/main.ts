@@ -4,6 +4,7 @@ import { PrismaService } from './modules/prisma/prisma.service';
 import { ValidationPipe } from '@nestjs/common';
 import { Logger } from '@nestjs/common';
 import * as cookieParser from 'cookie-parser';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
   const PORT = process.env.PORT || 3000;
@@ -11,6 +12,16 @@ async function bootstrap() {
 
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix(GLOBAL_PREFIX);
+
+  /// Swagger
+  const config = new DocumentBuilder()
+    .setTitle('Real Estate Api')
+    .setDescription('The Real Estate API Description')
+    .addCookieAuth('Auth')
+    .setVersion('1.0')
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('swagger', app, document);
 
   /// cors
   app.enableCors({
