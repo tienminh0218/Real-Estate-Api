@@ -1,4 +1,4 @@
-import { UserIsUserGuard } from './../auth/guards/isUser';
+import { IsUser } from './../auth/guards/isUser';
 import {
   Body,
   Controller,
@@ -66,7 +66,7 @@ export class UserController {
   @ApiForbiddenResponse({ description: 'Incorrect userId' })
   @ApiUnauthorizedResponse({ description: 'User not login' })
   @ApiBadRequestResponse({ description: 'Not found account to update' })
-  @UseGuards(JwtAuthGuard, UserIsUserGuard)
+  @UseGuards(JwtAuthGuard, IsUser)
   async updateUserById(
     @Param('id') id: string,
     @Body() payload: UpdateUserDto,

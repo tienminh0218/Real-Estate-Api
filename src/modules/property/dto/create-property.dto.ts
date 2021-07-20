@@ -26,15 +26,15 @@ export class CreatePropertyDto {
   @ApiProperty()
   @IsString()
   @MinLength(4)
+  name: string;
+
+  @ApiProperty()
+  @IsString()
+  @MinLength(4)
   coordinates: string;
 
   @ApiProperty()
   @IsNumber()
   @IsNotEmpty()
   price: number;
-
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  projectId: string;
 }

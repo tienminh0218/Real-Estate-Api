@@ -1,3 +1,4 @@
+import { IsUser } from './../auth/guards/isUser';
 import { ProjectsService } from './projects.service';
 import {
   Controller,
@@ -7,18 +8,21 @@ import {
   Body,
   Put,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import {
   Project as ProjectModel,
   Company as CompanyModel,
 } from '@prisma/client';
 import { CreateProjectDto } from './dto/create-project.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt';
 
 @Controller('projects')
 export class ProjectsController {
   constructor(private readonly projectsService: ProjectsService) {}
 
   @Post(':id')
+  @UseGuards(JwtAuthGuard, IsUser)
   async createProject(
     @Body() data: CreateProjectDto,
     @Param('id') id: string,
@@ -27,6 +31,7 @@ export class ProjectsController {
   }
 
   @Put(':id')
+  @UseGuards(JwtAuthGuard, IsUser)
   async updateProjectById(
     @Param('id') id: string,
     @Body() payload: CreateProjectDto,

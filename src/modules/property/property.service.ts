@@ -134,13 +134,17 @@ export class PropertyService {
     }
   }
 
-  async createProperty(payload: CreatePropertyDto): Promise<Property> {
+  async createProperty(
+    payload: CreatePropertyDto,
+    projectId: string,
+  ): Promise<Property> {
     try {
-      const { categoryId, brokerId, projectId, location, coordinates, price } =
+      const { categoryId, brokerId, location, coordinates, price, name } =
         payload;
 
       const result = await this.prismaService.property.create({
         data: {
+          name,
           location,
           coordinates,
           price,
@@ -166,6 +170,7 @@ export class PropertyService {
     try {
       const { where, data } = params;
       const {
+        name,
         categoryId,
         location,
         coordinates,
@@ -178,6 +183,7 @@ export class PropertyService {
       return this.prismaService.property.update({
         where,
         data: {
+          name,
           location,
           coordinates,
           price,

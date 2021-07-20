@@ -1,9 +1,12 @@
-import { Controller, Body, Get, Post, Param, Delete, Put } from '@nestjs/common';
+import { Controller, Body, Get, Post, Param, Delete, Put, UseGuards } from '@nestjs/common';
 import { CategoryPropertyService } from './categoryProperty.service';
 import { categoryProperty, Company as CompanyModel } from '@prisma/client';
 import { CreateCategoryPropertyDto } from './dto/create-categoryProperty.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { JwtAuthGuard } from '../auth/guards/jwt';
 
 @Controller('category')
+@UseGuards(JwtAuthGuard)
 export class CategoryPropertyController {
     constructor(
         private categoryPropertyService: CategoryPropertyService,

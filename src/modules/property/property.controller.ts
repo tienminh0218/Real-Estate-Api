@@ -1,3 +1,5 @@
+import { IsUser } from './../auth/guards/isUser';
+import { JwtAuthGuard } from './../auth/guards/jwt';
 import {
   Body,
   Controller,
@@ -8,9 +10,17 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { Property } from '@prisma/client';
-import { ApiOkResponse, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBadRequestResponse,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiResponse,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 
 import { PropertyService } from './property.service';
 import { UpdatePropertyDto } from './dto/update-property.dto';
@@ -39,12 +49,13 @@ export class PropertyController {
   }
 
   @Get('user/:id')
+  @ApiOkResponse({ description: 'Get property list of user' })
   async getPropertiesUser(@Param('id') id: string): Promise<any> {
     return await this.propertyService.getPropertiesOfUser(id);
   }
 
   @Get('project/:id')
-  @ApiOkResponse({ description: 'Get list property of project' })
+  @ApiOkResponse({ description: 'Get property list of project' })
   async getPropertiesProject(@Param('id') id: string): Promise<any> {
     return await this.propertyService.getPropertiesOfProject(id);
   }
@@ -52,18 +63,25 @@ export class PropertyController {
   @Get(':id')
   async getPropertyById(
     @Param('id') id: string,
-    @Query() optional,
+    @Query() optional: OptionalQueryProperty,
   ): Promise<Property> {
     return await this.propertyService.property({ id }, optional);
   }
 
-  @Post()
-  async createProperty(@Body() payload: CreatePropertyDto): Promise<Property> {
-    console.log(payload);
-    return await this.propertyService.createProperty(payload);
+  @Post(':id')
+  @ApiCreatedResponse({ description: 'Create a new property' })
+  @ApiUnauthorizedResponse({ description: 'User not logged in' })
+  @ApiBadRequestResponse({ description: 'Not found relationship' })
+  @UseGuards(JwtAuthGuard, IsUser)
+  async createProperty(
+    @Param('id') projectId: string,
+    @Body() payload: CreatePropertyDto,
+  ): Promise<Property> {
+    return await this.propertyService.createProperty(payload, projectId);
   }
 
   @Put(':id')
+  @UseGuards(JwtAuthGuard, IsUser)
   async updatePropertyById(
     @Param('id') id: string,
     @Body() payload: UpdatePropertyDto,
