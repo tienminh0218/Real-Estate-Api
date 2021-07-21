@@ -17,6 +17,7 @@ import {
   OptionalQueryProperty,
 } from './types/optional-query.type';
 import { UpdatePropertyDto } from './dto/update-property.dto';
+import { PropertyCustom } from './types/property.type';
 
 @Injectable()
 export class PropertyService {
@@ -70,22 +71,33 @@ export class PropertyService {
       include?: Prisma.PropertyInclude;
     },
     optional: OptionalQueryProperties = {},
-  ): Promise<Property[]> {
+  ): Promise<PropertyCustom> {
     try {
-      const { where } = params;
-      const { skip, take, cursor, orderBy, include: includeQuery } = optional;
+      const { where, cursor, orderBy } = params;
+      let { page, limit, include: includeQuery } = optional;
+      page = Number(page) || 1;
+      limit = Number(limit) || 20;
 
       const include =
         params.include || this.getIncludeProperty(includeQuery?.split(','));
 
-      return this.prismaService.property.findMany({
-        skip: Number(skip) || undefined,
-        take: Number(take) || undefined,
-        cursor,
+      const data = await this.prismaService.property.findMany({
+        skip: limit * (page - 1),
+        take: limit,
         where,
+        cursor,
         orderBy,
         include,
       });
+
+      return {
+        data,
+        pagination: {
+          page,
+          limit,
+          totalRows: data.length,
+        },
+      };
     } catch (error) {
       this.logger.error(error.message);
       throw new BadRequestException(error.message);

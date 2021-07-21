@@ -1,8 +1,13 @@
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, ID, ObjectType } from '@nestjs/graphql';
+
+import { User } from '../../user/types/graph-model.type';
+import { Property } from '../../property/types/graph-model.type';
+import { News } from '../../news/types/graph-model.type';
+import { Project } from '../../projects/types/graph-model.type';
 
 @ObjectType()
 export class Broker {
-  @Field()
+  @Field((type) => ID)
   id: string;
 
   @Field()
@@ -11,11 +16,8 @@ export class Broker {
   @Field()
   updatedAt: string;
 
-  @Field()
+  @Field((type) => User)
   user: string;
-
-  @Field()
-  userId: string;
 
   @Field()
   district: string;
@@ -23,18 +25,15 @@ export class Broker {
   @Field()
   city: string;
 
-  @Field()
-  properties: string;
+  @Field((type) => [Property])
+  properties: Property[];
 
-  @Field()
-  news: string;
+  @Field((type) => [News])
+  news: News[];
 
   @Field()
   comments_Broker: string;
 
-  @Field()
-  Project: string;
-
-  @Field()
-  projectId: string;
+  @Field((type) => Project)
+  Project: Project;
 }

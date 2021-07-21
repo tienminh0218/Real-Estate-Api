@@ -10,6 +10,7 @@ import {
   OptionalQueryUsers,
   OptionalQueryUser,
 } from './types/optional-query.type';
+import { UserCustom } from './types/user.type';
 
 @Injectable()
 export class UserService {
@@ -20,7 +21,7 @@ export class UserService {
 
     const listRelation = [
       'broker',
-      'company',
+      'companies',
       'comments_project',
       'comments_Broker',
       'comments_Company',
@@ -58,22 +59,32 @@ export class UserService {
       include?: Prisma.UserInclude;
     },
     optional: OptionalQueryUsers = {},
-  ): Promise<User[]> {
+  ): Promise<UserCustom> {
     try {
-      const { where } = params;
-      const { skip, take, cursor, orderBy, include: includeQuery } = optional;
-
+      const { where, orderBy, cursor } = params;
+      let { page, limit, include: includeQuery } = optional;
+      page = Number(page) || 1;
+      limit = Number(limit) || 20;
       const include =
         params.include || this.getIncludeUser(includeQuery?.split(','));
 
-      return this.prisma.user.findMany({
-        skip: Number(skip) || undefined,
-        take: Number(take) || undefined,
-        cursor,
+      const data = await this.prisma.user.findMany({
+        take: limit,
+        skip: limit * (page - 1),
         where,
         orderBy,
+        cursor,
         include,
       });
+
+      return {
+        data,
+        pagination: {
+          page,
+          limit,
+          totalRows: data.length,
+        },
+      };
     } catch (error) {
       this.logger.error(error.message);
       throw new BadRequestException(error.message);

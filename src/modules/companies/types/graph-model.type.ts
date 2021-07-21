@@ -1,15 +1,18 @@
-import { Field, ID, ObjectType } from '@nestjs/graphql';
+import { Field, ID, ObjectType, GraphQLISODateTime } from '@nestjs/graphql';
+
+import { Project } from '../../projects/types/graph-model.type';
+import { Comment_Company } from '../../comment/types/graph-model.type';
 
 @ObjectType()
 export class Company {
   @Field((type) => ID)
   id: string;
 
-  @Field()
-  createdAt: string;
+  @Field((type) => GraphQLISODateTime)
+  createdAt: Date;
 
-  @Field()
-  updatedAt: string;
+  @Field((type) => GraphQLISODateTime)
+  updatedAt: Date;
 
   @Field()
   userId: string;
@@ -23,9 +26,9 @@ export class Company {
   @Field()
   city: string;
 
-  //   @Field()
-  //   comments_Company: string;
+  @Field((type) => [Comment_Company])
+  comments_Company: Comment_Company[];
 
-  //   @Field()
-  //   projects: string;
+  @Field((type) => [Project], { nullable: 'itemsAndList' })
+  projects: Project[];
 }

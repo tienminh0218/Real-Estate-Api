@@ -1,15 +1,26 @@
-import { Field, ObjectType, ID, Int } from '@nestjs/graphql';
+import {
+  Field,
+  ObjectType,
+  ID,
+  Int,
+  GraphQLISODateTime,
+} from '@nestjs/graphql';
 
+import { CategoryProperty } from '../../categoryProperty/types/graph-model.type';
+import { User } from '../../user/types/graph-model.type';
+import { Broker } from '../../broker/types/graph-model.type';
+import { Project } from '../../projects/types/graph-model.type';
+import { Comment_Property } from '../../comment/types/graph-model.type';
 @ObjectType()
 export class Property {
   @Field((type) => ID)
   id: string;
 
-  @Field()
-  createdAt: string;
+  @Field((type) => GraphQLISODateTime)
+  createdAt: Date;
 
-  @Field()
-  updatedAt: string;
+  @Field((type) => GraphQLISODateTime)
+  updatedAt: Date;
 
   @Field()
   location: string;
@@ -23,18 +34,18 @@ export class Property {
   @Field((type) => Int)
   status: number;
 
-  @Field()
-  comments_Property: string;
+  @Field((type) => [Comment_Property])
+  comments_Property: Comment_Property[];
 
-  @Field()
-  brokerId: string;
+  @Field((type) => Broker)
+  broker: Broker;
 
-  @Field()
-  userId: string;
+  @Field((type) => User)
+  user: User;
 
-  @Field()
-  projectId: string;
+  @Field((type) => Project)
+  project: Project;
 
-  @Field()
-  categoryId: string;
+  @Field((type) => CategoryProperty)
+  category: CategoryProperty;
 }
