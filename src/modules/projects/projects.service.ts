@@ -125,12 +125,4 @@ export class ProjectsService {
       },
     });
   }
-
-  // async list_project_city(city:string): Promise<Project[]>{
-  //     return this.prisma.project.findMany({
-  //         where:{
-  //             city: city
-  //         }
-  //     })
-  // }
 }

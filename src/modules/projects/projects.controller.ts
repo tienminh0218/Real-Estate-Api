@@ -27,6 +27,7 @@ export class ProjectsController {
     @Body() data: CreateProjectDto,
     @Param('id') id: string,
   ): Promise<any> {
+
     return this.projectsService.createProject(data, id);
   }
 
@@ -43,6 +44,7 @@ export class ProjectsController {
   }
 
   @Delete('/:id')
+  @UseGuards(JwtAuthGuard)
   async deleteProject(@Param('id') id: string): Promise<ProjectModel> {
     return this.projectsService.deleteProject({ id });
   }
@@ -65,5 +67,9 @@ export class ProjectsController {
   @Get()
   async getAllProject(): Promise<ProjectModel[]> {
     return await this.projectsService.projects({});
+  }
+  @Get(':id')
+  async getProject(@Param('id') id: string): Promise<ProjectModel> {
+    return await this.projectsService.project({ id });
   }
 }
