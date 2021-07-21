@@ -19,7 +19,7 @@ export class CompaniesService {
     })
   }
 
-  async companys(params: {
+  async companies(params: {
     where?: Prisma.CompanyWhereInput;
     skip?: number;
     take?: number;
