@@ -1,5 +1,7 @@
 import { Field, ID, Int, ObjectType } from '@nestjs/graphql';
 
+import { Company } from '../../companies/types/graph-model.type';
+
 @ObjectType()
 export class User {
   @Field((type) => ID)
@@ -26,8 +28,8 @@ export class User {
   //   @Field()
   //   broker:
 
-  //   @Field()
-  //   company:
+  @Field((type) => [Company])
+  companies: Company[];
 
   //   @Field()
   //   comments_project:
