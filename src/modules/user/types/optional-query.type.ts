@@ -1,8 +1,6 @@
-import { PaginationType } from '../../../utils/generate-include';
-import { Prisma } from '@prisma/client';
+import {PaginationType} from '../../../common/types/pagination.type'
 
-export interface OptionalQueryUsers
-  extends PaginationType<Prisma.UserWhereUniqueInput, Prisma.UserOrderByInput> {
+export interface OptionalQueryUsers extends PaginationType {
   include?: string;
 }
 
