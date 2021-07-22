@@ -11,7 +11,7 @@ import { User } from '@prisma/client';
 
 import { User as UserType } from './types/graph-model.type';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UserCustom } from '../auth/interface/requestWithUser';
+import { UserInterface } from '../auth/interface/requestWithUser';
 @Resolver((of) => UserType)
 export class UserResolver {
   constructor(private readonly userService: UserService) {}
@@ -25,7 +25,7 @@ export class UserResolver {
   async getUserById(
     @Args('id', { type: () => String }) id: string,
   ): Promise<User> {
-    return await this.userService.user({ id });
+    return await this.userService.user({ where: { id } });
   }
 
   @Mutation(() => UserType)
@@ -36,5 +36,5 @@ export class UserResolver {
   @ResolveField(() => UserType)
   async relationShip(
     @Args('payload') payload: string,
-  ): Promise<UserCustom | any> {}
+  ): Promise<UserInterface | any> {}
 }

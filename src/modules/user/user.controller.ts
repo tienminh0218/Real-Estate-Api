@@ -6,6 +6,7 @@ import {
   Get,
   HttpCode,
   Param,
+  Patch,
   Put,
   Query,
   Res,
@@ -54,7 +55,7 @@ export class UserController {
     @Param('id') id: string,
     @Query() optional: OptionalQueryUser,
   ): Promise<User> {
-    return await this.userService.user({ id }, optional);
+    return await this.userService.user({ where: { id } }, optional);
   }
 
   @Put(':id')
@@ -75,7 +76,7 @@ export class UserController {
     });
   }
 
-  @Put(':id/role')
+  @Patch(':id/role')
   @ApiCreatedResponse({ description: 'Updated success role' })
   @ApiForbiddenResponse({ description: 'Not have role Admin' })
   @ApiUnauthorizedResponse({ description: 'User not login' })
