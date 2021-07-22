@@ -1,10 +1,3 @@
-export interface PaginationType<X, Y> {
-  skip?: number;
-  take?: number;
-  cursor?: X;
-  orderBy?: Y;
-}
-
 export const generateIncludeQuery = (
   listRelation: string[],
   listIncludeQuery: string[],

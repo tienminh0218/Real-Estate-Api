@@ -1,6 +1,3 @@
-import { ProjectsService } from './../projects/projects.service';
-import { UserService } from './../user/user.service';
-import { PrismaService } from './../prisma/prisma.service';
 import {
   Injectable,
   Logger,
@@ -9,6 +6,10 @@ import {
   forwardRef,
 } from '@nestjs/common';
 import { Prisma, Property } from '@prisma/client';
+
+import { ProjectsService } from './../projects/projects.service';
+import { UserService } from './../user/user.service';
+import { PrismaService } from './../prisma/prisma.service';
 import { CreatePropertyDto } from './dto/create-property.dto';
 import { generateIncludeQuery } from '../../utils/generate-include';
 import {
@@ -16,6 +17,7 @@ import {
   OptionalQueryProperty,
 } from './types/optional-query.type';
 import { UpdatePropertyDto } from './dto/update-property.dto';
+import { PropertyCustom } from './types/property.type';
 
 @Injectable()
 export class PropertyService {
@@ -31,7 +33,13 @@ export class PropertyService {
   getIncludeProperty(listIncludeQuery: string[]) {
     if (!listIncludeQuery) return;
 
-    const listRelation = ['category', 'comments_Property', 'broker', 'user'];
+    const listRelation = [
+      'category',
+      'comments_Property',
+      'broker',
+      'user',
+      'project',
+    ];
 
     return generateIncludeQuery(listRelation, listIncludeQuery);
   }
@@ -53,28 +61,43 @@ export class PropertyService {
     }
   }
 
-  async propertys(
+  async properties(
     params: {
       where?: Prisma.PropertyWhereInput;
+      skip?: number;
+      take?: number;
+      cursor?: Prisma.PropertyWhereUniqueInput;
+      orderBy?: Prisma.PropertyOrderByInput;
+      include?: Prisma.PropertyInclude;
     },
-    optional: OptionalQueryProperties<
-      Prisma.PropertyWhereUniqueInput,
-      Prisma.PropertyOrderByInput
-    > = {},
-  ): Promise<Property[]> {
+    optional: OptionalQueryProperties = {},
+  ): Promise<PropertyCustom> {
     try {
-      const { where } = params;
-      const { skip, take, cursor, orderBy } = optional;
-      const include = this.getIncludeProperty(optional?.include?.split(','));
+      const { where, cursor, orderBy } = params;
+      let { page, limit, include: includeQuery } = optional;
+      page = Number(page) || 1;
+      limit = Number(limit) || 20;
 
-      return this.prismaService.property.findMany({
-        skip: Number(skip) || undefined,
-        take: Number(take) || undefined,
-        cursor,
+      const include =
+        params.include || this.getIncludeProperty(includeQuery?.split(','));
+
+      const data = await this.prismaService.property.findMany({
+        skip: limit * (page - 1),
+        take: limit,
         where,
+        cursor,
         orderBy,
         include,
       });
+
+      return {
+        data,
+        pagination: {
+          page,
+          limit,
+          totalRows: data.length,
+        },
+      };
     } catch (error) {
       this.logger.error(error.message);
       throw new BadRequestException(error.message);
@@ -109,7 +132,7 @@ export class PropertyService {
     try {
       const { gte, lte, location } = data;
 
-      return this.propertys({
+      return this.properties({
         where: {
           AND: [
             { price: { gte: Number(gte), lte: Number(lte) } },
@@ -123,13 +146,17 @@ export class PropertyService {
     }
   }
 
-  async createProperty(payload: CreatePropertyDto): Promise<Property> {
+  async createProperty(
+    payload: CreatePropertyDto,
+    projectId: string,
+  ): Promise<Property> {
     try {
-      const { categoryId, brokerId, projectId, location, coordinates, price } =
+      const { categoryId, brokerId, location, coordinates, price, name } =
         payload;
 
       const result = await this.prismaService.property.create({
         data: {
+          name,
           location,
           coordinates,
           price,
@@ -155,6 +182,7 @@ export class PropertyService {
     try {
       const { where, data } = params;
       const {
+        name,
         categoryId,
         location,
         coordinates,
@@ -167,6 +195,7 @@ export class PropertyService {
       return this.prismaService.property.update({
         where,
         data: {
+          name,
           location,
           coordinates,
           price,

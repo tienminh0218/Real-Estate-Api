@@ -1,4 +1,4 @@
-import { UserIsUserGuard } from './../auth/guards/isUser';
+import { IsUser } from './../auth/guards/isUser';
 import {
   Body,
   Controller,
@@ -6,38 +6,65 @@ import {
   Get,
   HttpCode,
   Param,
+  Patch,
   Put,
   Query,
   Res,
-  Req,
   UseGuards,
 } from '@nestjs/common';
 import { User } from '@prisma/client';
-import { Response, Request } from 'express';
+import { Response, Request, query } from 'express';
+import {
+  ApiTags,
+  ApiOkResponse,
+  ApiCreatedResponse,
+  ApiCookieAuth,
+  ApiForbiddenResponse,
+  ApiUnauthorizedResponse,
+  ApiBadRequestResponse,
+} from '@nestjs/swagger';
 
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt';
-import { Roles, RoleType } from '../auth/decorators/roles.decorator';
+import { Roles, Role } from '../auth/decorators/roles.decorator';
 import { RolesGuard } from '../auth/guards/role';
 import { UpdateRoleUser } from './dto/update-role.dto';
+import {
+  OptionalQueryUser,
+  OptionalQueryUsers,
+} from './types/optional-query.type';
+import { UserCustom } from './types/user.type';
 
+@ApiTags('Users')
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get()
-  async getUsers(@Query() optional): Promise<User[] | null> {
+  @ApiOkResponse({ description: 'Get all users' })
+  async getUsers(
+    @Query() optional: OptionalQueryUsers,
+  ): Promise<UserCustom | null> {
     return await this.userService.users({}, optional);
   }
 
   @Get(':id')
-  async getUserById(@Param('id') id: string, @Query() optional): Promise<User> {
-    return await this.userService.user({ id }, optional);
+  @ApiOkResponse({ description: 'Get user by id' })
+  async getUserById(
+    @Param('id') id: string,
+    @Query() optional: OptionalQueryUser,
+  ): Promise<User> {
+    return await this.userService.user({ where: { id } }, optional);
   }
 
   @Put(':id')
-  @UseGuards(JwtAuthGuard, UserIsUserGuard)
+  @ApiCookieAuth('Auth')
+  @ApiCreatedResponse({ description: 'Updated success user by id' })
+  @ApiForbiddenResponse({ description: 'Incorrect userId' })
+  @ApiUnauthorizedResponse({ description: 'User not login' })
+  @ApiBadRequestResponse({ description: 'Not found account to update' })
+  @UseGuards(JwtAuthGuard, IsUser)
   async updateUserById(
     @Param('id') id: string,
     @Body() payload: UpdateUserDto,
@@ -49,8 +76,14 @@ export class UserController {
     });
   }
 
-  @Put(':id/role')
-  @Roles(RoleType.ADMIN)
+  @Patch(':id/role')
+  @ApiCreatedResponse({ description: 'Updated success role' })
+  @ApiForbiddenResponse({ description: 'Not have role Admin' })
+  @ApiUnauthorizedResponse({ description: 'User not login' })
+  @ApiBadRequestResponse({
+    description: 'Not found account to update or empty input data',
+  })
+  @Roles(Role.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
   async updateRole(
     @Param('id') id: string,
@@ -64,7 +97,9 @@ export class UserController {
 
   @Delete(':id')
   @HttpCode(204)
-  @Roles(RoleType.ADMIN)
+  @ApiForbiddenResponse({ description: 'Not have role Admin' })
+  @ApiBadRequestResponse({ description: 'Not found id' })
+  @Roles(Role.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
   async deleteUserById(
     @Param('id') id: string,

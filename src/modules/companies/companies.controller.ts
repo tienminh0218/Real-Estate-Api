@@ -1,3 +1,4 @@
+import { IsUser } from './../auth/guards/isUser';
 import {
   Controller,
   Body,
@@ -17,11 +18,22 @@ import { Request } from 'express';
 import { JwtAuthGuard } from '../auth/guards/jwt';
 
 @Controller('companies')
-@UseGuards(JwtAuthGuard)
+// @UseGuards(JwtAuthGuard)
 export class CompaniesController {
   constructor(private companiesService: CompaniesService) {}
 
+  @Get()
+  async getCompanies(@Param() param): Promise<CompanyModel[]> {
+    return await this.companiesService.companies(param);
+  }
+
+  @Get(':id')
+  async getCompany(@Param('id') id: string): Promise<CompanyModel> {
+    return await this.companiesService.company({ id });
+  }
+
   @Post()
+  @UseGuards(JwtAuthGuard)
   async createCompanycookies(
     @Req() req: RequestWithUser,
     @Body() data: CreateCompanyDto,
@@ -30,6 +42,7 @@ export class CompaniesController {
   }
 
   @Put(':id')
+  @UseGuards(JwtAuthGuard, IsUser)
   async updateCompanyById(
     @Param('id') id: string,
     @Body() payload: CreateCompanyDto,
@@ -41,22 +54,7 @@ export class CompaniesController {
   }
 
   @Delete('/:id')
-  async deleteCompany(@Param('id') id: string): Promise<CompanyModel> {
-    return this.companiesService.deleteCompany({ id });
-  }
-
-  @Put(':id')
-  async updateCompanyById(
-    @Param('id') id: string,
-    @Body() payload: CreateCompanyDto,
-  ): Promise<CompanyModel> {
-    return await this.companiesService.updateCompany({
-      where: { id },
-      data: payload,
-    });
-  }
-
-  @Delete('/:id')
+  @UseGuards(JwtAuthGuard, IsUser)
   async deleteCompany(@Param('id') id: string): Promise<CompanyModel> {
     return this.companiesService.deleteCompany({ id });
   }

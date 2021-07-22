@@ -1,11 +1,10 @@
-import { Response } from 'express';
-import { UserService } from './../user/user.service';
 import { Injectable, Logger, BadRequestException } from '@nestjs/common';
-import { comparePassword } from '../../utils/hash-password';
-import { CreateUserDto } from '../user/dto/create-user.dto';
 import { User } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
-import { getJwtConfig } from '../../config/config.service';
+
+import { UserService } from './../user/user.service';
+import { comparePassword } from '../../utils/hash-password';
+import { CreateUserDto } from '../user/dto/create-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -13,11 +12,11 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly logger: Logger,
     private readonly jwtService: JwtService,
-  ) { }
+  ) {}
 
   async validateUser(username: string, password: string): Promise<any> {
     try {
-      const user = await this.userService.user({ username });
+      const user = await this.userService.user({ where: { username } });
 
       if (user && comparePassword(password, user.password)) return user;
 
@@ -47,7 +46,23 @@ export class AuthService {
 
   async validateJwt({ username }) {
     try {
-      const user = await this.userService.user({ username });
+      // const user = await this.userService.users({
+      //   where: { username },
+      //   include: {
+      //     companies: {
+      //       include: { projects: { include: { properties: true } } },
+      //     },
+      //   },
+      // });
+
+      const user = await this.userService.user({
+        where: { username },
+        include: {
+          companies: {
+            include: { projects: { include: { properties: true } } },
+          },
+        },
+      });
 
       if (!user) return null;
 

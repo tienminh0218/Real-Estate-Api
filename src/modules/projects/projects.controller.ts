@@ -1,3 +1,4 @@
+import { IsUser } from './../auth/guards/isUser';
 import { ProjectsService } from './projects.service';
 import {
   Controller,
@@ -17,19 +18,21 @@ import { CreateProjectDto } from './dto/create-project.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt';
 
 @Controller('projects')
-@UseGuards(JwtAuthGuard)
 export class ProjectsController {
-  constructor(private readonly projectsService: ProjectsService) { }
+  constructor(private readonly projectsService: ProjectsService) {}
 
   @Post(':id')
+  @UseGuards(JwtAuthGuard, IsUser)
   async createProject(
     @Body() data: CreateProjectDto,
     @Param('id') id: string,
   ): Promise<any> {
+
     return this.projectsService.createProject(data, id);
   }
 
   @Put(':id')
+  @UseGuards(JwtAuthGuard, IsUser)
   async updateProjectById(
     @Param('id') id: string,
     @Body() payload: CreateProjectDto,
@@ -41,6 +44,7 @@ export class ProjectsController {
   }
 
   @Delete('/:id')
+  @UseGuards(JwtAuthGuard)
   async deleteProject(@Param('id') id: string): Promise<ProjectModel> {
     return this.projectsService.deleteProject({ id });
   }
@@ -63,5 +67,9 @@ export class ProjectsController {
   @Get()
   async getAllProject(): Promise<ProjectModel[]> {
     return await this.projectsService.projects({});
+  }
+  @Get(':id')
+  async getProject(@Param('id') id: string): Promise<ProjectModel> {
+    return await this.projectsService.project({ id });
   }
 }

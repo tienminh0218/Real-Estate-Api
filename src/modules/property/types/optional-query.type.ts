@@ -1,6 +1,6 @@
-import { PaginationType } from '../../../utils/generate-include';
+import { PaginationType } from '../../../common/types/pagination.type';
 
-export interface OptionalQueryProperties<X, Y> extends PaginationType<X, Y> {
+export interface OptionalQueryProperties extends PaginationType {
   include?: string;
 }
 
