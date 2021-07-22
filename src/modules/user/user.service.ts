@@ -10,6 +10,7 @@ import {
   OptionalQueryUsers,
   OptionalQueryUser,
 } from './types/optional-query.type';
+import { UserCustom } from './types/user.type';
 
 @Injectable()
 export class UserService {
@@ -20,7 +21,7 @@ export class UserService {
 
     const listRelation = [
       'broker',
-      'company',
+      'companies',
       'comments_project',
       'comments_Broker',
       'comments_Company',
@@ -32,14 +33,19 @@ export class UserService {
   }
 
   async user(
-    userWhereUniqueInput: Prisma.UserWhereUniqueInput,
+    param: {
+      where?: Prisma.UserWhereUniqueInput;
+      include?: Prisma.UserInclude;
+    },
     optional: OptionalQueryUser = {},
   ): Promise<User | null> {
     try {
-      const include = this.getIncludeUser(optional?.include?.split(','));
+      const { where } = param;
+      const includeQuery = this.getIncludeUser(optional?.include?.split(','));
+      const include = param.include || includeQuery;
 
       return this.prisma.user.findUnique({
-        where: userWhereUniqueInput,
+        where,
         include,
       });
     } catch (error) {
@@ -58,22 +64,32 @@ export class UserService {
       include?: Prisma.UserInclude;
     },
     optional: OptionalQueryUsers = {},
-  ): Promise<User[]> {
+  ): Promise<UserCustom> {
     try {
-      const { where } = params;
-      const { skip, take, cursor, orderBy, include: includeQuery } = optional;
-
+      const { where, orderBy, cursor } = params;
+      let { page, limit, include: includeQuery } = optional;
+      page = Number(page) || 1;
+      limit = Number(limit) || 20;
       const include =
         params.include || this.getIncludeUser(includeQuery?.split(','));
 
-      return this.prisma.user.findMany({
-        skip: Number(skip) || undefined,
-        take: Number(take) || undefined,
-        cursor,
+      const data = await this.prisma.user.findMany({
+        take: limit,
+        skip: limit * (page - 1),
         where,
         orderBy,
+        cursor,
         include,
       });
+
+      return {
+        data,
+        pagination: {
+          page,
+          limit,
+          totalRows: data.length,
+        },
+      };
     } catch (error) {
       this.logger.error(error.message);
       throw new BadRequestException(error.message);
@@ -83,7 +99,7 @@ export class UserService {
   async createUser(data: CreateUserDto): Promise<any> {
     try {
       const { username, password: rawPassword, fullName, role } = data;
-      const existedUser = await this.user({ username });
+      const existedUser = await this.user({ where: { username } });
 
       if (existedUser) throw new Error('Username already exist');
 
@@ -109,7 +125,7 @@ export class UserService {
   }): Promise<User> {
     try {
       const { where, data } = params;
-      const existedUser = await this.user({ id: where.id });
+      const existedUser = await this.user({ where: { id: where.id } });
 
       if (!existedUser) throw new Error('Account Not Found');
 
@@ -130,7 +146,7 @@ export class UserService {
 
   async deleteUser(where: Prisma.UserWhereUniqueInput): Promise<any> {
     try {
-      const existedUser = await this.user(where);
+      const existedUser = await this.user({ where });
 
       if (!existedUser) throw new Error('Account Not Found');
 

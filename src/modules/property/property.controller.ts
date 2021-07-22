@@ -17,7 +17,6 @@ import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
   ApiOkResponse,
-  ApiResponse,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
@@ -29,6 +28,7 @@ import {
   OptionalQueryProperty,
   OptionalQueryProperties,
 } from './types/optional-query.type';
+import { PropertyCustom } from './types/property.type';
 
 @ApiTags('Properties')
 @Controller('properties')
@@ -39,7 +39,7 @@ export class PropertyController {
   @ApiOkResponse({ description: 'Get all properties' })
   async getAllProperty(
     @Query() optional: OptionalQueryProperties,
-  ): Promise<Property[]> {
+  ): Promise<PropertyCustom> {
     return await this.propertyService.properties({}, optional);
   }
 

@@ -20,7 +20,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt';
 @Controller('companies')
 // @UseGuards(JwtAuthGuard)
 export class CompaniesController {
-  constructor(private companiesService: CompaniesService) { }
+  constructor(private companiesService: CompaniesService) {}
 
   @Get()
   async getCompanies(@Param() param): Promise<CompanyModel[]> {
@@ -33,7 +33,7 @@ export class CompaniesController {
   }
 
   @Post()
-  @UseGuards(JwtAuthGuard, IsUser)
+  @UseGuards(JwtAuthGuard)
   async createCompanycookies(
     @Req() req: RequestWithUser,
     @Body() data: CreateCompanyDto,
@@ -58,5 +58,4 @@ export class CompaniesController {
   async deleteCompany(@Param('id') id: string): Promise<CompanyModel> {
     return this.companiesService.deleteCompany({ id });
   }
-
 }

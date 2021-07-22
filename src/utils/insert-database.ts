@@ -5,16 +5,12 @@ import { user } from './data/user';
 
 const prisma = new PrismaClient();
 
-const createUser = async () => {
+async function main() {
   await prisma.user.createMany({
     data: user,
   });
   const data = await prisma.user.findMany({});
   console.log(data);
-};
-
-async function main() {
-  createUser();
 }
 
 main()
