@@ -54,6 +54,7 @@ export class CompaniesController {
   }
 
   @Delete('/:id')
+  @UseGuards(JwtAuthGuard, IsUser)
   async deleteCompany(@Param('id') id: string): Promise<CompanyModel> {
     return this.companiesService.deleteCompany({ id });
   }
