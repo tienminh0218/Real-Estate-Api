@@ -19,7 +19,6 @@ enum Role {
 enum Gender {
   MALE
   FEMALE
-  OTHER
 }
 
 model User {
@@ -49,7 +48,7 @@ model Broker {
   city            String           @db.VarChar(255)
   phoneNumber     String           @unique @db.VarChar(255)
   dob             String           @db.VarChar(255)
-  gender          Gender           @default(OTHER)
+  gender          Gender           @default(MALE)
   email           String           @unique @db.VarChar(255)
   properties      BrokerProperty[]
   news            News[]
