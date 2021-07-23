@@ -166,11 +166,12 @@ model Comment_Project {
 }
 
 model News {
-  id        String   @id @default(uuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  title     String   @db.VarChar(255)
-  content   String
-  author    Broker?  @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  authorId  String
+  id          String   @id @default(uuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  title       String   @db.VarChar(255)
+  content     String
+  author      Broker?  @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId    String
+  censorship  Boolean  @default(false)
 }
