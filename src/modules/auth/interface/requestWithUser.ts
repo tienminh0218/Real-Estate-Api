@@ -8,10 +8,10 @@ export interface ProjectInterface extends Project {
 export interface CompanyInterface extends Company {
   projects: ProjectInterface[];
 }
-export interface UserCustom extends User {
+export interface UserInterface extends User {
   companies: CompanyInterface[];
 }
 
 export interface RequestWithUser extends Request {
-  user: UserCustom;
+  user: UserInterface;
 }

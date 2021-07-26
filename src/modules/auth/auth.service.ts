@@ -16,7 +16,7 @@ export class AuthService {
 
   async validateUser(username: string, password: string): Promise<any> {
     try {
-      const user = await this.userService.user({ username });
+      const user = await this.userService.user({ where: { username } });
 
       if (user && comparePassword(password, user.password)) return user;
 
@@ -46,7 +46,16 @@ export class AuthService {
 
   async validateJwt({ username }) {
     try {
-      const user = await this.userService.users({
+      // const user = await this.userService.users({
+      //   where: { username },
+      //   include: {
+      //     companies: {
+      //       include: { projects: { include: { properties: true } } },
+      //     },
+      //   },
+      // });
+
+      const user = await this.userService.user({
         where: { username },
         include: {
           companies: {
