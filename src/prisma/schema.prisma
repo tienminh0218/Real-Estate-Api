@@ -173,5 +173,5 @@ model News {
   content     String
   author      Broker?  @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorId    String
-  status      Boolean  @default(false)
+  status      Boolean  @default(true)
 }
