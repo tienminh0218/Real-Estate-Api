@@ -16,6 +16,11 @@ enum Role {
   ADMIN
 }
 
+enum Gender {
+  MALE
+  FEMALE
+}
+
 model User {
   id                String             @id @default(uuid())
   createdAt         DateTime           @default(now())
@@ -41,7 +46,11 @@ model Broker {
   userId          String
   district        String           @db.VarChar(255)
   city            String           @db.VarChar(255)
-  properties      Property[]
+  phoneNumber     String           @unique @db.VarChar(255)
+  dob             String           @db.VarChar(255)
+  gender          Gender           @default(MALE)
+  email           String           @unique @db.VarChar(255)
+  properties      BrokerProperty[]
   news            News[]
   comments_Broker Comment_Broker[]
   Project         Project?         @relation(fields: [projectId], references: [id])
@@ -71,7 +80,7 @@ model categoryProperty {
 
 model Property {
   id                String             @id @default(uuid())
-  name              String             @db.VarChar(255)          
+  name              String             @db.VarChar(255)
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
   category          categoryProperty   @relation(fields: [categoryId], references: [id], onDelete: Cascade)
@@ -81,12 +90,22 @@ model Property {
   price             Int
   status            Int                @default(0)
   comments_Property Comment_Property[]
-  broker            Broker             @relation(fields: [brokerId], references: [id], onDelete: Cascade)
-  brokerId          String
+  broker            BrokerProperty[]
   user              User?              @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId            String?
   project           Project            @relation(fields: [projectId], references: [id], onDelete: Cascade)
   projectId         String
+}
+
+model BrokerProperty {
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  propertyId String
+  broker     Broker   @relation(fields: [brokerId], references: [id], onDelete: Cascade)
+  brokerId   String
+  createdAt  DateTime @default(now())
+  owner      Boolean  @default(true)
+
+  @@id([propertyId, brokerId])
 }
 
 model Project {
@@ -155,4 +174,5 @@ model News {
   content   String
   author    Broker?  @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorId  String
+  status    Boolean  @default(false)
 }

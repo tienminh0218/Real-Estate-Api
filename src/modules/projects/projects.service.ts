@@ -2,6 +2,8 @@ import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Project, Company, Prisma } from '@prisma/client';
 import { CreateProjectDto } from './dto/create-project.dto';
+import { OptionalQueryProjects } from './types/optional-query.type';
+import { ProjectCustom } from './types/project.type';
 
 @Injectable()
 export class ProjectsService {
@@ -15,21 +17,40 @@ export class ProjectsService {
     });
   }
 
-  async projects(params: {
-    where?: Prisma.ProjectWhereInput;
-    skip?: number;
-    take?: number;
-    cursor?: Prisma.ProjectWhereUniqueInput;
-    orderBy?: Prisma.ProjectOrderByInput;
-    include?: Prisma.ProjectInclude;
-  }): Promise<Project[]> {
+  async projects(
+    id: string,
+    params: {
+      where?: Prisma.ProjectWhereInput;
+      skip?: number;
+      take?: number;
+      cursor?: Prisma.ProjectWhereUniqueInput;
+      orderBy?: Prisma.ProjectOrderByInput;
+      include?: Prisma.ProjectInclude;
+    },
+    optional: OptionalQueryProjects,
+  ): Promise<ProjectCustom> {
     try {
-      const { where, include } = params;
+      const { where, orderBy, cursor } = params;
 
-      return this.prisma.project.findMany({
+      let { page, limit, include: includeQuery } = optional;
+
+      page = Number(page) || 1;
+      limit = Number(limit) || 20;
+      const data = await this.prisma.project.findMany({
         where,
-        include,
+        take: limit,
+        skip: limit * (page - 1),
+        orderBy,
+        cursor
       });
+      return {
+        data,
+        pagination: {
+          page,
+          limit,
+          totalRows: data.length,
+        },
+      };
     } catch (error) {
       this.logger.error(error);
       throw new BadRequestException(error);
@@ -88,13 +109,13 @@ export class ProjectsService {
     });
   }
 
-  async listProject(id: string): Promise<Project[]> {
-    return this.prisma.project.findMany({
-      where: {
-        companyId: id,
-      },
-    });
-  }
+  // async listProject(id: string): Promise<Project[]> {
+  //   return this.prisma.project.findMany({
+  //     where: {
+  //       companyId: id,
+  //     },
+  //   });
+  // }
 
   async listProjectCity(searchcity: string): Promise<Project[]> {
     return this.prisma.project.findMany({

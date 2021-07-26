@@ -28,7 +28,7 @@ export class PropertyService {
     private readonly projectsService: ProjectsService,
     private readonly prismaService: PrismaService,
     private readonly logger: Logger,
-  ) {}
+  ) { }
 
   getIncludeProperty(listIncludeQuery: string[]) {
     if (!listIncludeQuery) return;
@@ -116,17 +116,17 @@ export class PropertyService {
     }
   }
 
-  async getPropertiesOfProject(id: string) {
-    try {
-      return this.projectsService.projects({
-        where: { id },
-        include: { properties: true },
-      });
-    } catch (error) {
-      this.logger.error(error);
-      throw new BadRequestException(error);
-    }
-  }
+  // async getPropertiesOfProject(id: string) {
+  //   try {
+  //     return this.projectsService.projects({
+  //       where: { id },
+  //       include: { properties: true },
+  //     });
+  //   } catch (error) {
+  //     this.logger.error(error);
+  //     throw new BadRequestException(error);
+  //   }
+  // }
 
   async getRangeProperties(data: any) {
     try {
@@ -161,7 +161,7 @@ export class PropertyService {
           coordinates,
           price,
           category: { connect: { id: categoryId } },
-          broker: { connect: { id: brokerId } },
+          // broker: { connect: { id: brokerId } },
           project: { connect: { id: projectId } },
         },
       });
@@ -201,7 +201,7 @@ export class PropertyService {
           price,
           status,
           category: categoryId && { connect: { id: categoryId } },
-          broker: brokerId && { connect: { id: brokerId } },
+          // broker: brokerId && { connect: { id: brokerId } },
           user: userId && { connect: { id: userId } },
         },
       });

@@ -39,7 +39,7 @@ import { UserCustom } from './types/user.type';
 @ApiTags('Users')
 @Controller('users')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) { }
 
   @Get()
   @ApiOkResponse({ description: 'Get all users' })

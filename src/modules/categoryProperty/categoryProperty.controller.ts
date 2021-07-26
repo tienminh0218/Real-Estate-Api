@@ -1,9 +1,11 @@
-import { Controller, Body, Get, Post, Param, Delete, Put, UseGuards } from '@nestjs/common';
+import { Controller, Body, Get, Post, Param, Delete, Put, UseGuards, Optional } from '@nestjs/common';
 import { CategoryPropertyService } from './categoryProperty.service';
 import { categoryProperty, Company as CompanyModel } from '@prisma/client';
 import { CreateCategoryPropertyDto } from './dto/create-categoryProperty.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { JwtAuthGuard } from '../auth/guards/jwt';
+import { categoryPropertyCustom } from './types/category.type';
+import { OptionalQueryCategories } from './types/optional-query.type';
 
 @Controller('category')
 @UseGuards(JwtAuthGuard)
@@ -13,8 +15,8 @@ export class CategoryPropertyController {
     ) { }
 
     @Get()
-    getAllNews(): Promise<categoryProperty[]> {
-        return this.categoryPropertyService.getAllCategory();
+    getAllNews(@Param() optional: OptionalQueryCategories): Promise<categoryPropertyCustom> {
+        return this.categoryPropertyService.getAllCategory({}, optional);
     }
 
     @Get('/:id')

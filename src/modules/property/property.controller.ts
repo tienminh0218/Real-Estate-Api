@@ -33,7 +33,7 @@ import { PropertyCustom } from './types/property.type';
 @ApiTags('Properties')
 @Controller('properties')
 export class PropertyController {
-  constructor(private readonly propertyService: PropertyService) {}
+  constructor(private readonly propertyService: PropertyService) { }
 
   @Get()
   @ApiOkResponse({ description: 'Get all properties' })
@@ -54,11 +54,11 @@ export class PropertyController {
     return await this.propertyService.getPropertiesOfUser(id);
   }
 
-  @Get('project/:id')
-  @ApiOkResponse({ description: 'Get property list of project' })
-  async getPropertiesProject(@Param('id') id: string): Promise<any> {
-    return await this.propertyService.getPropertiesOfProject(id);
-  }
+  // @Get('project/:id')
+  // @ApiOkResponse({ description: 'Get property list of project' })
+  // async getPropertiesProject(@Param('id') id: string): Promise<any> {
+  //   return await this.propertyService.getPropertiesOfProject(id);
+  // }
 
   @Get(':id')
   async getPropertyById(
