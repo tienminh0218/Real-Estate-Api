@@ -39,8 +39,6 @@ export class IsUser extends IsBroker implements CanActivate {
       return this.compareUser(user, paramId, 'companies');
     if (path === 'properties')
       return this.compareUser(user, paramId, 'projects');
-
-    return false;
   }
 
   updateOrDeleteMethod(
