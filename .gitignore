@@ -398,3 +398,5 @@ Temporary Items
 dist
 
 src/prisma/migrations/
+src/utils/data/
+

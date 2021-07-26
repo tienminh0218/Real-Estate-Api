@@ -98,7 +98,7 @@ export class UserService {
 
   async createUser(data: CreateUserDto): Promise<any> {
     try {
-      const { username, password: rawPassword, fullName, role } = data;
+      const { username, password: rawPassword, fullName } = data;
       const existedUser = await this.user({ where: { username } });
 
       if (existedUser) throw new Error('Username already exist');
@@ -110,7 +110,6 @@ export class UserService {
           username,
           password: passwordHashed,
           fullName,
-          role,
         },
       });
     } catch (error) {
