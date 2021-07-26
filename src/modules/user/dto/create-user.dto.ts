@@ -37,10 +37,4 @@ export class CreateUserDto {
   @MaxLength(30)
   @Field({ nullable: true })
   fullName?: string;
-
-  @ApiProperty({ required: false })
-  @IsString()
-  @IsOptional()
-  @Field({ nullable: true })
-  role?: Role;
 }

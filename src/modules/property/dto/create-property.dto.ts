@@ -15,11 +15,6 @@ export class CreatePropertyDto {
 
   @ApiProperty()
   @IsString()
-  @IsNotEmpty()
-  brokerId: string;
-
-  @ApiProperty()
-  @IsString()
   @MinLength(4)
   location: string;
 

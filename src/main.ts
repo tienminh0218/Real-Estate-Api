@@ -1,10 +1,11 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './modules';
-import { PrismaService } from './modules/prisma/prisma.service';
 import { ValidationPipe } from '@nestjs/common';
 import { Logger } from '@nestjs/common';
-import * as cookieParser from 'cookie-parser';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import * as cookieParser from 'cookie-parser';
+
+import { AppModule } from './modules';
+import { PrismaService } from './modules/prisma/prisma.service';
 
 async function bootstrap() {
   const PORT = process.env.PORT || 3000;

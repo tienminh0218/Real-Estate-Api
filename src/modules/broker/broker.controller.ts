@@ -9,11 +9,11 @@ import { RequestWithUser } from '../auth/interface/requestWithUser';
 @Controller('broker')
 @UseGuards(JwtAuthGuard)
 export class BrokerController {
-  constructor(private readonly brokerService: BrokerService) { }
+  constructor(private readonly brokerService: BrokerService) {}
 
-  @Post('create')
-  createBroker(@Req() req: RequestWithUser, @Body() data: CreateBrokerDto) {
+  // @Post('create')
+  // createBroker(@Req() req: RequestWithUser, @Body() data: CreateBrokerDto) {
 
-    return this.brokerService.createBroker(req.user, data);
-  }
+  //   return this.brokerService.createBroker(req.user, data);
+  // }
 }
