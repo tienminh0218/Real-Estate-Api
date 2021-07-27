@@ -13,7 +13,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { User } from '@prisma/client';
-import { Response, Request, query } from 'express';
+import { Response } from 'express';
 import {
   ApiTags,
   ApiOkResponse,
@@ -47,7 +47,7 @@ export class UserController {
   async getUsers(
     @Query() optional: OptionalQueryUsers,
   ): Promise<UserCustom | null> {
-    return await this.userService.users({}, optional);
+    return this.userService.users({}, optional);
   }
 
   @Get(':id')
@@ -57,7 +57,7 @@ export class UserController {
     @Param('id') id: string,
     @Query() optional: OptionalQueryUser,
   ): Promise<User> {
-    return await this.userService.user({ where: { id } }, optional);
+    return this.userService.user({ where: { id } }, optional);
   }
 
   @Put(':id')
@@ -72,7 +72,7 @@ export class UserController {
     @Body() payload: UpdateUserDto,
   ): Promise<User> {
     const { fullName, password } = payload;
-    return await this.userService.updateUser({
+    return this.userService.updateUser({
       where: { id },
       data: { fullName, password },
     });
@@ -91,7 +91,7 @@ export class UserController {
     @Param('id') id: string,
     @Body() payload: UpdateRoleUser,
   ): Promise<User> {
-    return await this.userService.updateUser({
+    return this.userService.updateUser({
       where: { id },
       data: payload,
     });
@@ -107,7 +107,7 @@ export class UserController {
     @Param('id') id: string,
     @Res() res: Response,
   ): Promise<any> {
-    const result = await this.userService.deleteUser({ id });
+    const result = this.userService.deleteUser({ id });
     if (result) return res.json({});
   }
 }
