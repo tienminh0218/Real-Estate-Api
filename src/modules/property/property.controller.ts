@@ -46,43 +46,43 @@ export class PropertyController {
   async getAllProperty(
     @Query() optional: OptionalQueryProperties,
   ): Promise<PropertyCustom> {
-    return await this.propertyService.properties({}, optional);
+    return this.propertyService.properties({}, optional);
   }
 
   @Get('priceAndLocation')
   @Public()
   async filterProperties(@Query() data: any): Promise<any> {
-    return await this.propertyService.getRangeProperties(data);
+    return this.propertyService.getRangeProperties(data);
   }
 
-  @Get('user/:id')
+  @Get('user/:userId')
   @Public()
   @ApiOkResponse({ description: 'Get property list of user' })
   async getPropertiesUser(
-    @Param('id') id: string,
+    @Param('userId') id: string,
     @Query() optional: OptionalQueryProperties,
   ): Promise<any> {
-    return await this.propertyService.getPropertiesOfUser(id, optional);
+    return this.propertyService.getPropertiesOfUser(id, optional);
   }
 
-  @Get('project/:id')
+  @Get('project/:projectId')
   @Public()
   @ApiOkResponse({ description: 'Get property list of project' })
   async getPropertiesProject(
-    @Param('id') id: string,
+    @Param('projectId') id: string,
     @Query() optional: OptionalQueryProperties,
   ): Promise<any> {
-    return await this.propertyService.getPropertiesOfProject(id, optional);
+    return this.propertyService.getPropertiesOfProject(id, optional);
   }
 
-  @Get('broker/:id')
+  @Get('broker/:brokerId')
   @Public()
   @ApiOkResponse({ description: 'Get property list of project' })
   async getPropertiesBroker(
-    @Param('id') id: string,
+    @Param('brokerId') id: string,
     @Query() optional: OptionalQueryProperties,
   ): Promise<any> {
-    return await this.propertyService.getPropertiesOfBroker(id, optional);
+    return this.propertyService.getPropertiesOfBroker(id, optional);
   }
 
   @Get(':id')
@@ -92,7 +92,7 @@ export class PropertyController {
     @Param('id') id: string,
     @Query() optional: OptionalQueryProperty,
   ): Promise<Property> {
-    return await this.propertyService.property({ where: { id } }, optional);
+    return this.propertyService.property({ where: { id } }, optional);
   }
 
   @Post('broker')
@@ -104,31 +104,31 @@ export class PropertyController {
     @Body() payload: CreatePropertyDto,
     @Req() req: RequestWithUser,
   ): Promise<Property> {
-    return await this.propertyService.createBrokerProperty(
+    return this.propertyService.createBrokerProperty(
       payload,
       req.user?.broker?.id,
     );
   }
 
-  @Post(':id')
+  @Post(':projectId')
   @ApiCreatedResponse({ description: 'Create a new property' })
   @ApiUnauthorizedResponse({ description: 'User not logged in' })
   @ApiForbiddenResponse({ description: 'That project is not of user' })
   @ApiBadRequestResponse({ description: 'Not found relationship' })
   @UseGuards(IsUser)
   async createProperty(
-    @Param('id') projectId: string,
+    @Param('projectId') id: string,
     @Body() payload: CreatePropertyDto,
   ): Promise<Property> {
-    return await this.propertyService.createProperty(payload, projectId);
+    return this.propertyService.createProperty(payload, id);
   }
 
-  @Put(':id/broker')
+  @Put(':propertyId/broker')
   @ApiUnauthorizedResponse({ description: 'User not logged in' })
   @ApiBadRequestResponse({ description: 'Broker not found' })
   @UseGuards(IsBroker)
   async assignBroker(
-    @Param('id') propertyId: string,
+    @Param('propertyId') propertyId: string,
     @Body('brokerId') brokerId: string,
   ): Promise<any> {
     return this.propertyService.assignBroker({ propertyId, brokerId });
@@ -143,7 +143,7 @@ export class PropertyController {
     @Body() payload: UpdatePropertyDto,
     @Param('id') propertyId: string,
   ): Promise<Property> {
-    return await this.propertyService.updateProperty({
+    return this.propertyService.updateProperty({
       where: { id: propertyId },
       data: payload,
     });
@@ -158,7 +158,7 @@ export class PropertyController {
     @Param('id') id: string,
     @Body() payload: UpdatePropertyDto,
   ): Promise<Property> {
-    return await this.propertyService.updateProperty({
+    return this.propertyService.updateProperty({
       where: { id },
       data: payload,
     });
@@ -167,13 +167,13 @@ export class PropertyController {
   @Delete('broker/:id')
   @HttpCode(204)
   @ApiNoContentResponse({ description: 'Delete success a property' })
-  @ApiForbiddenResponse({ description: 'This property not that user' })
+  @ApiForbiddenResponse({ description: 'This property not that broker' })
   @ApiUnauthorizedResponse({ description: 'User not logged in' })
   @UseGuards(IsBroker)
   async deleteBrokerPropertyById(
     @Param('id') propertyId: string,
   ): Promise<any> {
-    return await this.propertyService.deleteProperty({ id: propertyId });
+    return this.propertyService.deleteProperty({ id: propertyId });
   }
 
   @Delete(':id')
@@ -183,6 +183,6 @@ export class PropertyController {
   @ApiUnauthorizedResponse({ description: 'User not logged in' })
   @UseGuards(IsUser)
   async deletePropertyById(@Param('id') id: string): Promise<any> {
-    return await this.propertyService.deleteProperty({ id });
+    return this.propertyService.deleteProperty({ id });
   }
 }

@@ -22,10 +22,6 @@ import { PropertyCustom } from './types/property.type';
 @Injectable()
 export class PropertyService {
   constructor(
-    @Inject(forwardRef(() => UserService))
-    private readonly userService: UserService,
-    @Inject(forwardRef(() => ProjectsService))
-    private readonly projectsService: ProjectsService,
     private readonly prismaService: PrismaService,
     private readonly logger: Logger,
   ) {}
@@ -58,12 +54,13 @@ export class PropertyService {
       );
       const include = param.include || includeQuery;
 
-      return this.prismaService.property.findUnique({
+      const result = await this.prismaService.property.findUnique({
         where,
         include,
       });
+      return result;
     } catch (error) {
-      this.logger.error(error.message);
+      this.logger.error(error);
       throw new BadRequestException(error.message);
     }
   }
@@ -82,11 +79,10 @@ export class PropertyService {
     try {
       const { where, cursor, orderBy } = params;
       let { page, limit, include: includeQuery } = optional;
-      page = Number(page) || 1;
-      limit = Number(limit) || 20;
-
       const include =
         params.include || this.getIncludeProperty(includeQuery?.split(','));
+      page = Number(page) || 1;
+      limit = Number(limit) || 20;
 
       const data = await this.prismaService.property.findMany({
         skip: limit * (page - 1),
@@ -106,7 +102,7 @@ export class PropertyService {
         },
       };
     } catch (error) {
-      this.logger.error(error.message);
+      this.logger.error(error);
       throw new BadRequestException(error.message);
     }
   }
@@ -181,7 +177,7 @@ export class PropertyService {
     try {
       const { gte, lte, location } = data;
 
-      return this.properties({
+      const result = await this.properties({
         where: {
           AND: [
             { price: { gte: Number(gte), lte: Number(lte) } },
@@ -189,6 +185,7 @@ export class PropertyService {
           ],
         },
       });
+      return result;
     } catch (error) {
       this.logger.error(error);
       throw new BadRequestException(error);
@@ -202,7 +199,7 @@ export class PropertyService {
     try {
       const { categoryId, location, coordinates, price, name } = payload;
 
-      const data = await this.prismaService.property.create({
+      const result = await this.prismaService.property.create({
         data: {
           name,
           location,
@@ -213,9 +210,9 @@ export class PropertyService {
         },
       });
 
-      return data;
+      return result;
     } catch (error) {
-      this.logger.error(error.message);
+      this.logger.error(error);
       if (error.code === 'P2025') {
         throw new BadRequestException('Not found relationship');
       }
@@ -228,7 +225,6 @@ export class PropertyService {
   ): Promise<Property> {
     try {
       if (!brokerId) throw new Error('user need to update their profile');
-      const { categoryId, location, coordinates, price, name } = payload;
       const propertyData = await this.createProperty(payload);
 
       await this.prismaService.brokerProperty.create({
@@ -272,7 +268,7 @@ export class PropertyService {
 
       return result;
     } catch (error) {
-      this.logger.error(error.message);
+      this.logger.error(error);
       if (error.code === 'P2025') {
         throw new BadRequestException('Not found relationship');
       }
@@ -283,7 +279,6 @@ export class PropertyService {
   async assignBroker(payload: { propertyId: string; brokerId: string }) {
     try {
       const { propertyId, brokerId } = payload;
-
       const result = await this.prismaService.brokerProperty.create({
         data: {
           propertyId,
@@ -294,7 +289,7 @@ export class PropertyService {
 
       return result;
     } catch (error) {
-      this.logger.error(error.message);
+      this.logger.error(error);
       if (error.code === 'P2003') {
         throw new BadRequestException('Broker not found');
       }
@@ -305,8 +300,13 @@ export class PropertyService {
   async deleteProperty(
     where: Prisma.PropertyWhereUniqueInput,
   ): Promise<Property> {
-    return this.prismaService.property.delete({
-      where,
-    });
+    try {
+      return await this.prismaService.property.delete({
+        where,
+      });
+    } catch (error) {
+      this.logger.error(error);
+      throw new BadRequestException(error.message);
+    }
   }
 }

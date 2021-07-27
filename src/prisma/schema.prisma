@@ -107,16 +107,6 @@ model BrokerProperty {
   @@id([propertyId, brokerId])
 }
 
-model BrokerProperty {
-  property          Property           @relation(fields: [propertyId], references: [id], onDelete: Cascade)
-  propertyId        String
-  broker            Broker             @relation(fields: [brokerId], references: [id], onDelete: Cascade)
-  brokerId          String
-  createdAt         DateTime           @default(now())
-  owner             Boolean            @default(true)
-  @@id([propertyId, brokerId])
-}
-
 model Project {
   id               String            @id @default(uuid())
   createdAt        DateTime          @default(now())
@@ -183,5 +173,5 @@ model News {
   content     String
   author      Broker?  @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorId    String
-  status      Boolean  @default(false)
+  status      Boolean  @default(true)
 }
