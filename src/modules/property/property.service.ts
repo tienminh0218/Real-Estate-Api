@@ -45,14 +45,21 @@ export class PropertyService {
   }
 
   async property(
-    propertyWhereUniqueInput: Prisma.PropertyWhereUniqueInput,
+    param: {
+      where?: Prisma.PropertyWhereUniqueInput;
+      include?: Prisma.PropertyInclude;
+    },
     optional: OptionalQueryProperty = {},
   ): Promise<Property | null> {
     try {
-      const include = this.getIncludeProperty(optional?.include?.split(','));
+      const { where } = param;
+      const includeQuery = this.getIncludeProperty(
+        optional?.include?.split(','),
+      );
+      const include = param.include || includeQuery;
 
       return this.prismaService.property.findUnique({
-        where: propertyWhereUniqueInput,
+        where,
         include,
       });
     } catch (error) {
@@ -104,29 +111,71 @@ export class PropertyService {
     }
   }
 
-  async getPropertiesOfUser(id: string) {
+  async getPropertiesOfUser(
+    id: string,
+    optional: OptionalQueryProperties = {},
+  ) {
     try {
-      return this.userService.users({
-        where: { id },
-        include: { properties: true, broker: true },
-      });
+      const result = await this.properties(
+        {
+          where: {
+            project: {
+              company: {
+                userId: id,
+              },
+            },
+          },
+        },
+        optional,
+      );
+
+      return result;
     } catch (error) {
       this.logger.error(error);
       throw new BadRequestException(error);
     }
   }
 
-  // async getPropertiesOfProject(id: string) {
-  //   try {
-  //     return this.projectsService.projects({
-  //       where: { id },
-  //       include: { properties: true },
-  //     });
-  //   } catch (error) {
-  //     this.logger.error(error);
-  //     throw new BadRequestException(error);
-  //   }
-  // }
+  async getPropertiesOfProject(
+    id: string,
+    optional: OptionalQueryProperties = {},
+  ) {
+    try {
+      const result = await this.properties(
+        { where: { projectId: id } },
+        optional,
+      );
+
+      return result;
+    } catch (error) {
+      this.logger.error(error);
+      throw new BadRequestException(error);
+    }
+  }
+
+  async getPropertiesOfBroker(
+    id: string,
+    optional: OptionalQueryProperties = {},
+  ) {
+    try {
+      const result = await this.properties(
+        {
+          where: {
+            broker: {
+              every: {
+                brokerId: id,
+              },
+            },
+          },
+        },
+        optional,
+      );
+      return result;
+    } catch (error) {
+      this.logger.error(error);
+      throw new BadRequestException(error);
+    }
+  }
 
   async getRangeProperties(data: any) {
     try {
@@ -148,30 +197,54 @@ export class PropertyService {
 
   async createProperty(
     payload: CreatePropertyDto,
-    projectId: string,
+    projectId: string = undefined,
   ): Promise<Property> {
     try {
-      const { categoryId, brokerId, location, coordinates, price, name } =
-        payload;
+      const { categoryId, location, coordinates, price, name } = payload;
 
-      const result = await this.prismaService.property.create({
+      const data = await this.prismaService.property.create({
         data: {
           name,
           location,
           coordinates,
           price,
           category: { connect: { id: categoryId } },
-          // broker: { connect: { id: brokerId } },
-          project: { connect: { id: projectId } },
+          project: projectId && { connect: { id: projectId } },
         },
       });
 
-      return result;
+      return data;
     } catch (error) {
       this.logger.error(error.message);
       if (error.code === 'P2025') {
         throw new BadRequestException('Not found relationship');
       }
+    }
+  }
+
+  async createBrokerProperty(
+    payload: CreatePropertyDto,
+    brokerId: string,
+  ): Promise<Property> {
+    try {
+      if (!brokerId) throw new Error('user need to update their profile');
+      const { categoryId, location, coordinates, price, name } = payload;
+      const propertyData = await this.createProperty(payload);
+
+      await this.prismaService.brokerProperty.create({
+        data: {
+          property: { connect: { id: propertyData.id } },
+          broker: { connect: { id: brokerId } },
+        },
+      });
+
+      return propertyData;
+    } catch (error) {
+      this.logger.error(error);
+      if (error.code === 'P2025') {
+        throw new BadRequestException('Not found relationship');
+      }
+      throw new BadRequestException(error.message);
     }
   }
 
@@ -181,18 +254,10 @@ export class PropertyService {
   }): Promise<Property> {
     try {
       const { where, data } = params;
-      const {
-        name,
-        categoryId,
-        location,
-        coordinates,
-        price,
-        status,
-        brokerId,
-        userId,
-      } = data;
+      const { name, categoryId, location, coordinates, price, status, userId } =
+        data;
 
-      return this.prismaService.property.update({
+      const result = await this.prismaService.property.update({
         where,
         data: {
           name,
@@ -201,12 +266,38 @@ export class PropertyService {
           price,
           status,
           category: categoryId && { connect: { id: categoryId } },
-          // broker: brokerId && { connect: { id: brokerId } },
           user: userId && { connect: { id: userId } },
         },
       });
+
+      return result;
     } catch (error) {
       this.logger.error(error.message);
+      if (error.code === 'P2025') {
+        throw new BadRequestException('Not found relationship');
+      }
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  async assignBroker(payload: { propertyId: string; brokerId: string }) {
+    try {
+      const { propertyId, brokerId } = payload;
+
+      const result = await this.prismaService.brokerProperty.create({
+        data: {
+          propertyId,
+          brokerId,
+          owner: false,
+        },
+      });
+
+      return result;
+    } catch (error) {
+      this.logger.error(error.message);
+      if (error.code === 'P2003') {
+        throw new BadRequestException('Broker not found');
+      }
       throw new BadRequestException(error.message);
     }
   }

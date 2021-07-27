@@ -2,10 +2,12 @@ import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Observable } from 'rxjs';
 
 import { RequestWithUser, UserInterface } from '../interface/requestWithUser';
+import { Role } from '../decorators/roles.decorator';
+import { IsBroker } from './isBroker';
 
 @Injectable()
-export class IsUser implements CanActivate {
-  compare(user: UserInterface, paramId: string, key: string): boolean {
+export class IsUser extends IsBroker implements CanActivate {
+  compareUser(user: UserInterface, paramId: string, key: string): boolean {
     let result: boolean = false;
 
     switch (key) {
@@ -33,10 +35,10 @@ export class IsUser implements CanActivate {
   }
 
   postMethod(path: string, user: UserInterface, paramId: string): boolean {
-    if (path === 'projects') return this.compare(user, paramId, 'companies');
-    if (path === 'properties') return this.compare(user, paramId, 'projects');
-
-    return false;
+    if (path === 'projects')
+      return this.compareUser(user, paramId, 'companies');
+    if (path === 'properties')
+      return this.compareUser(user, paramId, 'projects');
   }
 
   updateOrDeleteMethod(
@@ -45,9 +47,9 @@ export class IsUser implements CanActivate {
     paramId: string,
   ): boolean {
     if (path === 'users') return user.id === paramId;
-    if (path === 'companies') return this.compare(user, paramId, path);
-    if (path === 'projects') return this.compare(user, paramId, path);
-    if (path === 'properties') return this.compare(user, paramId, path);
+    if (path === 'companies') return this.compareUser(user, paramId, path);
+    if (path === 'projects') return this.compareUser(user, paramId, path);
+    if (path === 'properties') return this.compareUser(user, paramId, path);
 
     return false;
   }
@@ -58,7 +60,7 @@ export class IsUser implements CanActivate {
     const request: RequestWithUser = context.switchToHttp().getRequest();
     const user = request.user;
 
-    if (user.role === 'ADMIN') return true;
+    if (user.role === Role.ADMIN) return true;
 
     const paramId = request.params.id;
     const path = request.url.split('/')[2]; /// /api/example/ -> path = "example"

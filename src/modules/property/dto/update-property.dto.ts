@@ -44,8 +44,4 @@ export class UpdatePropertyDto {
   @ApiProperty({ required: false })
   @IsOptional()
   categoryId?: string;
-
-  @ApiProperty({ required: false })
-  @IsOptional()
-  brokerId?: string;
 }

@@ -1,4 +1,4 @@
-import { User, Company, Project, Property } from '@prisma/client';
+import { User, Company, Project, Property, Broker } from '@prisma/client';
 import { Request } from 'express';
 
 export interface ProjectInterface extends Project {
@@ -10,6 +10,7 @@ export interface CompanyInterface extends Company {
 }
 export interface UserInterface extends User {
   companies: CompanyInterface[];
+  broker: Broker;
 }
 
 export interface RequestWithUser extends Request {

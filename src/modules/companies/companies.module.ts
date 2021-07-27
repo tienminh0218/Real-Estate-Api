@@ -4,11 +4,12 @@ import { CompaniesController } from './companies.controller';
 import { PrismaService } from '../prisma/prisma.service';
 import { PrismaModule } from '../prisma/prisma.module';
 import { AuthModule } from './../auth/auth.module';
+import { CompaniesResolver } from './companies.resolver';
 
 
 @Module({
   imports: [PrismaModule, AuthModule],
-  providers: [CompaniesService, PrismaService, Logger],
+  providers: [CompaniesService, PrismaService, Logger, CompaniesResolver],
   controllers: [CompaniesController]
 })
 export class CompaniesModule { }

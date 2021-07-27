@@ -46,21 +46,13 @@ export class AuthService {
 
   async validateJwt({ username }) {
     try {
-      // const user = await this.userService.users({
-      //   where: { username },
-      //   include: {
-      //     companies: {
-      //       include: { projects: { include: { properties: true } } },
-      //     },
-      //   },
-      // });
-
       const user = await this.userService.user({
         where: { username },
         include: {
           companies: {
             include: { projects: { include: { properties: true } } },
           },
+          broker: true,
         },
       });
 

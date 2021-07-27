@@ -15,6 +15,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { RequestWithUser } from './interface/requestWithUser';
 import { LocalAuthGuard } from './guards/local';
+import { Public } from './decorators/public.decorator';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -22,10 +23,12 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly configService: ConfigService,
-  ) {}
+  ) { }
 
-  @UseGuards(LocalAuthGuard)
   @Post('login')
+  @HttpCode(200)
+  @UseGuards(LocalAuthGuard)
+  @Public()
   async login(
     @Res({ passthrough: true }) res: Response,
     @Req() req: RequestWithUser,
@@ -42,6 +45,7 @@ export class AuthController {
   }
 
   @Post('register')
+  @Public()
   async register(
     @Res({ passthrough: true }) res: Response,
     @Body() payload: CreateUserDto,
