@@ -1,14 +1,6 @@
-import {
-  Injectable,
-  Logger,
-  BadRequestException,
-  Inject,
-  forwardRef,
-} from '@nestjs/common';
+import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import { Prisma, Property } from '@prisma/client';
 
-import { ProjectsService } from './../projects/projects.service';
-import { UserService } from './../user/user.service';
 import { PrismaService } from './../prisma/prisma.service';
 import { CreatePropertyDto } from './dto/create-property.dto';
 import { generateIncludeQuery } from '../../utils/generate-include';
@@ -199,7 +191,7 @@ export class PropertyService {
     try {
       const { categoryId, location, coordinates, price, name } = payload;
 
-      const result = await this.prismaService.property.create({
+      const data = await this.prismaService.property.create({
         data: {
           name,
           location,
@@ -210,7 +202,7 @@ export class PropertyService {
         },
       });
 
-      return result;
+      return data;
     } catch (error) {
       this.logger.error(error);
       if (error.code === 'P2025') {

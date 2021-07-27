@@ -98,6 +98,7 @@ export class PropertyController {
   @Post('broker')
   @ApiCreatedResponse({ description: 'Create a new property' })
   @ApiUnauthorizedResponse({ description: 'User not logged in' })
+  @ApiForbiddenResponse({ description: 'That project is not of user' })
   @ApiBadRequestResponse({ description: 'Not found relationship' })
   @UseGuards(IsBroker)
   async createBrokerProperty(
