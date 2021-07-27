@@ -9,6 +9,7 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { getJwtConfig } from '../../config/config.service';
 import { JwtStrategy } from './strategies/jwt';
+import { AuthResolver } from './auth.resolver';
 
 @Module({
   imports: [
@@ -17,7 +18,7 @@ import { JwtStrategy } from './strategies/jwt';
     JwtModule.register(getJwtConfig),
     ConfigModule,
   ],
-  providers: [AuthService, Logger, JwtStrategy, LocalStrategy],
+  providers: [AuthService, Logger, JwtStrategy, LocalStrategy, AuthResolver],
   controllers: [AuthController],
   exports: [AuthService, JwtModule],
 })

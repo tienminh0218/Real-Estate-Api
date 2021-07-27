@@ -15,6 +15,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { RequestWithUser } from './interface/requestWithUser';
 import { LocalAuthGuard } from './guards/local';
+import { Public } from './decorators/public.decorator';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -26,13 +27,14 @@ export class AuthController {
 
   @Post('login')
   @HttpCode(200)
+  @Public()
   @UseGuards(LocalAuthGuard)
   async login(
     @Res({ passthrough: true }) res: Response,
     @Req() req: RequestWithUser,
   ): Promise<any> {
     const { token, user } = await this.authService.login(req.user);
-
+    console.log({ token, user });
     res.cookie(this.configService.get<string>('COOKIE_NAME'), token, {
       // httpOnly: true,
       // secure: true,
@@ -43,6 +45,7 @@ export class AuthController {
   }
 
   @Post('register')
+  @Public()
   async register(
     @Res({ passthrough: true }) res: Response,
     @Body() payload: CreateUserDto,
@@ -59,6 +62,7 @@ export class AuthController {
   }
 
   @Post('logout')
+  @Public()
   @HttpCode(200)
   async logout(@Res() res: Response) {
     return res.clearCookie(this.configService.get<string>('COOKIE_NAME')).end();

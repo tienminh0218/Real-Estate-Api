@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { APP_GUARD } from '@nestjs/core';
+import { join } from 'path';
 
 import { NewsModule } from './news/news.module';
 import { CommentModule } from './comment/comment.module';
@@ -19,7 +20,8 @@ import { JwtAuthGuard } from './auth/guards/jwt';
   imports: [
     ConfigModule.forRoot(),
     GraphQLModule.forRoot({
-      autoSchemaFile: true,
+      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+      context: ({ req, res }) => ({ req, res }),
     }),
     PrismaModule,
     UserModule,
