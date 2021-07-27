@@ -26,7 +26,6 @@ import {
 
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { JwtAuthGuard } from '../auth/guards/jwt';
 import { Roles, Role } from '../auth/decorators/roles.decorator';
 import { RolesGuard } from '../auth/guards/role';
 import { UpdateRoleUser } from './dto/update-role.dto';
@@ -35,6 +34,7 @@ import {
   OptionalQueryUsers,
 } from './types/optional-query.type';
 import { UserCustom } from './types/user.type';
+import { Public } from '../auth/decorators/public.decorator';
 
 @ApiTags('Users')
 @Controller('users')
@@ -42,6 +42,7 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get()
+  @Public()
   @ApiOkResponse({ description: 'Get all users' })
   async getUsers(
     @Query() optional: OptionalQueryUsers,
@@ -50,6 +51,7 @@ export class UserController {
   }
 
   @Get(':id')
+  @Public()
   @ApiOkResponse({ description: 'Get user by id' })
   async getUserById(
     @Param('id') id: string,
@@ -64,7 +66,7 @@ export class UserController {
   @ApiForbiddenResponse({ description: 'Incorrect userId' })
   @ApiUnauthorizedResponse({ description: 'User not login' })
   @ApiBadRequestResponse({ description: 'Not found account to update' })
-  @UseGuards(JwtAuthGuard, IsUser)
+  @UseGuards(IsUser)
   async updateUserById(
     @Param('id') id: string,
     @Body() payload: UpdateUserDto,
@@ -84,7 +86,7 @@ export class UserController {
     description: 'Not found account to update or empty input data',
   })
   @Roles(Role.ADMIN)
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(RolesGuard)
   async updateRole(
     @Param('id') id: string,
     @Body() payload: UpdateRoleUser,
@@ -100,7 +102,7 @@ export class UserController {
   @ApiForbiddenResponse({ description: 'Not have role Admin' })
   @ApiBadRequestResponse({ description: 'Not found id' })
   @Roles(Role.ADMIN)
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(RolesGuard)
   async deleteUserById(
     @Param('id') id: string,
     @Res() res: Response,

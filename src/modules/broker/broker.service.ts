@@ -10,19 +10,19 @@ export class BrokerService {
     private readonly logger: Logger,
   ) {}
 
-  async createBroker(user: any, data: CreateBrokerDto) {
-    try {
-      const { district, city } = data;
-      const broker = await this.prismaService.broker.create({
-        data: {
-          district: district,
-          city: city,
-          user: { connect: { id: user.id } },
-        },
-      });
-      return broker;
-    } catch (error) {
-      throw new BadRequestException('You are already a Broker!!!');
-    }
-  }
+  // async createBroker(user: any, data: CreateBrokerDto) {
+  //   try {
+  //     const { district, city } = data;
+  //     const broker = await this.prismaService.broker.create({
+  //       data: {
+  //         district: district,
+  //         city: city,
+  //         user: { connect: { id: user.id } },
+  //       },
+  //     });
+  //     return broker;
+  //   } catch (error) {
+  //     throw new BadRequestException('You are already a Broker!!!');
+  //   }
+  // }
 }
