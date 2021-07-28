@@ -149,11 +149,15 @@ type LoginEd {
 type Query {
   getUsers: [User!]!
   getUserById(id: String!): User!
+  getCompanies: [Company!]!
+  getCompanyById(id: String!): Company!
 }
 
 type Mutation {
   createUser(payload: CreateUserDto!): User!
   login(inputLogin: LoginDto!): LoginEd!
+  createCompany(input: CreateCompanyDto!): Company!
+  deleteCompany(id: String!): Company!
 }
 
 input CreateUserDto {
@@ -165,4 +169,10 @@ input CreateUserDto {
 input LoginDto {
   username: String!
   password: String!
+}
+
+input CreateCompanyDto {
+  companyName: String!
+  district: String!
+  city: String!
 }
