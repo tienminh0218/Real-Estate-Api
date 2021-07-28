@@ -1,6 +1,5 @@
 import { Field, InputType } from '@nestjs/graphql';
 import {
-  IsNumber,
   IsOptional,
   IsString,
   Matches,
@@ -8,7 +7,6 @@ import {
   MinLength,
   IsAlphanumeric,
 } from 'class-validator';
-import { Role } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
 
 @InputType()

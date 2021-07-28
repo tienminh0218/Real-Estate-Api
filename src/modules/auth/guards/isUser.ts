@@ -1,12 +1,12 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Observable } from 'rxjs';
+import { GqlExecutionContext } from '@nestjs/graphql';
 
 import { RequestWithUser, UserInterface } from '../interface/requestWithUser';
 import { Role } from '../decorators/roles.decorator';
-import { IsBroker } from './isBroker';
 
 @Injectable()
-export class IsUser extends IsBroker implements CanActivate {
+export class IsUser implements CanActivate {
   compareUser(user: UserInterface, paramId: string, key: string): boolean {
     let result: boolean = false;
 
@@ -57,9 +57,18 @@ export class IsUser extends IsBroker implements CanActivate {
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
-    const request: RequestWithUser = context.switchToHttp().getRequest();
-    const user = request.user;
+    let request: RequestWithUser;
+    const contextType: string = context.getType();
 
+    if (contextType === 'graphql') {
+      const ctx = GqlExecutionContext.create(context);
+      request = ctx.getContext().req;
+    }
+    if (contextType === 'http') {
+      request = context.switchToHttp().getRequest();
+    }
+
+    const user = request.user;
     if (user.role === Role.ADMIN) return true;
 
     const paramId = request.params.id;

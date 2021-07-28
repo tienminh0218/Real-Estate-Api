@@ -35,7 +35,6 @@ export class AuthController {
     @Req() req: RequestWithUser,
   ): Promise<any> {
     const { token, user } = await this.authService.login(req.user);
-    console.log({ token, user });
     res.cookie(this.configService.get<string>('COOKIE_NAME'), token, {
       // httpOnly: true,
       // secure: true,

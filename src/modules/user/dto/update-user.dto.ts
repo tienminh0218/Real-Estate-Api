@@ -1,3 +1,4 @@
+import { Field, InputType } from '@nestjs/graphql';
 import { ApiProperty } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
 import {
@@ -9,17 +10,20 @@ import {
   IsEnum,
 } from 'class-validator';
 
+@InputType()
 export class UpdateUserDto {
   @ApiProperty()
   @IsString()
   @IsOptional()
   @MinLength(4)
   @MaxLength(30)
+  @Field({ nullable: true })
   fullName?: string;
 
   @ApiProperty({ required: false })
   @IsEnum(Role)
   @IsOptional()
+  @Field({ nullable: true })
   role?: Role;
 
   @ApiProperty()
@@ -30,5 +34,6 @@ export class UpdateUserDto {
     message: 'password to weak',
   })
   @IsOptional()
+  @Field({ nullable: true })
   password?: string;
 }
