@@ -43,13 +43,13 @@ export class UserService {
       const { where } = param;
       const includeQuery = this.getIncludeUser(optional?.include?.split(','));
       const include = param.include || includeQuery;
-
-      return this.prisma.user.findUnique({
+      const result = await this.prisma.user.findUnique({
         where,
         include,
       });
+      return result;
     } catch (error) {
-      this.logger.error(error.message);
+      this.logger.error(error);
       throw new BadRequestException(error.message);
     }
   }
@@ -91,7 +91,7 @@ export class UserService {
         },
       };
     } catch (error) {
-      this.logger.error(error.message);
+      this.logger.error(error);
       throw new BadRequestException(error.message);
     }
   }
@@ -100,20 +100,19 @@ export class UserService {
     try {
       const { username, password: rawPassword, fullName } = data;
       const existedUser = await this.user({ where: { username } });
-
       if (existedUser) throw new Error('Username already exist');
-
       const passwordHashed = await hashPassword(rawPassword);
 
-      return this.prisma.user.create({
+      const result = await this.prisma.user.create({
         data: {
           username,
           password: passwordHashed,
           fullName,
         },
       });
+      return result;
     } catch (error) {
-      this.logger.error(`${error.message}`);
+      this.logger.error(error);
       throw new BadRequestException(error.message);
     }
   }
@@ -125,20 +124,19 @@ export class UserService {
     try {
       const { where, data } = params;
       const existedUser = await this.user({ where: { id: where.id } });
-
       if (!existedUser) throw new Error('Account Not Found');
-
       const passwordHashed = await hashPassword(data.password);
 
-      return this.prisma.user.update({
+      const result = await this.prisma.user.update({
         data: {
           ...data,
           password: passwordHashed,
         },
         where,
       });
+      return result;
     } catch (error) {
-      this.logger.error(`${error.message}`);
+      this.logger.error(error);
       throw new BadRequestException(error.message);
     }
   }
@@ -146,16 +144,14 @@ export class UserService {
   async deleteUser(where: Prisma.UserWhereUniqueInput): Promise<any> {
     try {
       const existedUser = await this.user({ where });
-
       if (!existedUser) throw new Error('Account Not Found');
-
       await this.prisma.user.delete({
         where,
       });
 
       return true;
     } catch (error) {
-      this.logger.error(`${error.message}`);
+      this.logger.error(error);
       throw new BadRequestException(error.message);
     }
   }

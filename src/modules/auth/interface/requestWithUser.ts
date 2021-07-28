@@ -9,8 +9,8 @@ export interface CompanyInterface extends Company {
   projects: ProjectInterface[];
 }
 export interface UserInterface extends User {
-  companies: CompanyInterface[];
-  broker: Broker;
+  companies?: CompanyInterface[];
+  broker?: Broker;
 }
 
 export interface RequestWithUser extends Request {
