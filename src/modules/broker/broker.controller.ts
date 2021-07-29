@@ -1,5 +1,10 @@
+import { JwtAuthGuard } from './../auth/guards/jwt';
+import {
+  ApiOkResponse,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 import { UpdateBrokerDto } from './dto/update-broker.dto';
-import { LocalAuthGuard } from './../auth/guards/local';
 import {
   Get,
   Body,
@@ -18,22 +23,26 @@ import { BrokerService } from './broker.service';
 import { RequestWithUser } from '../auth/interface/requestWithUser';
 
 @Controller('broker')
-@UseGuards(LocalAuthGuard)
+@ApiTags('broker')
+@UseGuards(JwtAuthGuard)
 export class BrokerController {
   constructor(private readonly brokerService: BrokerService) {}
-<<<<<<< HEAD
 
   @Get('project/:id')
+  @ApiOkResponse({ description: 'Get brokers of project' })
   async getBrokersOfProject(@Param('id') id: string) {
     return this.brokerService.getBrokerOfProject({ id });
   }
 
   @Get('districtOrCity')
+  @ApiOkResponse({ description: 'Get brokers of district or city' })
   async getBrokerOfDistrictOrCity(@Query() data: any) {
     return await this.brokerService.getBrokerOfDistrictOrCity(data);
   }
 
   @Post('create')
+  @ApiOkResponse({ description: 'register broker' })
+  @ApiUnauthorizedResponse({ description: 'User not logged in' })
   async createBroker(
     @Req() req: RequestWithUser,
     @Body() data: CreateBrokerDto,
@@ -42,6 +51,8 @@ export class BrokerController {
   }
 
   @Put('update')
+  @ApiOkResponse({ description: 'update broker infomation' })
+  @ApiUnauthorizedResponse({ description: 'User not logged in' })
   async updateBroker(
     @Req() req: RequestWithUser,
     @Body() data: UpdateBrokerDto,
@@ -50,15 +61,9 @@ export class BrokerController {
   }
 
   @Delete('delete')
+  @ApiOkResponse({ description: 'delete broker' })
+  @ApiUnauthorizedResponse({ description: 'User not logged in' })
   async deleteBroker(@Req() req: RequestWithUser) {
     return await this.brokerService.deleteBroker(req.user);
   }
-=======
-
-  // @Post('create')
-  // createBroker(@Req() req: RequestWithUser, @Body() data: CreateBrokerDto) {
-
-  //   return this.brokerService.createBroker(req.user, data);
-  // }
->>>>>>> 6255e55d09af92363e0bb8edbed66012331eadc3
 }
