@@ -11,15 +11,19 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { RolesGuard } from '../auth/guards/role';
 import { Role } from '../auth/decorators/roles.decorator';
 import { IsUser } from '../auth/guards/isUser';
-import { GraphQL } from '../auth/decorators/graphql.decorator';
+import {
+  Method,
+  Methods,
+  Paths,
+} from '../auth/decorators/method-graph.decorator';
+import { OptionalQueryUser } from './types/optional-query.type';
 
-@GraphQL()
 @Resolver((of) => UserGraphType)
 export class UserResolver {
   constructor(private readonly userService: UserService) {}
 
   @Query(() => UserCustom)
-  @Public()
+  // @Public()
   async getUsers(): Promise<UserCustom> {
     return this.userService.users({});
   }
@@ -39,6 +43,7 @@ export class UserResolver {
   }
 
   @Mutation(() => UserGraphType)
+  @Method(Methods.PUT, Paths.USER)
   @UseGuards(IsUser)
   updateUserById(
     @Args('id') id: string,
