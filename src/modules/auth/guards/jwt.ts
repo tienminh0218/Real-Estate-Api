@@ -4,7 +4,6 @@ import { Reflector } from '@nestjs/core';
 import { GqlExecutionContext } from '@nestjs/graphql';
 
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
-import { IS_GRAPHQL } from '../decorators/graphql.decorator';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
@@ -13,11 +12,8 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
   }
 
   getRequest(context: ExecutionContext) {
-    const isGraphQL = this.reflector.getAllAndOverride<boolean>(IS_GRAPHQL, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
-    if (isGraphQL) {
+    const contextType: string = context.getType();
+    if (contextType === 'graphql') {
       const ctx = GqlExecutionContext.create(context);
       return ctx.getContext().req;
     }
