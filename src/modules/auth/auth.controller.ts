@@ -39,7 +39,6 @@ export class AuthController {
       // secure: true,
       maxAge: this.configService.get<number>('MAX_AGE') * 1000, /// 24h
     });
-
     return { token, user };
   }
 

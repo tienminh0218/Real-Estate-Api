@@ -1,5 +1,4 @@
 import { Injectable, Logger, BadRequestException } from '@nestjs/common';
-import { User } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
 
 import { UserService } from './../user/user.service';
