@@ -63,8 +63,9 @@ export class CompaniesService {
     try {
       const { companyName, district, city } = data;
       const existCompanyName = await this.company({ companyName })
-      if (existCompanyName) throw new Error('companyName already exist');
 
+      if (existCompanyName) throw new Error('companyName already exist');
+      console.log(user);
       const createComp = this.prisma.company.create({
         data: {
           companyName,

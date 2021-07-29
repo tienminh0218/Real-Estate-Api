@@ -14,17 +14,22 @@ import { CreateCompanyDto } from './dto/create-company.dto';
 import { CompaniesService } from './companies.service';
 import { Company as CompanyModel } from '@prisma/client';
 import { RequestWithUser } from '../auth/interface/requestWithUser';
+import { Public } from '../auth/decorators/public.decorator';
+import { IsUser } from '../auth/guards/isUser';
+import { UseGuards } from '@nestjs/common';
 
 @Resolver((of) => CompanyType)
 export class CompaniesResolver {
     constructor(private readonly companiesService: CompaniesService) { }
 
     @Query(returns => [CompanyType])
+    @Public()
     async getCompanies(): Promise<CompanyModel[]> {
         return;
     }
 
     @Query(returns => CompanyType)
+    @Public()
     async getCompanyById(
         @Args('id', { type: () => String }) id: string,
     ): Promise<CompanyModel> {
@@ -32,14 +37,17 @@ export class CompaniesResolver {
     }
 
     @Mutation(returns => CompanyType)
+    // @UseGuards(GraphqlJwtAuthGuard)
     async createCompany(
         @Args('input') input: CreateCompanyDto,
         @Context() context: { req: RequestWithUser },
     ): Promise<CompanyModel> {
+        console.log(context.req.user);
         return await this.companiesService.createCompany(context.req.user, input);
     }
 
     @Mutation(returns => CompanyType)
+    @UseGuards(IsUser)
     async deleteCompany(@Args('id') id: string) {
         return this.companiesService.deleteCompany({ id });
     }
