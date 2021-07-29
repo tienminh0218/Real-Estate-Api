@@ -111,25 +111,25 @@ export class PropertyController {
     );
   }
 
-  @Post(':projectId')
+  @Post(':id')
   @ApiCreatedResponse({ description: 'Create a new property' })
   @ApiUnauthorizedResponse({ description: 'User not logged in' })
   @ApiForbiddenResponse({ description: 'That project is not of user' })
   @ApiBadRequestResponse({ description: 'Not found relationship' })
   @UseGuards(IsUser)
   async createProperty(
-    @Param('projectId') id: string,
+    @Param('id') id: string,
     @Body() payload: CreatePropertyDto,
   ): Promise<Property> {
     return this.propertyService.createProperty(payload, id);
   }
 
-  @Put(':propertyId/broker')
+  @Put(':id/broker')
   @ApiUnauthorizedResponse({ description: 'User not logged in' })
   @ApiBadRequestResponse({ description: 'Broker not found' })
   @UseGuards(IsBroker)
   async assignBroker(
-    @Param('propertyId') propertyId: string,
+    @Param('id') propertyId: string,
     @Body('brokerId') brokerId: string,
   ): Promise<any> {
     return this.propertyService.assignBroker({ propertyId, brokerId });
