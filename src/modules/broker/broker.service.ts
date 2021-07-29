@@ -33,19 +33,38 @@ export class BrokerService {
   async getBrokerOfproperty() {}
 
   async getBrokerOfDistrictOrCity(data: any) {
-    const { district, city } = data;
-    const brokers = await this.prismaService.broker.findMany({
-      where: {
-        OR: [
-          { district: { contains: district } },
-          { city: { contains: city } },
-        ],
-      },
-    });
-    if (brokers.length === 0) {
-      throw new BadRequestException('Brokers not found!!!!');
+    try {
+      const { district, city } = data;
+      let { page, limit } = data;
+
+      page = +page || 1;
+      limit = +limit || 5;
+
+      const brokers = await this.prismaService.broker.findMany({
+        take: limit,
+        skip: limit * (page - 1),
+        where: {
+          OR: [
+            { district: { contains: district } },
+            { city: { contains: city } },
+          ],
+        },
+      });
+      if (brokers.length === 0) {
+        throw new BadRequestException('Brokers not found!!!!');
+      }
+      return {
+        brokers,
+        pagination: {
+          page,
+          limit,
+          totalRows: brokers.length,
+        },
+      };
+    } catch (error) {
+      this.logger.error(error.message);
+      throw new BadRequestException(error.message);
     }
-    return brokers;
   }
 
   async createBroker(user: any, data: CreateBrokerDto) {
@@ -84,7 +103,12 @@ export class BrokerService {
   }
 
   async deleteBroker(user: any) {
-    const broker = await this.isBroker(user);
-    return this.prismaService.broker.delete({ where: { id: broker.id } });
+    try {
+      const broker = await this.isBroker(user);
+      return this.prismaService.broker.delete({ where: { id: broker.id } });
+    } catch (error) {
+      this.logger.error(error.message);
+      throw new BadRequestException(error.message);
+    }
   }
 }
