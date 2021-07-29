@@ -1,5 +1,4 @@
 import { Field, InputType, Int } from '@nestjs/graphql';
-import { IsNumber, IsOptional } from 'class-validator';
 import { PaginationType } from '../../../common/types/pagination.type';
 
 export class OptionalQueryUsers extends PaginationType {

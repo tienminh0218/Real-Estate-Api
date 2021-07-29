@@ -1,3 +1,7 @@
+import { PropertyService } from './../property/property.service';
+import { ProjectsService } from './../projects/projects.service';
+import { Prisma } from '@prisma/client';
+import { UpdateBrokerDto } from './dto/update-broker.dto';
 import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 
 import { CreateBrokerDto } from './dto/create-broker.dto';
@@ -8,21 +12,118 @@ export class BrokerService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly logger: Logger,
+    private readonly projectsService: ProjectsService,
+    private readonly propertyService: PropertyService,
   ) {}
 
-  // async createBroker(user: any, data: CreateBrokerDto) {
-  //   try {
-  //     const { district, city } = data;
-  //     const broker = await this.prismaService.broker.create({
-  //       data: {
-  //         district: district,
-  //         city: city,
-  //         user: { connect: { id: user.id } },
-  //       },
-  //     });
-  //     return broker;
-  //   } catch (error) {
-  //     throw new BadRequestException('You are already a Broker!!!');
-  //   }
-  // }
+  async isBroker(user: any) {
+    const IsBroker = await this.prismaService.broker.findFirst({
+      where: { userId: user.id },
+    });
+    if (!IsBroker) {
+      throw new BadRequestException('You are not the Broker!!!');
+    }
+    return IsBroker;
+  }
+
+  async getBrokerOfProject(id: Prisma.ProjectWhereUniqueInput) {
+    const brokers = await this.projectsService.project(id);
+  }
+
+  async getBrokerOfproperty() {}
+
+  async getBrokerOfDistrictOrCity(data: any) {
+    try {
+      const { district, city } = data;
+      let { page, limit } = data;
+
+      page = +page || 1;
+      limit = +limit || 5;
+
+      const brokers = await this.prismaService.broker.findMany({
+        take: limit,
+        skip: limit * (page - 1),
+        where: {
+          OR: [
+            { district: { contains: district } },
+            { city: { contains: city } },
+          ],
+        },
+      });
+      if (brokers.length === 0) {
+        throw new BadRequestException('Brokers not found!!!!');
+      }
+      return {
+        brokers,
+        pagination: {
+          page,
+          limit,
+          totalRows: brokers.length,
+        },
+      };
+    } catch (error) {
+      this.logger.error(error.message);
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  async createBroker(user: any, data: CreateBrokerDto) {
+    try {
+      const { district, city, phoneNumber, dob, email } = data;
+      const broker = await this.prismaService.broker.create({
+        data: {
+          phoneNumber: phoneNumber,
+          dob: dob,
+          email: email,
+          district: district,
+          city: city,
+          user: { connect: { id: user.id } },
+        },
+      });
+      return broker;
+    } catch (error) {
+      this.logger.error(error);
+      if (error.code === 'P2002') {
+        throw new BadRequestException(
+          'Your email or phone number is already used !!!',
+        );
+      }
+      throw new BadRequestException('You are already a Broker!!!');
+    }
+  }
+
+  async updateBroker(user: any, data: UpdateBrokerDto) {
+    try {
+      const broker = await this.isBroker(user);
+      const { district, city, phoneNumber, dob, email } = data;
+      return await this.prismaService.broker.update({
+        where: { id: broker.id },
+        data: {
+          phoneNumber: phoneNumber || broker.phoneNumber,
+          dob: dob || broker.dob,
+          email: email || broker.email,
+          district: district || broker.district,
+          city: city || broker.city,
+        },
+      });
+    } catch (error) {
+      this.logger.error(error);
+      if (error.code === 'P2002') {
+        throw new BadRequestException(
+          'Your email or phone number is already used !!!',
+        );
+      }
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  async deleteBroker(user: any) {
+    try {
+      const broker = await this.isBroker(user);
+      return this.prismaService.broker.delete({ where: { id: broker.id } });
+    } catch (error) {
+      this.logger.error(error.message);
+      throw new BadRequestException(error.message);
+    }
+  }
 }

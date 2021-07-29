@@ -63,6 +63,6 @@ export class AuthController {
   @Public()
   @HttpCode(200)
   async logout(@Res() res: Response) {
-    return res.clearCookie(this.configService.get<string>('COOKIE_NAME')).end();
+    res.clearCookie(process.env.COOKIE_NAME).send('Logout successfully!!!');
   }
 }
