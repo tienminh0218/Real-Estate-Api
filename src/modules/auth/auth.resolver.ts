@@ -1,11 +1,12 @@
 import { UnauthorizedException } from '@nestjs/common';
 import { Response } from 'express';
-import { Args, Mutation, Resolver, Context } from '@nestjs/graphql';
+import { Args, Mutation, Resolver } from '@nestjs/graphql';
 import { ConfigService } from '@nestjs/config';
 
 import { LoginDto, LoginEd } from './types/index';
 import { AuthService } from './auth.service';
 import { Public } from './decorators/public.decorator';
+import { ResGraph } from './decorators/context';
 
 @Resolver((of) => LoginEd)
 export class AuthResolver {
@@ -16,9 +17,7 @@ export class AuthResolver {
 
   @Mutation(() => LoginEd)
   @Public()
-  async login(@Args('inputLogin') data: LoginDto, @Context() context) {
-    const res: Response = context.res;
-
+  async login(@Args('inputLogin') data: LoginDto, @ResGraph() res: Response) {
     const { username, password } = data;
     const user = await this.authService.validateUser(username, password);
     if (!user) throw new UnauthorizedException();

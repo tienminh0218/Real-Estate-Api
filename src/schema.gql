@@ -127,12 +127,22 @@ type User {
   comments_Company: [Comment_Company]!
   comments_Property: [Comment_Property]!
   properties: [Property]!
-  relationShip(payload: String!): User!
 }
 
 enum Role {
   USER
   ADMIN
+}
+
+type PaginationType {
+  page: Float!
+  limit: Float!
+  totalRows: Float!
+}
+
+type UserCustom {
+  data: [User!]!
+  pagination: PaginationType!
 }
 
 type UserLogin {
@@ -147,12 +157,13 @@ type LoginEd {
 }
 
 type Query {
-  getUsers: [User!]!
+  getUsers: UserCustom!
   getUserById(id: String!): User!
 }
 
 type Mutation {
-  createUser(payload: CreateUserDto!): User!
+  createUser(inputData: CreateUserDto!): User!
+  updateUserById(inputData: UpdateUserDto!, id: String!): User!
   login(inputLogin: LoginDto!): LoginEd!
 }
 
@@ -160,6 +171,12 @@ input CreateUserDto {
   username: String!
   password: String!
   fullName: String
+}
+
+input UpdateUserDto {
+  fullName: String
+  role: String
+  password: String
 }
 
 input LoginDto {
