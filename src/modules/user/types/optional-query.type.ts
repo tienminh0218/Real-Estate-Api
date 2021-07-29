@@ -1,9 +1,10 @@
-import {PaginationType} from '../../../common/types/pagination.type'
+import { Field, ObjectType } from '@nestjs/graphql';
+import { PaginationType } from '../../../common/types/pagination.type';
 
-export interface OptionalQueryUsers extends PaginationType {
+export class OptionalQueryUsers extends PaginationType {
   include?: string;
 }
 
-export interface OptionalQueryUser {
+export class OptionalQueryUser {
   include?: string;
 }
