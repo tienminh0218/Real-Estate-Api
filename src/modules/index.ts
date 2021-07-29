@@ -20,7 +20,8 @@ import { JwtAuthGuard } from './auth/guards/jwt';
   imports: [
     ConfigModule.forRoot(),
     GraphQLModule.forRoot({
-      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+      // autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+      autoSchemaFile: true,
       context: ({ req, res }) => ({ req, res }),
     }),
     PrismaModule,

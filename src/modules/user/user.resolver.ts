@@ -23,7 +23,7 @@ export class UserResolver {
   constructor(private readonly userService: UserService) {}
 
   @Query(() => UserCustom)
-  @Public()
+  // @Public()
   async getUsers(): Promise<UserCustom> {
     return this.userService.users({});
   }

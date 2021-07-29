@@ -140,6 +140,12 @@ enum Role {
   ADMIN
 }
 
+type PaginationType {
+  page: Float!
+  limit: Float!
+  totalRows: Float!
+}
+
 type UserCustom {
   data: [User!]!
   pagination: PaginationType!
