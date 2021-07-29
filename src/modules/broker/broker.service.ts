@@ -16,6 +16,7 @@ export class BrokerService {
     private readonly propertyService: PropertyService,
   ) {}
 
+<<<<<<< HEAD
   async isBroker(user: any) {
     const IsBroker = await this.prismaService.broker.findFirst({
       where: { userId: user.id },
@@ -111,4 +112,21 @@ export class BrokerService {
       throw new BadRequestException(error.message);
     }
   }
+=======
+  // async createBroker(user: any, data: CreateBrokerDto) {
+  //   try {
+  //     const { district, city } = data;
+  //     const broker = await this.prismaService.broker.create({
+  //       data: {
+  //         district: district,
+  //         city: city,
+  //         user: { connect: { id: user.id } },
+  //       },
+  //     });
+  //     return broker;
+  //   } catch (error) {
+  //     throw new BadRequestException('You are already a Broker!!!');
+  //   }
+  // }
+>>>>>>> 6255e55d09af92363e0bb8edbed66012331eadc3
 }

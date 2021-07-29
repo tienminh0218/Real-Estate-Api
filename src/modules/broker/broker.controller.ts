@@ -21,6 +21,7 @@ import { RequestWithUser } from '../auth/interface/requestWithUser';
 @UseGuards(LocalAuthGuard)
 export class BrokerController {
   constructor(private readonly brokerService: BrokerService) {}
+<<<<<<< HEAD
 
   @Get('project/:id')
   async getBrokersOfProject(@Param('id') id: string) {
@@ -52,4 +53,12 @@ export class BrokerController {
   async deleteBroker(@Req() req: RequestWithUser) {
     return await this.brokerService.deleteBroker(req.user);
   }
+=======
+
+  // @Post('create')
+  // createBroker(@Req() req: RequestWithUser, @Body() data: CreateBrokerDto) {
+
+  //   return this.brokerService.createBroker(req.user, data);
+  // }
+>>>>>>> 6255e55d09af92363e0bb8edbed66012331eadc3
 }

@@ -1,6 +1,5 @@
 import { Field, InputType } from '@nestjs/graphql';
 import {
-  IsNumber,
   IsOptional,
   IsString,
   Matches,
@@ -8,7 +7,6 @@ import {
   MinLength,
   IsAlphanumeric,
 } from 'class-validator';
-import { Role } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
 
 @InputType()
@@ -37,10 +35,4 @@ export class CreateUserDto {
   @MaxLength(30)
   @Field({ nullable: true })
   fullName?: string;
-
-  @ApiProperty({ required: false })
-  @IsString()
-  @IsOptional()
-  @Field({ nullable: true })
-  role?: Role;
 }

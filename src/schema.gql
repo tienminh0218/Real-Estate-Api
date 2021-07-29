@@ -1,0 +1,191 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type PaginationType {
+  page: Float!
+  limit: Float!
+  totalRows: Float!
+}
+
+type CategoryProperty {
+  id: ID!
+  createdAt: String!
+  updatedAt: String!
+  nameCategory: String!
+}
+
+type Comment_Broker {
+  id: ID!
+  createdAt: String!
+  updatedAt: String!
+  content: String!
+  user: User!
+  broker: Broker!
+}
+
+type Comment_Company {
+  id: ID!
+  createdAt: String!
+  updatedAt: String!
+  content: String!
+  user: User!
+  company: Company!
+}
+
+type Comment_Property {
+  id: ID!
+  createdAt: String!
+  updatedAt: String!
+  content: String!
+  user: User!
+  property: Property!
+}
+
+type Comment_Project {
+  id: ID!
+  createdAt: String!
+  updatedAt: String!
+  content: String!
+  user: User!
+  project: Project!
+}
+
+type Property {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  location: String!
+  coordinates: String!
+  price: Int!
+  status: Int!
+  comments_Property: [Comment_Property!]!
+  broker: Broker!
+  user: User!
+  project: Project!
+  category: CategoryProperty!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type News {
+  id: ID!
+  createdAt: String!
+  updatedAt: String!
+  title: String!
+  content: String!
+  author: Broker!
+}
+
+type Broker {
+  id: ID!
+  createdAt: String!
+  updatedAt: String!
+  user: User!
+  district: String!
+  city: String!
+  properties: [Property!]!
+  news: [News!]!
+  comments_Broker: String!
+  Project: Project!
+}
+
+type Project {
+  id: ID!
+  createdAt: String!
+  updatedAt: String!
+  projectName: String!
+  district: String!
+  city: String!
+  properties: [Property!]!
+  comments_project: [Comment_Project!]!
+  company: Company!
+  brokers: Broker!
+}
+
+type Company {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  userId: String!
+  companyName: String!
+  district: String!
+  city: String!
+  comments_Company: [Comment_Company!]!
+  projects: [Project]
+}
+
+type User {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  username: String!
+  password: String!
+  role: Role
+  fullName: String
+  broker: Broker
+  companies: [Company]!
+  comments_project: [Comment_Project]!
+  comments_Broker: [Comment_Broker]!
+  comments_Company: [Comment_Company]!
+  comments_Property: [Comment_Property]!
+  properties: [Property]!
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+type PaginationType {
+  page: Float!
+  limit: Float!
+  totalRows: Float!
+}
+
+type UserCustom {
+  data: [User!]!
+  pagination: PaginationType!
+}
+
+type UserLogin {
+  username: String!
+  id: ID!
+  fullName: String
+}
+
+type LoginEd {
+  token: String!
+  user: UserLogin!
+}
+
+type Query {
+  getUsers: UserCustom!
+  getUserById(id: String!): User!
+}
+
+type Mutation {
+  createUser(inputData: CreateUserDto!): User!
+  updateUserById(inputData: UpdateUserDto!, id: String!): User!
+  login(inputLogin: LoginDto!): LoginEd!
+}
+
+input CreateUserDto {
+  username: String!
+  password: String!
+  fullName: String
+}
+
+input UpdateUserDto {
+  fullName: String
+  role: String
+  password: String
+}
+
+input LoginDto {
+  username: String!
+  password: String!
+}

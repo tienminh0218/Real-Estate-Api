@@ -1,5 +1,4 @@
 import { Injectable, Logger, BadRequestException } from '@nestjs/common';
-import { User } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
 
 import { UserService } from './../user/user.service';
@@ -14,10 +13,9 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async validateUser(username: string, password: string): Promise<any> {
+  async validateUser(username: string, password: string) {
     try {
       const user = await this.userService.user({ where: { username } });
-
       if (user && comparePassword(password, user.password)) return user;
 
       return null;
@@ -27,9 +25,9 @@ export class AuthService {
     }
   }
 
-  async login(user: User): Promise<any> {
+  login(user: any) {
     const { username, fullName, id } = user;
-    const token = await this.getCookieWithJwtToken(username, id);
+    const token = this.getCookieWithJwtToken(username, id);
 
     return { token, user: { username, id, fullName } };
   }
@@ -46,21 +44,13 @@ export class AuthService {
 
   async validateJwt({ username }) {
     try {
-      // const user = await this.userService.users({
-      //   where: { username },
-      //   include: {
-      //     companies: {
-      //       include: { projects: { include: { properties: true } } },
-      //     },
-      //   },
-      // });
-
       const user = await this.userService.user({
         where: { username },
         include: {
           companies: {
             include: { projects: { include: { properties: true } } },
           },
+          broker: true,
         },
       });
 
@@ -73,7 +63,7 @@ export class AuthService {
     }
   }
 
-  async getCookieWithJwtToken(username: string, id: string): Promise<string> {
+  getCookieWithJwtToken(username: string, id: string): string {
     const payload = { username, id };
     const token = this.jwtService.sign(payload);
 
