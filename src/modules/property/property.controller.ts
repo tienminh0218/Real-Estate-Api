@@ -27,10 +27,7 @@ import { IsBroker } from './../auth/guards/isBroker';
 import { PropertyService } from './property.service';
 import { UpdatePropertyDto } from './dto/update-property.dto';
 import { CreatePropertyDto } from './dto/create-property.dto';
-import {
-  OptionalQueryProperty,
-  OptionalQueryProperties,
-} from './types/optional-query.type';
+import { OptionalQueryProperties } from './types/optional-query.type';
 import { PropertyCustom } from './types/property.type';
 import { RequestWithUser } from '../auth/interface/requestWithUser';
 import { Public } from '../auth/decorators/public.decorator';
@@ -88,11 +85,8 @@ export class PropertyController {
   @Get(':id')
   @Public()
   @ApiOkResponse({ description: 'Get a property by id' })
-  async getPropertyById(
-    @Param('id') id: string,
-    @Query() optional: OptionalQueryProperty,
-  ): Promise<Property> {
-    return this.propertyService.property({ where: { id } }, optional);
+  async getPropertyById(@Param('id') id: string): Promise<Property> {
+    return this.propertyService.property({ where: { id } });
   }
 
   @Post('broker')
@@ -107,11 +101,11 @@ export class PropertyController {
   ): Promise<Property> {
     return this.propertyService.createBrokerProperty(
       payload,
-      req.user?.broker?.id,
+      req.user.broker.id,
     );
   }
 
-  @Post(':id')
+  @Post('project/:id')
   @ApiCreatedResponse({ description: 'Create a new property' })
   @ApiUnauthorizedResponse({ description: 'User not logged in' })
   @ApiForbiddenResponse({ description: 'That project is not of user' })
@@ -165,7 +159,7 @@ export class PropertyController {
     });
   }
 
-  @Delete('broker/:id')
+  @Delete(':id/broker')
   @HttpCode(204)
   @ApiNoContentResponse({ description: 'Delete success a property' })
   @ApiForbiddenResponse({ description: 'This property not that broker' })
@@ -177,7 +171,7 @@ export class PropertyController {
     return this.propertyService.deleteProperty({ id: propertyId });
   }
 
-  @Delete(':id')
+  @Delete(':id/project')
   @HttpCode(204)
   @ApiNoContentResponse({ description: 'Delete success a property' })
   @ApiForbiddenResponse({ description: 'This property not that user' })

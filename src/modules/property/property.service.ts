@@ -3,11 +3,7 @@ import { Prisma, Property } from '@prisma/client';
 
 import { PrismaService } from './../prisma/prisma.service';
 import { CreatePropertyDto } from './dto/create-property.dto';
-import { generateIncludeQuery } from '../../utils/generate-include';
-import {
-  OptionalQueryProperties,
-  OptionalQueryProperty,
-} from './types/optional-query.type';
+import { OptionalQueryProperties } from './types/optional-query.type';
 import { UpdatePropertyDto } from './dto/update-property.dto';
 import { PropertyCustom } from './types/property.type';
 
@@ -18,37 +14,17 @@ export class PropertyService {
     private readonly logger: Logger,
   ) {}
 
-  getIncludeProperty(listIncludeQuery: string[]) {
-    if (!listIncludeQuery) return;
-
-    const listRelation = [
-      'category',
-      'comments_Property',
-      'broker',
-      'user',
-      'project',
-    ];
-
-    return generateIncludeQuery(listRelation, listIncludeQuery);
-  }
-
-  async property(
-    param: {
-      where?: Prisma.PropertyWhereUniqueInput;
-      include?: Prisma.PropertyInclude;
-    },
-    optional: OptionalQueryProperty = {},
-  ): Promise<Property | null> {
+  async property(param: {
+    where?: Prisma.PropertyWhereUniqueInput;
+  }): Promise<Property | null> {
     try {
       const { where } = param;
-      const includeQuery = this.getIncludeProperty(
-        optional?.include?.split(','),
-      );
-      const include = param.include || includeQuery;
 
       const result = await this.prismaService.property.findUnique({
         where,
-        include,
+        include: {
+          location: true,
+        },
       });
       return result;
     } catch (error) {
@@ -64,15 +40,12 @@ export class PropertyService {
       take?: number;
       cursor?: Prisma.PropertyWhereUniqueInput;
       orderBy?: Prisma.PropertyOrderByInput;
-      include?: Prisma.PropertyInclude;
     },
     optional: OptionalQueryProperties = {},
   ): Promise<PropertyCustom> {
     try {
       const { where, cursor, orderBy } = params;
-      let { page, limit, include: includeQuery } = optional;
-      const include =
-        params.include || this.getIncludeProperty(includeQuery?.split(','));
+      let { page, limit } = optional;
       page = Number(page) || 1;
       limit = Number(limit) || 20;
 
@@ -82,7 +55,9 @@ export class PropertyService {
         where,
         cursor,
         orderBy,
-        include,
+        include: {
+          location: true,
+        },
       });
 
       return {
@@ -189,22 +164,30 @@ export class PropertyService {
     projectId: string = undefined,
   ): Promise<Property> {
     try {
-      const { categoryId, location, coordinates, price, name } = payload;
+      const { categoryId, price, name, lng, lat } = payload;
 
       const data = await this.prismaService.property.create({
         data: {
           name,
-          location,
-          coordinates,
           price,
+          location: {
+            create: {
+              lat,
+              lng,
+            },
+          },
           category: { connect: { id: categoryId } },
           project: projectId && { connect: { id: projectId } },
+        },
+        include: {
+          location: true,
         },
       });
 
       return data;
     } catch (error) {
       this.logger.error(error);
+      this.logger.error(error.code);
       if (error.code === 'P2025') {
         throw new BadRequestException('Not found relationship');
       }
@@ -216,7 +199,6 @@ export class PropertyService {
     brokerId: string,
   ): Promise<Property> {
     try {
-      if (!brokerId) throw new Error('user need to update their profile');
       const propertyData = await this.createProperty(payload);
 
       await this.prismaService.brokerProperty.create({
@@ -242,15 +224,12 @@ export class PropertyService {
   }): Promise<Property> {
     try {
       const { where, data } = params;
-      const { name, categoryId, location, coordinates, price, status, userId } =
-        data;
+      const { name, categoryId, location, price, status, userId } = data;
 
       const result = await this.prismaService.property.update({
         where,
         data: {
           name,
-          location,
-          coordinates,
           price,
           status,
           category: categoryId && { connect: { id: categoryId } },
