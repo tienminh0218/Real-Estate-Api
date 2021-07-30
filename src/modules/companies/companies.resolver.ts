@@ -16,7 +16,8 @@ import { Company as CompanyModel } from '@prisma/client';
 import { RequestWithUser } from '../auth/interface/requestWithUser';
 import { Public } from '../auth/decorators/public.decorator';
 import { IsUser } from '../auth/guards/isUser';
-import { UseGuards } from '@nestjs/common';
+import { Patch, UseGuards } from '@nestjs/common';
+import { Method, Methods, Paths } from '../auth/decorators/method-graph.decorator';
 
 @Resolver((of) => CompanyType)
 export class CompaniesResolver {
@@ -37,7 +38,8 @@ export class CompaniesResolver {
     }
 
     @Mutation(returns => CompanyType)
-    // @UseGuards(GraphqlJwtAuthGuard)
+    @Method(Methods.POST, Paths.USER)
+    @UseGuards(IsUser)
     async createCompany(
         @Args('input') input: CreateCompanyDto,
         @Context() context: { req: RequestWithUser },
@@ -47,6 +49,7 @@ export class CompaniesResolver {
     }
 
     @Mutation(returns => CompanyType)
+    @Method(Methods.DELETE, Paths.USER)
     @UseGuards(IsUser)
     async deleteCompany(@Args('id') id: string) {
         return this.companiesService.deleteCompany({ id });
