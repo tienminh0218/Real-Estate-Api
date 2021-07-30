@@ -1,4 +1,13 @@
-import { Controller, Body, Get, Post, Param, Delete, Put, UseGuards, Optional } from '@nestjs/common';
+import {
+    Controller,
+    Body,
+    Get,
+    Post,
+    Param,
+    Delete,
+    Put,
+    UseGuards,
+} from '@nestjs/common';
 import { CategoryPropertyService } from './categoryProperty.service';
 import { categoryProperty, Company as CompanyModel } from '@prisma/client';
 import { CreateCategoryPropertyDto } from './dto/create-categoryProperty.dto';
@@ -41,6 +50,4 @@ export class CategoryPropertyController {
     async deleteCategory(@Param('id') id: string): Promise<categoryProperty> {
         return this.categoryPropertyService.deleteCategory({ id });
     }
-
-
 }

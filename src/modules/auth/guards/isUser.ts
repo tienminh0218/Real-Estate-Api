@@ -49,8 +49,9 @@ export class IsUser implements CanActivate {
   postMethod(path: string, user: UserInterface, paramId: string): boolean {
     if (path === 'projects')
       return this.compareUser(user, paramId, 'companies');
-    if (path === 'properties')
+    if (path === 'properties') {
       return this.compareUser(user, paramId, 'projects');
+    }
 
     this.logger.warn('Path not found');
     return false;

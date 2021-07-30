@@ -12,10 +12,12 @@ import {
 } from '@nestjs/common';
 import { CreateNewsDto } from './dto/create-news.dto';
 import { News } from '@prisma/client';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('news')
+@ApiTags('news')
 export class NewsController {
-  constructor(private newsService: NewsService) { }
+  constructor(private newsService: NewsService) {}
   @Post('/:id')
   createNews(
     @Param('id') id: string,

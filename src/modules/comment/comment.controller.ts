@@ -16,8 +16,10 @@ import {
   Comment_Property,
 } from '@prisma/client';
 import { UpdateCommentDto } from './dto/update-comment.dto';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('comment')
+@ApiTags('comment')
 export class CommentController {
   constructor(private readonly commentService: CommentService) {}
 

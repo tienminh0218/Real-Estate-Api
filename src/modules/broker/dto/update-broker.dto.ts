@@ -1,24 +1,23 @@
 import {
-  IsEmail,
-  IsISO8601,
-  IsNotEmpty,
+  IsOptional,
   IsString,
-  Matches,
-  MaxLength,
   MinLength,
+  MaxLength,
+  Matches,
+  IsEmail,
 } from 'class-validator';
 
-export class CreateBrokerDto {
+export class UpdateBrokerDto {
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   district: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   city: string;
 
-  @IsNotEmpty()
   @IsString()
+  @IsOptional()
   @MinLength(9)
   @MaxLength(11)
   @Matches(/^[0-9]+$$/i, {
@@ -26,7 +25,7 @@ export class CreateBrokerDto {
   })
   phoneNumber: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @Matches(
     /^(0[1-9]|[12][0-9]|3[01])[- /.](0[1-9]|1[012])[- /.](19|20)\d\d$/i,
     {
@@ -35,7 +34,7 @@ export class CreateBrokerDto {
   )
   dob: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsEmail()
   email: string;
 }
