@@ -16,7 +16,7 @@ export class PropertyService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly logger: Logger,
-  ) {}
+  ) { }
 
   getIncludeProperty(listIncludeQuery: string[]) {
     if (!listIncludeQuery) return;

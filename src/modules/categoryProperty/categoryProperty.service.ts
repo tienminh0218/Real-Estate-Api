@@ -3,10 +3,12 @@ import { Prisma, categoryProperty } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 // import { CreateCompanyDto } from './dto/create-company.dto';
 import { CreateCategoryPropertyDto } from './dto/create-categoryProperty.dto';
+import { categoryPropertyCustom } from './types/category.type';
+import { OptionalQueryCategories } from './types/optional-query.type';
 
 @Injectable()
 export class CategoryPropertyService {
-  constructor(private logger: Logger, private prisma: PrismaService) {}
+  constructor(private logger: Logger, private prisma: PrismaService) { }
 
   async categoryProperty(
     categoryPropertyWhereUniqueInput: Prisma.categoryPropertyWhereUniqueInput,
@@ -42,8 +44,42 @@ export class CategoryPropertyService {
     }
   }
 
-  getAllCategory(): Promise<categoryProperty[]> {
-    return this.prisma.categoryProperty.findMany();
+  async getAllCategory(
+    params: {
+      where?: Prisma.CompanyWhereInput;
+      skip?: number;
+      take?: number;
+      cursor?: Prisma.CompanyWhereUniqueInput;
+      orderBy?: Prisma.CompanyOrderByInput;
+      include?: Prisma.CompanyInclude;
+    },
+    optional: OptionalQueryCategories = {}
+  ): Promise<categoryPropertyCustom> {
+    try {
+      const { where, orderBy, cursor } = params;
+      let { page, limit, include: includeQuery } = optional;
+
+      page = Number(page) || 1;
+      limit = Number(limit) || 20;
+      const data = await this.prisma.categoryProperty.findMany({
+        take: limit,
+        skip: limit * (page - 1),
+        where,
+        orderBy,
+        cursor
+      });
+      return {
+        data,
+        pagination: {
+          page,
+          limit,
+          totalRows: data.length,
+        },
+      };
+    } catch (error) {
+      this.logger.error(error);
+      throw new BadRequestException(error);
+    }
   }
 
   async createCategoryProperty(data: CreateCategoryPropertyDto): Promise<any> {
