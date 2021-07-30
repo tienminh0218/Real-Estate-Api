@@ -11,26 +11,26 @@ import { OptionalQueryCategories } from './types/optional-query.type';
 @UseGuards(JwtAuthGuard)
 export class CategoryPropertyController {
     constructor(
-        private categoryPropertyService: CategoryPropertyService,
+        private categoryPropertyService: CategoryPropertyService
     ) { }
 
     @Get()
-    getAllNews(@Param() optional: OptionalQueryCategories): Promise<categoryPropertyCustom> {
+    async getAllCategory(@Param() optional: OptionalQueryCategories): Promise<categoryPropertyCustom> {
         return this.categoryPropertyService.getAllCategory({}, optional);
     }
 
     @Get('/:id')
-    getNewsById(@Param('id') id: string): Promise<categoryProperty> {
+    async getCategoryById(@Param('id') id: string): Promise<categoryProperty> {
         return this.categoryPropertyService.getCategoryById({ id });
     }
 
     @Post()
-    async createProject(@Body() data: CreateCategoryPropertyDto): Promise<any> {
+    async createCategory(@Body() data: CreateCategoryPropertyDto): Promise<any> {
         return this.categoryPropertyService.createCategoryProperty(data);
     }
 
     @Put(':id')
-    async updateCompanyById(
+    async updateCategoryById(
         @Param('id') id: string,
         @Body() payload: CreateCategoryPropertyDto,
     ): Promise<categoryProperty> {
@@ -38,7 +38,7 @@ export class CategoryPropertyController {
     }
 
     @Delete('/:id')
-    async deleteCompany(@Param('id') id: string): Promise<categoryProperty> {
+    async deleteCategory(@Param('id') id: string): Promise<categoryProperty> {
         return this.categoryPropertyService.deleteCategory({ id });
     }
 
