@@ -9,6 +9,7 @@ import {
   Put,
   Delete,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import {
   Project as ProjectModel,
@@ -16,10 +17,12 @@ import {
 } from '@prisma/client';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt';
+import { ProjectCustom } from './types/project.type';
+import { OptionalQueryProjects } from './types/optional-query.type';
 
 @Controller('projects')
 export class ProjectsController {
-  constructor(private readonly projectsService: ProjectsService) {}
+  constructor(private readonly projectsService: ProjectsService) { }
 
   @Post(':id')
   @UseGuards(JwtAuthGuard, IsUser)
@@ -55,8 +58,8 @@ export class ProjectsController {
   }
 
   @Get('listProject/:id')
-  async listProject(@Param('id') id: string): Promise<ProjectModel[]> {
-    return this.projectsService.listProject(id);
+  async listProject(@Query() optional: OptionalQueryProjects, @Param('id') id: string): Promise<ProjectCustom> {
+    return this.projectsService.projects(id, {}, optional);
   }
 
   @Get('listProjectCity/:city')
@@ -64,10 +67,10 @@ export class ProjectsController {
     return this.projectsService.listProjectCity(city);
   }
 
-  @Get()
-  async getAllProject(): Promise<ProjectModel[]> {
-    return await this.projectsService.projects({});
-  }
+  // @Get()
+  // async getAllProject(): Promise<ProjectModel[]> {
+  //   return await this.projectsService.projects({});
+  // }
   @Get(':id')
   async getProject(@Param('id') id: string): Promise<ProjectModel> {
     return await this.projectsService.project({ id });

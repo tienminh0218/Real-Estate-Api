@@ -38,7 +38,7 @@ import { Public } from '../auth/decorators/public.decorator';
 @ApiTags('Properties')
 @Controller('properties')
 export class PropertyController {
-  constructor(private readonly propertyService: PropertyService) {}
+  constructor(private readonly propertyService: PropertyService) { }
 
   @Get()
   @Public()

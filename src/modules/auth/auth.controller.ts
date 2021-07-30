@@ -23,12 +23,13 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly configService: ConfigService,
-  ) {}
+  ) { }
 
   @Post('login')
   @HttpCode(200)
   @Public()
   @UseGuards(LocalAuthGuard)
+  @Public()
   async login(
     @Res({ passthrough: true }) res: Response,
     @Req() req: RequestWithUser,
