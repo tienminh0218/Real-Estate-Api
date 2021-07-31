@@ -3,6 +3,8 @@ import { Prisma, Company } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { JwtService } from '@nestjs/jwt';
+import { OptionalQueryCompanies } from './types/optional-query.type';
+import { CompanyCustom } from './types/company.type';
 
 @Injectable()
 export class CompaniesService {
@@ -19,21 +21,38 @@ export class CompaniesService {
     })
   }
 
-  async companies(params: {
-    where?: Prisma.CompanyWhereInput;
-    skip?: number;
-    take?: number;
-    cursor?: Prisma.CompanyWhereUniqueInput;
-    orderBy?: Prisma.CompanyOrderByInput;
-    include?: Prisma.CompanyInclude;
-  }): Promise<Company[]> {
+  async companies(
+    params: {
+      where?: Prisma.CompanyWhereInput;
+      skip?: number;
+      take?: number;
+      cursor?: Prisma.CompanyWhereUniqueInput;
+      orderBy?: Prisma.CompanyOrderByInput;
+      include?: Prisma.CompanyInclude;
+    },
+    optional: OptionalQueryCompanies = {}
+  ): Promise<CompanyCustom> {
     try {
-      const { where, include } = params;
+      const { where, orderBy, cursor } = params;
+      let { page, limit, include: includeQuery } = optional;
 
-      return this.prisma.company.findMany({
+      page = Number(page) || 1;
+      limit = Number(limit) || 20;
+      const data = await this.prisma.company.findMany({
+        take: limit,
+        skip: limit * (page - 1),
         where,
-        include
+        orderBy,
+        cursor
       });
+      return {
+        data,
+        pagination: {
+          page,
+          limit,
+          totalRows: data.length,
+        },
+      };
     } catch (error) {
       this.logger.error(error);
       throw new BadRequestException(error);
@@ -44,8 +63,9 @@ export class CompaniesService {
     try {
       const { companyName, district, city } = data;
       const existCompanyName = await this.company({ companyName })
-      if (existCompanyName) throw new Error('companyName already exist');
 
+      if (existCompanyName) throw new Error('companyName already exist');
+      console.log(user);
       const createComp = this.prisma.company.create({
         data: {
           companyName,

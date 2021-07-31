@@ -1,13 +1,25 @@
-import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  Logger,
+} from '@nestjs/common';
 import { Observable } from 'rxjs';
+import { Reflector } from '@nestjs/core';
+import { GqlExecutionContext } from '@nestjs/graphql';
 
+import { PrismaService } from '../../prisma/prisma.service';
 import { RequestWithUser } from '../interface/requestWithUser';
 import { Role } from '../decorators/roles.decorator';
+import { METHOD_GRAPH } from '../decorators/method-graph.decorator';
 
 @Injectable()
 export class IsBroker implements CanActivate {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly reflector: Reflector,
+    private readonly logger: Logger,
+  ) {}
 
   async compareBroker(
     brokerId: string,
@@ -16,15 +28,23 @@ export class IsBroker implements CanActivate {
   ): Promise<boolean> {
     let result: boolean = false;
 
+    if (!(brokerId && paramId)) return false;
+
     switch (path) {
       case 'properties':
-        const dataProp = await this.prismaService.brokerProperty.findFirst({
-          where: {
-            brokerId,
-            propertyId: paramId,
-            owner: true,
-          },
-        });
+        const dataProp = await this.prismaService.brokerProperty
+          .findFirst({
+            where: {
+              AND: [
+                { brokerId: { contains: brokerId } },
+                { propertyId: { contains: paramId } },
+                { owner: { equals: true } },
+              ],
+            },
+          })
+          .catch((error) => {
+            this.logger.error(error.message);
+          });
         result = !!dataProp;
         break;
 
@@ -44,23 +64,70 @@ export class IsBroker implements CanActivate {
     return result;
   }
 
-  canActivate(
-    context: ExecutionContext,
-  ): boolean | Promise<boolean> | Observable<boolean> {
-    const request: RequestWithUser = context.switchToHttp().getRequest();
+  handleGraphType(
+    request: RequestWithUser,
+    contextGraph: GqlExecutionContext,
+    path: string,
+    method: string,
+  ): Promise<boolean> | boolean {
     const user = request.user;
+    const { id } = contextGraph.switchToWs().getData();
 
-    if (user.role === Role.ADMIN) return true;
-    if (!user.broker) return false;
+    if (method === 'POST') return user.broker !== null;
+    if (method === 'PUT' || method === 'PATCH')
+      return this.compareBroker(user.broker?.id, id, path);
+    if (method === 'DELETE')
+      return this.compareBroker(user.broker?.id, id, path);
 
+    this.logger.warn('Method not found in Graphql type');
+    return false;
+  }
+
+  handleHttpType(request: RequestWithUser): Promise<boolean> | boolean {
+    const user = request.user;
     const method = request.method;
     const paramId = request.params.id;
     const path = request.url.split('/')[2]; /// /api/example/ -> path = "example"
 
     if (method === 'POST') return user.broker !== null;
     if (method === 'PUT' || method === 'PATCH')
-      return this.compareBroker(user.broker.id, paramId, path);
+      return this.compareBroker(user.broker?.id, paramId, path);
     if (method === 'DELETE')
-      return this.compareBroker(user.broker.id, paramId, path);
+      return this.compareBroker(user.broker?.id, paramId, path);
+
+    this.logger.warn('Method not found in Http type');
+    return false;
+  }
+
+  isAdmin(request: RequestWithUser): boolean {
+    return request.user.role === Role.ADMIN;
+  }
+
+  canActivate(
+    context: ExecutionContext,
+  ): boolean | Promise<boolean> | Observable<boolean> {
+    const contextType: string = context.getType();
+    let request: RequestWithUser;
+
+    if (contextType === 'graphql') {
+      const ctx = GqlExecutionContext.create(context);
+      const { method, path } = this.reflector.get(
+        METHOD_GRAPH,
+        ctx.getHandler(),
+      );
+      request = ctx.getContext().req;
+
+      return (
+        this.isAdmin(request) ||
+        this.handleGraphType(request, ctx, path, method)
+      );
+    }
+    if (contextType === 'http') {
+      request = context.switchToHttp().getRequest();
+      return this.isAdmin(request) || this.handleHttpType(request);
+    }
+
+    this.logger.warn('Context type not found');
+    return false;
   }
 }

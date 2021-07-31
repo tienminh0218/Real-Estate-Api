@@ -80,7 +80,7 @@ model categoryProperty {
 
 model Property {
   id                String             @id @default(uuid())
-  name              String             @db.VarChar(255)          
+  name              String             @db.VarChar(255)
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
   category          categoryProperty   @relation(fields: [categoryId], references: [id], onDelete: Cascade)
@@ -89,10 +89,10 @@ model Property {
   price             Int
   status            Int                @default(0)
   comments_Property Comment_Property[]
-  broker            BrokerProperty[]          
+  broker            BrokerProperty[]
   user              User?              @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId            String?
-  project           Project?            @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  project           Project?           @relation(fields: [projectId], references: [id], onDelete: Cascade)
   projectId         String?
 }
 
@@ -101,17 +101,22 @@ model Location {
   type              String             @default("Point") 
   lat               Float
   lng               Float
+  address           String
+  ward              String
+  district          String
+  city              String
   property          Property           @relation(fields: [propertyId], references: [id], onDelete: Cascade)
   propertyId        String
 }
 
 model BrokerProperty {
-  property          Property           @relation(fields: [propertyId], references: [id], onDelete: Cascade)
-  propertyId        String
-  broker            Broker             @relation(fields: [brokerId], references: [id], onDelete: Cascade)
-  brokerId          String
-  createdAt         DateTime           @default(now())
-  owner             Boolean            @default(true)
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  propertyId String
+  broker     Broker   @relation(fields: [brokerId], references: [id], onDelete: Cascade)
+  brokerId   String
+  createdAt  DateTime @default(now())
+  owner      Boolean  @default(true)
+
   @@id([propertyId, brokerId])
 }
 
@@ -174,13 +179,13 @@ model Comment_Project {
 }
 
 model News {
-  id          String   @id @default(uuid())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  title       String   @db.VarChar(255)
-  content     String
-  author      Broker?  @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  authorId    String
-  status      Boolean  @default(true)
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  title     String   @db.VarChar(255)
+  content   String
+  author    Broker?  @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId  String
+  status    Boolean  @default(true)
 }
 

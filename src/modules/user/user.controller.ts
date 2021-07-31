@@ -39,7 +39,7 @@ import { Public } from '../auth/decorators/public.decorator';
 @ApiTags('Users')
 @Controller('users')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) { }
 
   @Get()
   @Public()

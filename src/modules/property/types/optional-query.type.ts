@@ -1,3 +1,3 @@
-import { PaginationType } from '../../../common/types/pagination.type';
+import { PaginationInput } from '../../../common/types/pagination.type';
 
-export interface OptionalQueryProperties extends PaginationType {}
+export class OptionalQueryProperties extends PaginationInput {}

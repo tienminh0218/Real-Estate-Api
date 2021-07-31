@@ -165,12 +165,16 @@ type LoginEd {
 type Query {
   getUsers: UserCustom!
   getUserById(id: String!): User!
+  getCompanies: [Company!]!
+  getCompanyById(id: String!): Company!
 }
 
 type Mutation {
   createUser(inputData: CreateUserDto!): User!
   updateUserById(inputData: UpdateUserDto!, id: String!): User!
   login(inputLogin: LoginDto!): LoginEd!
+  createCompany(input: CreateCompanyDto!): Company!
+  deleteCompany(id: String!): Company!
 }
 
 input CreateUserDto {
@@ -188,4 +192,10 @@ input UpdateUserDto {
 input LoginDto {
   username: String!
   password: String!
+}
+
+input CreateCompanyDto {
+  companyName: String!
+  district: String!
+  city: String!
 }

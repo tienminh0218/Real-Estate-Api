@@ -6,6 +6,7 @@ import { CreatePropertyDto } from './dto/create-property.dto';
 import { OptionalQueryProperties } from './types/optional-query.type';
 import { UpdatePropertyDto } from './dto/update-property.dto';
 import { PropertyCustom } from './types/property.type';
+import { FilterQuery } from './dto/filter-property.dto';
 
 @Injectable()
 export class PropertyService {
@@ -140,18 +141,33 @@ export class PropertyService {
     }
   }
 
-  async getRangeProperties(data: any) {
+  async getRangeProperties(data: FilterQuery) {
     try {
-      const { gte, lte, location } = data;
+      const { filterPrice, city, orderBy: orderByPrice, ...optional } = data;
+      let [min, max]: (string | number)[] = filterPrice?.split(',') || [];
+      min = (min && Number(min)) || undefined;
+      max = (max && Number(max)) || undefined;
 
-      const result = await this.properties({
-        where: {
-          AND: [
-            { price: { gte: Number(gte), lte: Number(lte) } },
-            { location },
-          ],
+      const result = await this.properties(
+        {
+          where: {
+            AND: [
+              { price: { gte: min, lte: max } },
+              {
+                location: {
+                  city: {
+                    contains: city,
+                  },
+                },
+              },
+            ],
+          },
+          orderBy: {
+            price: orderByPrice,
+          },
         },
-      });
+        optional,
+      );
       return result;
     } catch (error) {
       this.logger.error(error);
@@ -164,7 +180,17 @@ export class PropertyService {
     projectId: string = undefined,
   ): Promise<Property> {
     try {
-      const { categoryId, price, name, lng, lat } = payload;
+      const {
+        categoryId,
+        price,
+        name,
+        address,
+        ward,
+        city,
+        district,
+        lng,
+        lat,
+      } = payload;
 
       const data = await this.prismaService.property.create({
         data: {
@@ -172,6 +198,10 @@ export class PropertyService {
           price,
           location: {
             create: {
+              address,
+              ward,
+              city,
+              district,
               lat,
               lng,
             },
@@ -224,7 +254,19 @@ export class PropertyService {
   }): Promise<Property> {
     try {
       const { where, data } = params;
-      const { name, categoryId, location, price, status, userId } = data;
+      const {
+        name,
+        categoryId,
+        price,
+        status,
+        userId,
+        lat,
+        lng,
+        address,
+        ward,
+        city,
+        district,
+      } = data;
 
       const result = await this.prismaService.property.update({
         where,
@@ -232,8 +274,21 @@ export class PropertyService {
           name,
           price,
           status,
+          location: {
+            update: {
+              lat,
+              lng,
+              address,
+              ward,
+              district,
+              city,
+            },
+          },
           category: categoryId && { connect: { id: categoryId } },
           user: userId && { connect: { id: userId } },
+        },
+        include: {
+          location: true,
         },
       });
 
@@ -252,8 +307,8 @@ export class PropertyService {
       const { propertyId, brokerId } = payload;
       const result = await this.prismaService.brokerProperty.create({
         data: {
-          propertyId,
-          brokerId,
+          property: { connect: { id: propertyId } },
+          broker: { connect: { id: brokerId } },
           owner: false,
         },
       });
@@ -261,8 +316,11 @@ export class PropertyService {
       return result;
     } catch (error) {
       this.logger.error(error);
-      if (error.code === 'P2003') {
+      if (error.code === 'P2025') {
         throw new BadRequestException('Broker not found');
+      }
+      if (error.code === 'P2002') {
+        throw new BadRequestException('Can not assign owner');
       }
       throw new BadRequestException(error.message);
     }
@@ -270,11 +328,13 @@ export class PropertyService {
 
   async deleteProperty(
     where: Prisma.PropertyWhereUniqueInput,
-  ): Promise<Property> {
+  ): Promise<boolean> {
     try {
-      return await this.prismaService.property.delete({
+      const result = await this.prismaService.property.delete({
         where,
       });
+
+      return !!result;
     } catch (error) {
       this.logger.error(error);
       throw new BadRequestException(error.message);

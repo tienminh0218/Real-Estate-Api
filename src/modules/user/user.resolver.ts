@@ -16,7 +16,7 @@ import {
   Methods,
   Paths,
 } from '../auth/decorators/method-graph.decorator';
-import { GraphQlPagination } from './types/optional-query.type';
+import { PaginationInput } from '../../common/types/pagination.type';
 import { UpdateRoleUser } from './dto/update-role.dto';
 @Resolver((of) => UserGraphType)
 export class UserResolver {
@@ -25,7 +25,7 @@ export class UserResolver {
   @Query(() => UserCustom)
   @Public()
   async getUsers(
-    @Args('pagination') pagination: GraphQlPagination,
+    @Args('pagination') pagination: PaginationInput,
   ): Promise<UserCustom> {
     return this.userService.users({}, pagination);
   }

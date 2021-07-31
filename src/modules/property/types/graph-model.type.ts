@@ -4,6 +4,7 @@ import {
   ID,
   Int,
   GraphQLISODateTime,
+  Float,
 } from '@nestjs/graphql';
 
 import { CategoryProperty } from '../../categoryProperty/types/graph-model.type';
@@ -11,10 +12,41 @@ import { User } from '../../user/types/graph-model.type';
 import { Broker } from '../../broker/types/graph-model.type';
 import { Project } from '../../projects/types/graph-model.type';
 import { Comment_Property } from '../../comment/types/graph-model.type';
+
+@ObjectType()
+export class Location {
+  @Field((type) => ID)
+  id: string;
+
+  @Field({ nullable: true })
+  type: string;
+
+  @Field((type) => Float)
+  lat: number;
+
+  @Field((type) => Float)
+  lng: number;
+
+  @Field()
+  address: string;
+
+  @Field()
+  ward: string;
+
+  @Field()
+  district: string;
+
+  @Field()
+  city: string;
+}
+
 @ObjectType()
 export class Property {
   @Field((type) => ID)
   id: string;
+
+  @Field()
+  name: string;
 
   @Field((type) => GraphQLISODateTime)
   createdAt: Date;
@@ -22,11 +54,8 @@ export class Property {
   @Field((type) => GraphQLISODateTime)
   updatedAt: Date;
 
-  @Field()
-  location: string;
-
-  @Field()
-  coordinates: string;
+  @Field((type) => Location)
+  location: Location;
 
   @Field((type) => Int)
   price: number;

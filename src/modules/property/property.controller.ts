@@ -25,12 +25,13 @@ import {
 import { IsUser } from './../auth/guards/isUser';
 import { IsBroker } from './../auth/guards/isBroker';
 import { PropertyService } from './property.service';
-import { UpdatePropertyDto } from './dto/update-property.dto';
+import { UpdatePropertyDto, AssignBroker } from './dto/update-property.dto';
 import { CreatePropertyDto } from './dto/create-property.dto';
 import { OptionalQueryProperties } from './types/optional-query.type';
 import { PropertyCustom } from './types/property.type';
 import { RequestWithUser } from '../auth/interface/requestWithUser';
 import { Public } from '../auth/decorators/public.decorator';
+import { FilterQuery } from './dto/filter-property.dto';
 
 @ApiTags('Properties')
 @Controller('properties')
@@ -46,46 +47,47 @@ export class PropertyController {
     return this.propertyService.properties({}, optional);
   }
 
-  @Get('priceAndLocation')
+  @Get('filter')
   @Public()
-  async filterProperties(@Query() data: any): Promise<any> {
+  @ApiOkResponse({ description: 'Filter properties by price and city' })
+  async filterProperties(@Query() data: FilterQuery): Promise<any> {
     return this.propertyService.getRangeProperties(data);
   }
 
-  @Get('user/:userId')
+  @Get('user/:id')
   @Public()
   @ApiOkResponse({ description: 'Get property list of user' })
   async getPropertiesUser(
-    @Param('userId') id: string,
+    @Param('id') userId: string,
     @Query() optional: OptionalQueryProperties,
   ): Promise<any> {
-    return this.propertyService.getPropertiesOfUser(id, optional);
+    return this.propertyService.getPropertiesOfUser(userId, optional);
   }
 
-  @Get('project/:projectId')
+  @Get('project/:id')
   @Public()
   @ApiOkResponse({ description: 'Get property list of project' })
   async getPropertiesProject(
-    @Param('projectId') id: string,
+    @Param('id') projectId: string,
     @Query() optional: OptionalQueryProperties,
   ): Promise<any> {
-    return this.propertyService.getPropertiesOfProject(id, optional);
+    return this.propertyService.getPropertiesOfProject(projectId, optional);
   }
 
-  @Get('broker/:brokerId')
+  @Get('broker/:id')
   @Public()
   @ApiOkResponse({ description: 'Get property list of project' })
   async getPropertiesBroker(
-    @Param('brokerId') id: string,
+    @Param('id') brokerId: string,
     @Query() optional: OptionalQueryProperties,
   ): Promise<any> {
-    return this.propertyService.getPropertiesOfBroker(id, optional);
+    return this.propertyService.getPropertiesOfBroker(brokerId, optional);
   }
 
   @Get(':id')
   @Public()
   @ApiOkResponse({ description: 'Get a property by id' })
-  async getPropertyById(@Param('id') id: string): Promise<Property> {
+  getPropertyById(@Param('id') id: string): Promise<Property> {
     return this.propertyService.property({ where: { id } });
   }
 
@@ -118,38 +120,41 @@ export class PropertyController {
     return this.propertyService.createProperty(payload, id);
   }
 
-  @Put(':id/broker')
+  @Put(':id/assignBroker')
   @ApiUnauthorizedResponse({ description: 'User not logged in' })
   @ApiBadRequestResponse({ description: 'Broker not found' })
   @UseGuards(IsBroker)
   async assignBroker(
     @Param('id') propertyId: string,
-    @Body('brokerId') brokerId: string,
+    @Body() payload: AssignBroker,
   ): Promise<any> {
-    return this.propertyService.assignBroker({ propertyId, brokerId });
+    return this.propertyService.assignBroker({
+      propertyId,
+      brokerId: payload.brokerId,
+    });
   }
 
-  @Put('broker/:id')
+  @Put(':id/broker')
   @ApiCreatedResponse({ description: 'Updated success a property' })
   @ApiForbiddenResponse({ description: 'This property not that user' })
   @ApiUnauthorizedResponse({ description: 'User not logged in' })
   @UseGuards(IsBroker)
   async updateBrokerPropertyById(
     @Body() payload: UpdatePropertyDto,
-    @Param('id') propertyId: string,
+    @Param('id') id: string,
   ): Promise<Property> {
     return this.propertyService.updateProperty({
-      where: { id: propertyId },
+      where: { id },
       data: payload,
     });
   }
 
-  @Put(':id')
+  @Put(':id/project')
   @ApiCreatedResponse({ description: 'Updated success a property' })
   @ApiForbiddenResponse({ description: 'This property not that user' })
   @ApiUnauthorizedResponse({ description: 'User not logged in' })
   @UseGuards(IsUser)
-  async updatePropertyById(
+  async updateProjectPropertyById(
     @Param('id') id: string,
     @Body() payload: UpdatePropertyDto,
   ): Promise<Property> {
@@ -165,10 +170,8 @@ export class PropertyController {
   @ApiForbiddenResponse({ description: 'This property not that broker' })
   @ApiUnauthorizedResponse({ description: 'User not logged in' })
   @UseGuards(IsBroker)
-  async deleteBrokerPropertyById(
-    @Param('id') propertyId: string,
-  ): Promise<any> {
-    return this.propertyService.deleteProperty({ id: propertyId });
+  async deleteBrokerPropertyById(@Param('id') id: string): Promise<any> {
+    return this.propertyService.deleteProperty({ id });
   }
 
   @Delete(':id/project')
@@ -177,7 +180,7 @@ export class PropertyController {
   @ApiForbiddenResponse({ description: 'This property not that user' })
   @ApiUnauthorizedResponse({ description: 'User not logged in' })
   @UseGuards(IsUser)
-  async deletePropertyById(@Param('id') id: string): Promise<any> {
+  async deleteProjectPropertyById(@Param('id') id: string): Promise<any> {
     return this.propertyService.deleteProperty({ id });
   }
 }
