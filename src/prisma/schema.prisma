@@ -85,8 +85,7 @@ model Property {
   updatedAt         DateTime           @updatedAt
   category          categoryProperty   @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   categoryId        String
-  location          String
-  coordinates       String
+  location          Location?
   price             Int
   status            Int                @default(0)
   comments_Property Comment_Property[]
@@ -95,6 +94,19 @@ model Property {
   userId            String?
   project           Project?           @relation(fields: [projectId], references: [id], onDelete: Cascade)
   projectId         String?
+}
+
+model Location {
+  id                String             @id @default(uuid())
+  type              String             @default("Point") 
+  lat               Float
+  lng               Float
+  address           String
+  ward              String
+  district          String
+  city              String
+  property          Property           @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  propertyId        String
 }
 
 model BrokerProperty {
