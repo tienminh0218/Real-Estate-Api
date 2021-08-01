@@ -23,13 +23,12 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly configService: ConfigService,
-  ) { }
+  ) {}
 
   @Post('login')
   @HttpCode(200)
   @Public()
   @UseGuards(LocalAuthGuard)
-  @Public()
   async login(
     @Res({ passthrough: true }) res: Response,
     @Req() req: RequestWithUser,
@@ -61,9 +60,8 @@ export class AuthController {
   }
 
   @Post('logout')
-  @Public()
   @HttpCode(200)
   async logout(@Res() res: Response) {
-    res.clearCookie(process.env.COOKIE_NAME).send('Logout successfully!!!');
+    res.clearCookie(this.configService.get<string>('COOKIE_NAME')).end();
   }
 }

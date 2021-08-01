@@ -1,19 +1,9 @@
-import { Field, InputType, Int } from '@nestjs/graphql';
-import { PaginationType } from '../../../common/types/pagination.type';
+import { PaginationInput } from '../../../common/types/pagination.type';
 
-export class OptionalQueryUsers extends PaginationType {
+export class OptionalQueryUsers extends PaginationInput {
   include?: string;
 }
 
 export class OptionalQueryUser {
   include?: string;
-}
-
-@InputType()
-export class GraphQlPagination {
-  @Field((type) => Int, { nullable: true })
-  limit?: number;
-
-  @Field((type) => Int, { nullable: true })
-  page?: number;
 }
