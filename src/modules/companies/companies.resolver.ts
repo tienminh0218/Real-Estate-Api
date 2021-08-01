@@ -38,18 +38,30 @@ export class CompaniesResolver {
     }
 
     @Mutation(returns => CompanyType)
-    @Method(Methods.POST, Paths.USER)
+    @Method(Methods.POST, Paths.COMPANY)
     @UseGuards(IsUser)
     async createCompany(
         @Args('input') input: CreateCompanyDto,
         @Context() context: { req: RequestWithUser },
     ): Promise<CompanyModel> {
-        console.log(context.req.user);
         return await this.companiesService.createCompany(context.req.user, input);
     }
 
     @Mutation(returns => CompanyType)
-    @Method(Methods.DELETE, Paths.USER)
+    @Method(Methods.POST, Paths.COMPANY)
+    @UseGuards(IsUser)
+    async updateCompany(
+        @Args('id') id: string,
+        @Args('inputData') inputData: CreateCompanyDto,
+    ): Promise<CompanyModel> {
+        return await this.companiesService.updateCompany({
+            where: { id },
+            data: inputData,
+        });
+    }
+
+    @Mutation(returns => CompanyType)
+    @Method(Methods.DELETE, Paths.COMPANY)
     @UseGuards(IsUser)
     async deleteCompany(@Args('id') id: string) {
         return this.companiesService.deleteCompany({ id });
