@@ -9,7 +9,8 @@ import {
     Resolver,
 } from '@nestjs/graphql';
 import { Project as ProjectType } from './types/graph-model.type';
-import { Project as ProjectModel } from '.prisma/client';
+import { Company as CompanyType } from '../companies/types/graph-model.type';
+import { Project as ProjectModel, Company as CompanyModel } from '.prisma/client';
 import { RequestWithUser } from '../auth/interface/requestWithUser';
 import { Public } from '../auth/decorators/public.decorator';
 import { IsUser } from '../auth/guards/isUser';
@@ -17,15 +18,20 @@ import { Patch, UseGuards } from '@nestjs/common';
 import { Method, Methods, Paths } from '../auth/decorators/method-graph.decorator';
 import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
+import { ProjectCustom } from './types/project.type';
+import { PaginationInput } from 'src/common/types/pagination.type';
 
 @Resolver((of) => ProjectType)
 export class ProjectsResolver {
     constructor(private readonly projectService: ProjectsService) { }
 
-    @Query(returns => [ProjectType])
+    @Query(returns => ProjectCustom)
     @Public()
-    async getProjects(): Promise<ProjectModel[]> {
-        return;
+    async getProjectOfCompany(
+        @Args('id') id: string,
+        @Args('pagination') pagination: PaginationInput
+    ): Promise<ProjectCustom> {
+        return await this.projectService.projects(id, {}, pagination);
     }
 
     @Query(returns => ProjectType)
@@ -64,5 +70,22 @@ export class ProjectsResolver {
     @UseGuards(IsUser)
     async deleteProject(@Args('id') id: string) {
         return this.projectService.deleteProject({ id });
+    }
+
+    @Query(returns => CompanyType)
+    @Public()
+    async infoCompany(
+        @Args('id', { type: () => String }) id: string,
+    ): Promise<CompanyModel> {
+        return await this.projectService.infoComp({ id });
+    }
+
+    @Query(returns => ProjectCustom)
+    @Public()
+    async listProjectCity(
+        @Args('city') city: string,
+        @Args('pagination') pagination: PaginationInput
+    ): Promise<ProjectCustom> {
+        return await this.projectService.listProjectCity(city, {}, pagination);
     }
 }

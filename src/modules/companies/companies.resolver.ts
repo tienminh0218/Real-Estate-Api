@@ -18,15 +18,17 @@ import { Public } from '../auth/decorators/public.decorator';
 import { IsUser } from '../auth/guards/isUser';
 import { Patch, UseGuards } from '@nestjs/common';
 import { Method, Methods, Paths } from '../auth/decorators/method-graph.decorator';
+import { PaginationInput } from 'src/common/types/pagination.type';
+import { CompanyCustom } from './types/company.type';
 
 @Resolver((of) => CompanyType)
 export class CompaniesResolver {
     constructor(private readonly companiesService: CompaniesService) { }
 
-    @Query(returns => [CompanyType])
+    @Query(returns => CompanyCustom)
     @Public()
-    async getCompanies(): Promise<CompanyModel[]> {
-        return;
+    async getCompanies(@Args('pagination') pagination: PaginationInput): Promise<CompanyCustom> {
+        return await this.companiesService.companies({}, pagination);
     }
 
     @Query(returns => CompanyType)

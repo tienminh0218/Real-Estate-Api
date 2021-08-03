@@ -31,7 +31,6 @@ export class ProjectsController {
     @Body() data: CreateProjectDto,
     @Param('id') id: string,
   ): Promise<any> {
-
     return this.projectsService.createProject(data, id);
   }
 
@@ -56,7 +55,7 @@ export class ProjectsController {
   @Get('infoComp/:id')
   @Public()
   async infoCom(@Param('id') id: string): Promise<CompanyModel> {
-    return this.projectsService.infoComp(id);
+    return this.projectsService.infoComp({ id });
   }
 
   @Get('listProject/:id')
@@ -67,14 +66,10 @@ export class ProjectsController {
 
   @Get('listProjectCity/:city')
   @Public()
-  async listProjectCity(@Param('city') city: string): Promise<ProjectModel[]> {
-    return this.projectsService.listProjectCity(city);
+  async listProjectCity(@Query() optional: OptionalQueryProjects, @Param('city') city: string): Promise<ProjectCustom> {
+    return this.projectsService.listProjectCity(city, {}, optional);
   }
 
-  // @Get()
-  // async getAllProject(): Promise<ProjectModel[]> {
-  //   return await this.projectsService.projects({});
-  // }
   @Get(':id')
   @Public()
   async getProject(@Param('id') id: string): Promise<ProjectModel> {
