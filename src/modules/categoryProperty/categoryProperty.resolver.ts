@@ -41,7 +41,7 @@ export class CategoryPropertyResolver {
     }
 
     @Mutation(returns => CategoryPropertyType)
-    @Method(Methods.POST, Paths.PROJECT)
+    @Method(Methods.POST, Paths.CATEGORY)
     @Public()
     async createCategoryProperty(
         @Args('input') input: CreateCategoryPropertyDto,
@@ -50,7 +50,7 @@ export class CategoryPropertyResolver {
     }
 
     @Mutation(returns => CategoryPropertyType)
-    @Method(Methods.POST, Paths.PROJECT)
+    @Method(Methods.POST, Paths.CATEGORY)
     @UseGuards(IsUser)
     async updateCategory(
         @Args('id') id: string,
@@ -63,7 +63,7 @@ export class CategoryPropertyResolver {
     }
 
     @Mutation(returns => CategoryPropertyType)
-    @Method(Methods.DELETE, Paths.PROJECT)
+    @Method(Methods.DELETE, Paths.CATEGORY)
     @UseGuards(IsUser)
     async deleteCategory(@Args('id') id: string) {
         return this.categoryPropertyService.deleteCategory({ id });
