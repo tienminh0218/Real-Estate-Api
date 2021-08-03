@@ -1,5 +1,4 @@
 import { Response } from 'express';
-import { AuthService } from './auth.service';
 import {
   Body,
   Controller,
@@ -12,6 +11,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { ApiTags } from '@nestjs/swagger';
 
+import { AuthService } from './auth.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { RequestWithUser } from './interface/requestWithUser';
 import { LocalAuthGuard } from './guards/local';

@@ -19,10 +19,10 @@ export class IsUser implements CanActivate {
     private readonly logger: Logger,
   ) {}
 
-  compareUser(user: UserInterface, paramId: string, key: string): boolean {
+  compareUser(user: UserInterface, paramId: string, path: string): boolean {
     let result: boolean = false;
 
-    switch (key) {
+    switch (path) {
       case 'companies':
         result = user.companies?.some((company) => company.id === paramId);
         break;
@@ -53,7 +53,7 @@ export class IsUser implements CanActivate {
       return this.compareUser(user, paramId, 'projects');
     }
 
-    this.logger.warn('Path not found');
+    this.logger.warn('Path not found in post method');
     return false;
   }
 
@@ -67,7 +67,7 @@ export class IsUser implements CanActivate {
     if (path === 'projects') return this.compareUser(user, paramId, path);
     if (path === 'properties') return this.compareUser(user, paramId, path);
 
-    this.logger.warn('Path not found');
+    this.logger.warn('Path not found in update or delete method');
     return false;
   }
 

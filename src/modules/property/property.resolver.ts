@@ -1,5 +1,6 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
+import { Property } from '@prisma/client';
 
 import { PropertyService } from './property.service';
 import { Property as PropertyGraphType } from './types/graph-model.type';
@@ -33,7 +34,7 @@ export class PropertyResolver {
 
   @Query(() => PropertyGraphType)
   @Public()
-  getPropertyById(@Args('id') id: string) {
+  getPropertyById(@Args('id') id: string): Promise<Property> {
     return this.propertyService.property({ where: { id } });
   }
 

@@ -29,35 +29,35 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { Roles, Role } from '../auth/decorators/roles.decorator';
 import { RolesGuard } from '../auth/guards/role';
 import { UpdateRoleUser } from './dto/update-role.dto';
-import {
-  OptionalQueryUser,
-  OptionalQueryUsers,
-} from './types/optional-query.type';
+import { OptionalQueryUsers } from './types/optional-query.type';
 import { UserCustom } from './types/user.type';
 import { Public } from '../auth/decorators/public.decorator';
 
 @ApiTags('Users')
 @Controller('users')
 export class UserController {
-  constructor(private readonly userService: UserService) { }
+  constructor(private readonly userService: UserService) {}
 
   @Get()
   @Public()
   @ApiOkResponse({ description: 'Get all users' })
-  async getUsers(
-    @Query() optional: OptionalQueryUsers,
-  ): Promise<UserCustom | null> {
-    return this.userService.users({}, optional);
+  async getUsers(@Query() optional: OptionalQueryUsers): Promise<UserCustom> {
+    const { data, pagination } = await this.userService.users({}, optional);
+    data.forEach((user) => {
+      delete user.password;
+    });
+    return { data, pagination };
   }
 
   @Get(':id')
   @Public()
   @ApiOkResponse({ description: 'Get user by id' })
-  async getUserById(
-    @Param('id') id: string,
-    @Query() optional: OptionalQueryUser,
-  ): Promise<User> {
-    return this.userService.user({ where: { id } }, optional);
+  async getUserById(@Param('id') id: string): Promise<User> {
+    const { password, ...rest } = await this.userService.user({
+      where: { id },
+    });
+
+    return rest as User;
   }
 
   @Put(':id')

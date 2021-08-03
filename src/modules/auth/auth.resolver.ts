@@ -55,7 +55,6 @@ export class AuthResolver {
   @Query(() => String)
   logout(@ResGraph() res: Response) {
     res.clearCookie(this.configService.get<string>('COOKIE_NAME'));
-
     return 'Logout Success';
   }
 }

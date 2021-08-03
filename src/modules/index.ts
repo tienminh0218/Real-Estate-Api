@@ -1,10 +1,9 @@
-import { BrokerModule } from '././broker/broker.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { APP_GUARD } from '@nestjs/core';
-import { join } from 'path';
 
+import { BrokerModule } from '././broker/broker.module';
 import { NewsModule } from './news/news.module';
 import { CommentModule } from './comment/comment.module';
 import { PrismaModule } from './prisma/prisma.module';
