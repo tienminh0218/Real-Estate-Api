@@ -7,16 +7,16 @@ export class NewsService {
   constructor(
     private prismaService: PrismaService,
     private readonly logger: Logger,
-  ) { }
+  ) {}
 
-  async createNews(data: Prisma.NewsCreateInput, id: string): Promise<any> {
+  async createNews(data: Prisma.NewsCreateInput, user: any): Promise<any> {
     try {
       const { title, content } = data;
       const news = await this.prismaService.news.create({
         data: {
           title: title,
           content: content,
-          author: { connect: { id: id } },
+          author: { connect: { id: user.broker.id } },
         },
         include: {
           author: true,
@@ -33,8 +33,19 @@ export class NewsService {
     }
   }
 
-  getAllNews(): Promise<News[]> {
-    return this.prismaService.news.findMany();
+  getAllNews(data: any): Promise<News[]> {
+    try {
+      let { page, limit } = data;
+      page = +page || 1;
+      limit = +limit || 2;
+      return this.prismaService.news.findMany({
+        take: limit,
+        skip: limit * (page - 1),
+      });
+    } catch (error) {
+      this.logger.error(`${error.message}`);
+      throw new BadRequestException(error.message);
+    }
   }
 
   async getNewsById(
