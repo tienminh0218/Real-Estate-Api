@@ -18,15 +18,17 @@ import { Public } from '../auth/decorators/public.decorator';
 import { IsUser } from '../auth/guards/isUser';
 import { Patch, UseGuards } from '@nestjs/common';
 import { Method, Methods, Paths } from '../auth/decorators/method-graph.decorator';
+import { PaginationInput } from 'src/common/types/pagination.type';
+import { CompanyCustom } from './types/company.type';
 
 @Resolver((of) => CompanyType)
 export class CompaniesResolver {
     constructor(private readonly companiesService: CompaniesService) { }
 
-    @Query(returns => [CompanyType])
+    @Query(returns => CompanyCustom)
     @Public()
-    async getCompanies(): Promise<CompanyModel[]> {
-        return;
+    async getCompanies(@Args('pagination') pagination: PaginationInput): Promise<CompanyCustom> {
+        return await this.companiesService.companies({}, pagination);
     }
 
     @Query(returns => CompanyType)
@@ -38,18 +40,30 @@ export class CompaniesResolver {
     }
 
     @Mutation(returns => CompanyType)
-    @Method(Methods.POST, Paths.USER)
+    @Method(Methods.POST, Paths.COMPANY)
     @UseGuards(IsUser)
     async createCompany(
         @Args('input') input: CreateCompanyDto,
         @Context() context: { req: RequestWithUser },
     ): Promise<CompanyModel> {
-        console.log(context.req.user);
         return await this.companiesService.createCompany(context.req.user, input);
     }
 
     @Mutation(returns => CompanyType)
-    @Method(Methods.DELETE, Paths.USER)
+    @Method(Methods.POST, Paths.COMPANY)
+    @UseGuards(IsUser)
+    async updateCompany(
+        @Args('id') id: string,
+        @Args('inputData') inputData: CreateCompanyDto,
+    ): Promise<CompanyModel> {
+        return await this.companiesService.updateCompany({
+            where: { id },
+            data: inputData,
+        });
+    }
+
+    @Mutation(returns => CompanyType)
+    @Method(Methods.DELETE, Paths.COMPANY)
     @UseGuards(IsUser)
     async deleteCompany(@Args('id') id: string) {
         return this.companiesService.deleteCompany({ id });

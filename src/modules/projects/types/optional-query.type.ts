@@ -1,6 +1,6 @@
-import { PaginationType } from '../../../common/types/pagination.type'
+import { PaginationInput } from '../../../common/types/pagination.type'
 
-export interface OptionalQueryProjects extends PaginationType {
+export interface OptionalQueryProjects extends PaginationInput {
   include?: string;
 }
 

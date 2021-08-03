@@ -32,7 +32,7 @@ export class ProjectsService {
     try {
       const { where, orderBy, cursor } = params;
 
-      let { page, limit, include: includeQuery } = optional;
+      let { page, limit } = optional;
 
       page = Number(page) || 1;
       limit = Number(limit) || 20;
@@ -103,47 +103,58 @@ export class ProjectsService {
     });
   }
 
-  async infoComp(id: string): Promise<Company | null> {
+  async infoComp(where: Prisma.ProjectWhereUniqueInput): Promise<Company | null> {
     return this.prisma.company.findFirst({
-      where: { id: id },
+      where,
     });
   }
 
-  // async listProject(id: string): Promise<Project[]> {
-  //   return this.prisma.project.findMany({
-  //     where: {
-  //       companyId: id,
-  //     },
-  //   });
-  // }
+  async listProjectCity(
+    searchcity: string,
+    params: {
+      where?: Prisma.ProjectWhereInput;
+      skip?: number;
+      take?: number;
+      cursor?: Prisma.ProjectWhereUniqueInput;
+      orderBy?: Prisma.ProjectOrderByInput;
+      include?: Prisma.ProjectInclude;
+    },
+    optional: OptionalQueryProjects,
+  ): Promise<ProjectCustom> {
+    try {
+      const { where, orderBy, cursor } = params;
 
-  async listProjectCity(searchcity: string): Promise<Project[]> {
-    return this.prisma.project.findMany({
-      where: {
-        OR: [
-          {
-            city: { contains: searchcity },
-          },
-          {
-            district: { contains: searchcity },
-          },
-        ],
-      },
-    });
-  }
+      let { page, limit } = optional;
 
-  async list_project_city(searchcity: string): Promise<Project[]> {
-    return this.prisma.project.findMany({
-      where: {
-        OR: [
-          {
-            city: { contains: searchcity },
-          },
-          {
-            district: { contains: searchcity },
-          },
-        ],
-      },
-    });
+      page = Number(page) || 1;
+      limit = Number(limit) || 20;
+      const data = await this.prisma.project.findMany({
+        where: {
+          OR: [
+            {
+              city: { contains: searchcity },
+            },
+            {
+              district: { contains: searchcity },
+            },
+          ],
+        },
+        take: limit,
+        skip: limit * (page - 1),
+        orderBy,
+        cursor
+      });
+      return {
+        data,
+        pagination: {
+          page,
+          limit,
+          totalRows: data.length,
+        },
+      };
+    } catch (error) {
+      this.logger.error(error);
+      throw new BadRequestException(error);
+    }
   }
 }
