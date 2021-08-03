@@ -1,3 +1,4 @@
+import { RequestWithUser } from './../auth/interface/requestWithUser';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { CommentService } from './comment.service';
 import {
@@ -8,6 +9,8 @@ import {
   Param,
   Post,
   Put,
+  Query,
+  Req,
 } from '@nestjs/common';
 import {
   Comment_Broker,
@@ -27,33 +30,37 @@ export class CommentController {
   @Post('/broker/:id')
   createBrokerComment(
     @Param('id') id: string,
+    @Req() req: RequestWithUser,
     @Body() data: CreateCommentDto,
   ): Promise<any> {
-    return this.commentService.createBrokerComment(data, id);
+    return this.commentService.createBrokerComment(req.user, data, id);
   }
 
   @Post('/company/:id')
   createCompanyComment(
     @Param('id') id: string,
+    @Req() req: RequestWithUser,
     @Body() data: CreateCommentDto,
   ): Promise<any> {
-    return this.commentService.createCompanyComment(data, id);
+    return this.commentService.createCompanyComment(req.user, data, id);
   }
 
   @Post('/project/:id')
   createProjectComment(
     @Param('id') id: string,
+    @Req() req: RequestWithUser,
     @Body() data: CreateCommentDto,
   ): Promise<any> {
-    return this.commentService.createProjectComment(data, id);
+    return this.commentService.createProjectComment(req.user, data, id);
   }
 
   @Post('/property/:id')
   createPropertyComment(
     @Param('id') id: string,
+    @Req() req: RequestWithUser,
     @Body() data: CreateCommentDto,
   ): Promise<any> {
-    return this.commentService.createPropertyComment(data, id);
+    return this.commentService.createPropertyComment(req.user, data, id);
   }
 
   ///Get comment by id
@@ -79,56 +86,60 @@ export class CommentController {
 
   ///Get all comments
   @Get('/broker')
-  getAllBrokerComments(): Promise<Comment_Broker[]> {
-    return this.commentService.getAllBrokerComments();
+  getAllBrokerComments(@Query() data: any): Promise<Comment_Broker[]> {
+    return this.commentService.getAllBrokerComments(data);
   }
 
   @Get('/company')
-  getAllCompanyComments(): Promise<Comment_Company[]> {
-    return this.commentService.getAllCompanyComments();
+  getAllCompanyComments(@Query() data: any): Promise<Comment_Company[]> {
+    return this.commentService.getAllCompanyComments(data);
   }
 
   @Get('/project')
-  getAllProjectComments(): Promise<Comment_Project[]> {
-    return this.commentService.getAllProjectComments();
+  getAllProjectComments(@Query() data: any): Promise<Comment_Project[]> {
+    return this.commentService.getAllProjectComments(data);
   }
 
   @Get('/property')
-  getAllPropertyComments(): Promise<Comment_Property[]> {
-    return this.commentService.getAllPropertyComments();
+  getAllPropertyComments(@Query() data: any): Promise<Comment_Property[]> {
+    return this.commentService.getAllPropertyComments(data);
   }
 
   ///Update comment by id
   @Put('/broker/:id')
   updateBrokerCommentById(
     @Param('id') id: string,
+    @Req() req: RequestWithUser,
     @Body() data: UpdateCommentDto,
   ): Promise<Comment_Broker> {
-    return this.commentService.updateBrokerComment({ id }, data);
+    return this.commentService.updateBrokerComment(req.user, { id }, data);
   }
 
   @Put('/company/:id')
   updateCompanyCommentById(
     @Param('id') id: string,
+    @Req() req: RequestWithUser,
     @Body() data: UpdateCommentDto,
   ): Promise<Comment_Company> {
-    return this.commentService.updateCompanyComment({ id }, data);
+    return this.commentService.updateCompanyComment(req.user, { id }, data);
   }
 
   @Put('/project/:id')
   updateProjectCommentById(
     @Param('id') id: string,
+    @Req() req: RequestWithUser,
     @Body() data: UpdateCommentDto,
   ): Promise<Comment_Project> {
-    return this.commentService.updateProjectComment({ id }, data);
+    return this.commentService.updateProjectComment(req.user, { id }, data);
   }
 
   @Put('/property/:id')
   updatePropertyCommentById(
     @Param('id') id: string,
+    @Req() req: RequestWithUser,
     @Body() data: UpdateCommentDto,
   ): Promise<Comment_Property> {
-    return this.commentService.updatePropertyComment({ id }, data);
+    return this.commentService.updatePropertyComment(req.user, { id }, data);
   }
   ///Delete comment by id
   @Delete('/broker/:id')

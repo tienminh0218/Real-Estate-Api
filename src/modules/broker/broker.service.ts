@@ -1,6 +1,3 @@
-import { PropertyService } from './../property/property.service';
-import { ProjectsService } from './../projects/projects.service';
-import { Prisma } from '@prisma/client';
 import { UpdateBrokerDto } from './dto/update-broker.dto';
 import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 
@@ -12,9 +9,7 @@ export class BrokerService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly logger: Logger,
-    private readonly projectsService: ProjectsService,
-    private readonly propertyService: PropertyService,
-  ) { }
+  ) {}
 
   async isBroker(user: any) {
     const IsBroker = await this.prismaService.broker.findFirst({
@@ -26,11 +21,76 @@ export class BrokerService {
     return IsBroker;
   }
 
-  async getBrokerOfProject(id: Prisma.ProjectWhereUniqueInput) {
-    const brokers = await this.projectsService.project(id);
+  async getBrokerOfProject(data: any) {
+    try {
+      const { projectId } = data;
+      let { page, limit } = data;
+
+      page = +page || 1;
+      limit = +limit || 5;
+      const brokers = await this.prismaService.property.findMany({
+        take: limit,
+        skip: limit * (page - 1),
+        where: {
+          projectId: { contains: projectId },
+        },
+        select: {
+          broker: { select: { broker: true } },
+        },
+      });
+      if (brokers.length === 0) {
+        throw new BadRequestException('Brokers not found!!!!');
+      }
+      return {
+        brokers,
+        pagination: {
+          page,
+          limit,
+          totalRows: brokers.length,
+        },
+      };
+    } catch (error) {
+      this.logger.error(error.message);
+      throw new BadRequestException(error.message);
+    }
   }
 
-  async getBrokerOfproperty() { }
+  async getBrokerOfProperty(data: any) {
+    try {
+      const { propertyId, propertyName } = data;
+      let { page, limit } = data;
+
+      page = +page || 1;
+      limit = +limit || 5;
+      const brokers = await this.prismaService.property.findMany({
+        take: limit,
+        skip: limit * (page - 1),
+        where: {
+          OR: [
+            { id: { contains: propertyId } },
+            { name: { contains: propertyName } },
+          ],
+        },
+        select: {
+          broker: { select: { broker: true } },
+        },
+      });
+      if (brokers.length === 0) {
+        throw new BadRequestException('Brokers not found!!!!');
+      }
+      return {
+        brokers,
+        pagination: {
+          page,
+          limit,
+          totalRows: brokers.length,
+        },
+      };
+    } catch (error) {
+      this.logger.error(error.message);
+      throw new BadRequestException(error.message);
+    }
+  }
 
   async getBrokerOfDistrictOrCity(data: any) {
     try {

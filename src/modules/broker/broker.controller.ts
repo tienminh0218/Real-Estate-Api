@@ -15,7 +15,6 @@ import {
   Put,
   Delete,
   Query,
-  Param,
 } from '@nestjs/common';
 
 import { CreateBrokerDto } from './dto/create-broker.dto';
@@ -26,12 +25,18 @@ import { RequestWithUser } from '../auth/interface/requestWithUser';
 @ApiTags('broker')
 @UseGuards(JwtAuthGuard)
 export class BrokerController {
-  constructor(private readonly brokerService: BrokerService) { }
+  constructor(private readonly brokerService: BrokerService) {}
 
-  @Get('project/:id')
+  @Get('property')
+  @ApiOkResponse({ description: 'Get brokers of property' })
+  async getBrokersOfProperty(@Query() data: any) {
+    return this.brokerService.getBrokerOfProperty(data);
+  }
+
+  @Get('project')
   @ApiOkResponse({ description: 'Get brokers of project' })
-  async getBrokersOfProject(@Param('id') id: string) {
-    return this.brokerService.getBrokerOfProject({ id });
+  async getBrokersOfProject(@Query() data: any) {
+    return this.brokerService.getBrokerOfProject(data);
   }
 
   @Get('districtOrCity')

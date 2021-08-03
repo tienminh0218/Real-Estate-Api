@@ -9,26 +9,32 @@ import {
   Param,
   Post,
   Put,
+  Query,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { CreateNewsDto } from './dto/create-news.dto';
 import { News } from '@prisma/client';
 import { ApiTags } from '@nestjs/swagger';
+import { IsBroker } from '../auth/guards/isBroker';
+import { RequestWithUser } from '../auth/interface/requestWithUser';
 
 @Controller('news')
 @ApiTags('news')
 export class NewsController {
   constructor(private newsService: NewsService) {}
   @Post('/:id')
+  @UseGuards(IsBroker)
   createNews(
-    @Param('id') id: string,
     @Body() data: CreateNewsDto,
+    @Req() req: RequestWithUser,
   ): Promise<any> {
-    return this.newsService.createNews(data, id);
+    return this.newsService.createNews(data, req.user);
   }
 
   @Get()
-  getAllNews(): Promise<News[]> {
-    return this.newsService.getAllNews();
+  getAllNews(@Query() data: any): Promise<News[]> {
+    return this.newsService.getAllNews(data);
   }
 
   @Get('/:id')
@@ -37,6 +43,7 @@ export class NewsController {
   }
 
   @Put('/:id')
+  @UseGuards(IsBroker)
   updateNews(
     @Param('id') id: string,
     @Body() data: UpdateNewsDto,
@@ -46,6 +53,7 @@ export class NewsController {
 
   @HttpCode(204)
   @Delete('/:id')
+  @UseGuards(IsBroker)
   deleteNews(@Param('id') id: string): Promise<void> {
     return this.newsService.deleteNews({ id });
   }
