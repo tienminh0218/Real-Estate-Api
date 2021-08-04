@@ -20,6 +20,9 @@ import { Patch, UseGuards } from '@nestjs/common';
 import { Method, Methods, Paths } from '../auth/decorators/method-graph.decorator';
 import { PaginationInput } from 'src/common/types/pagination.type';
 import { CompanyCustom } from './types/company.type';
+import { IsBroker } from '../auth/guards/isBroker';
+import { Role, Roles } from '../auth/decorators/roles.decorator';
+import { RolesGuard } from '../auth/guards/role';
 
 @Resolver((of) => CompanyType)
 export class CompaniesResolver {
@@ -41,7 +44,9 @@ export class CompaniesResolver {
 
     @Mutation(returns => CompanyType)
     @Method(Methods.POST, Paths.COMPANY)
-    @UseGuards(IsUser)
+    // @UseGuards(IsBroker)
+    @Roles(Role.ADMIN)
+    @UseGuards(RolesGuard)
     async createCompany(
         @Args('input') input: CreateCompanyDto,
         @Context() context: { req: RequestWithUser },
@@ -51,7 +56,7 @@ export class CompaniesResolver {
 
     @Mutation(returns => CompanyType)
     @Method(Methods.POST, Paths.COMPANY)
-    @UseGuards(IsUser)
+    @UseGuards(IsBroker)
     async updateCompany(
         @Args('id') id: string,
         @Args('inputData') inputData: CreateCompanyDto,
