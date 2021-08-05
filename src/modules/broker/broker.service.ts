@@ -23,22 +23,29 @@ export class BrokerService {
 
   async getBrokerOfProject(data: any) {
     try {
-      console.log(data);
-      const { projectId } = data;
+      const { projectId, projectName } = data;
       let { page, limit } = data;
 
       page = +page || 1;
       limit = +limit || 5;
-      const brokers = await this.prismaService.property.findMany({
-        take: limit,
-        skip: limit * (page - 1),
+
+      const brokers = await this.prismaService.broker.findMany({
         where: {
-          projectId: { contains: projectId },
-        },
-        select: {
-          broker: { select: { broker: true } },
+          Project: {
+            OR: [{ id: projectId }, { projectName: { contains: projectName } }],
+          },
         },
       });
+      // const brokers = await this.prismaService.property.findMany({
+      //   take: limit,
+      //   skip: limit * (page - 1),
+      //   where: {
+      //     projectId: { contains: projectId },
+      //   },
+      //   select: {
+      //     broker: { select: { broker: true } },
+      //   },
+      // });
       if (brokers.length === 0) {
         throw new BadRequestException('Brokers not found!!!!');
       }
@@ -63,22 +70,43 @@ export class BrokerService {
 
       page = +page || 1;
       limit = +limit || 5;
-      const brokers = await this.prismaService.property.findMany({
-        take: limit,
-        skip: limit * (page - 1),
+
+      const brokers = await this.prismaService.broker.findMany({
         where: {
-          OR: [
-            { id: { contains: propertyId } },
-            { name: { contains: propertyName } },
-          ],
-        },
-        select: {
-          broker: { select: { broker: true } },
+          properties: {
+            some: {
+              OR: [
+                { propertyId: { contains: propertyId } },
+                { property: { name: { contains: propertyName } } },
+              ],
+            },
+          },
         },
       });
+      // const brokers = await this.prismaService.property.findMany({
+      //   take: limit,
+      //   skip: limit * (page - 1),
+      //   where: {
+      //     OR: [
+      //       { id: { contains: propertyId } },
+      //       { name: { contains: propertyName } },
+      //     ],
+      //   },
+      //   select: {
+      //     broker: { select: { broker: true } },
+      //   },
+      // });
       if (brokers.length === 0) {
         throw new BadRequestException('Brokers not found!!!!');
       }
+      // return {
+      //   brokers,
+      //   pagination: {
+      //     page,
+      //     limit,
+      //     totalRows: brokers.length,
+      //   },
+      // };
       return {
         brokers,
         pagination: {
