@@ -25,7 +25,7 @@ export class UserResolver {
   @Query(() => UserCustom)
   @Public()
   async getUsers(
-    @Args('pagination') pagination: PaginationInput,
+    @Args('pagination') pagination: PaginationInput = {},
   ): Promise<UserCustom> {
     return this.userService.users({}, pagination);
   }

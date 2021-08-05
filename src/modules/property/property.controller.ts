@@ -51,7 +51,7 @@ export class PropertyController {
   @Public()
   @ApiOkResponse({ description: 'Filter properties by price and city' })
   async filterProperties(@Query() data: FilterQuery): Promise<any> {
-    return this.propertyService.getRangeProperties(data);
+    return this.propertyService.filterProperties(data);
   }
 
   @Get('user/:id')

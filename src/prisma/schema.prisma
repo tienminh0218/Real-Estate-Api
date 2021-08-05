@@ -97,7 +97,6 @@ model Property {
 }
 
 model Location {
-  id                String             @id @default(uuid())
   type              String             @default("Point") 
   lat               Float
   lng               Float
@@ -107,6 +106,8 @@ model Location {
   city              String
   property          Property           @relation(fields: [propertyId], references: [id], onDelete: Cascade)
   propertyId        String
+
+  @@id([propertyId])
 }
 
 model BrokerProperty {

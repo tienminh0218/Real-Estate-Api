@@ -5,11 +5,11 @@ import {
   Int,
   GraphQLISODateTime,
   Float,
+  Directive,
 } from '@nestjs/graphql';
 
 import { CategoryProperty } from '../../categoryProperty/types/graph-model.type';
 import { User } from '../../user/types/graph-model.type';
-import { Broker } from '../../broker/types/graph-model.type';
 import { Project } from '../../projects/types/graph-model.type';
 import { Comment_Property } from '../../comment/types/graph-model.type';
 
@@ -63,11 +63,14 @@ export class Property {
   @Field((type) => Int)
   status: number;
 
-  @Field((type) => [Comment_Property])
-  comments_Property: Comment_Property[];
+  @Field((type) => Int)
+  status2: number;
 
-  @Field((type) => Broker)
-  broker: Broker;
+  // @Field((type) => [Comment_Property])
+  // comments_Property: Comment_Property[];
+
+  // @Field((type) => Broker)
+  // broker: Broker;
 
   @Field((type) => User)
   user: User;
@@ -77,4 +80,16 @@ export class Property {
 
   @Field((type) => CategoryProperty)
   category: CategoryProperty;
+}
+
+@ObjectType()
+export class BrokerOwner {
+  @Field((type) => Boolean)
+  owner: boolean;
+}
+
+@ObjectType()
+export class PropOfBroker extends Property {
+  @Field((type) => BrokerOwner)
+  broker: BrokerOwner;
 }
