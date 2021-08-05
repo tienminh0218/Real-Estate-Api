@@ -18,7 +18,7 @@ export class CategoryPropertyService {
         where: categoryPropertyWhereUniqueInput,
       });
 
-      if (existCategory) throw new Error('Category not found');
+      // if (existCategory) throw new Error('Category not found');
       return existCategory;
     } catch (error) {
       this.logger.error(`${error.message}`);
