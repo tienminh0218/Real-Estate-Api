@@ -1,22 +1,23 @@
 import { News, Prisma } from '@prisma/client';
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { NewsCustom } from './types/news.type';
 
 @Injectable()
 export class NewsService {
   constructor(
     private prismaService: PrismaService,
     private readonly logger: Logger,
-  ) { }
+  ) {}
 
-  async createNews(data: Prisma.NewsCreateInput, id: string): Promise<any> {
+  async createNews(data: Prisma.NewsCreateInput, user: any): Promise<any> {
     try {
       const { title, content } = data;
       const news = await this.prismaService.news.create({
         data: {
           title: title,
           content: content,
-          author: { connect: { id: id } },
+          author: { connect: { id: user.broker.id } },
         },
         include: {
           author: true,
@@ -33,8 +34,27 @@ export class NewsService {
     }
   }
 
-  getAllNews(): Promise<News[]> {
-    return this.prismaService.news.findMany();
+  async getAllNews(data: any): Promise<NewsCustom> {
+    try {
+      let { page, limit } = data;
+      page = +page || 1;
+      limit = +limit || 2;
+      const news = await this.prismaService.news.findMany({
+        take: limit,
+        skip: limit * (page - 1),
+      });
+      return {
+        news,
+        pagination: {
+          page,
+          limit,
+          totalRows: news.length,
+        },
+      };
+    } catch (error) {
+      this.logger.error(`${error.message}`);
+      throw new BadRequestException(error.message);
+    }
   }
 
   async getNewsById(
@@ -69,11 +89,12 @@ export class NewsService {
     }
   }
 
-  async deleteNews(where: Prisma.NewsWhereUniqueInput): Promise<void> {
+  async deleteNews(where: Prisma.NewsWhereUniqueInput): Promise<News> {
     try {
       const existedNews = await this.getNewsById(where);
       if (!existedNews) throw new Error('News not found');
-      await this.prismaService.news.delete({ where });
+      const result = await this.prismaService.news.delete({ where });
+      return result;
     } catch (error) {
       this.logger.error(`${error.message}`);
       throw new BadRequestException(error.message);

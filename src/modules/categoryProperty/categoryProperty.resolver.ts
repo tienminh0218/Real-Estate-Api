@@ -19,6 +19,7 @@ import { CategoryPropertyService } from './categoryProperty.service';
 import { categoryPropertyCustom } from './types/category.type';
 import { categoryProperty as categoryPropertyModel } from '@prisma/client';
 import { CreateCategoryPropertyDto } from './dto/create-categoryProperty.dto';
+import { IsBroker } from '../auth/guards/isBroker';
 
 @Resolver((of) => CategoryPropertyType)
 export class CategoryPropertyResolver {
@@ -42,7 +43,7 @@ export class CategoryPropertyResolver {
 
     @Mutation(returns => CategoryPropertyType)
     @Method(Methods.POST, Paths.CATEGORY)
-    @Public()
+    @UseGuards(IsBroker)
     async createCategoryProperty(
         @Args('input') input: CreateCategoryPropertyDto,
     ): Promise<categoryPropertyModel> {
@@ -51,7 +52,7 @@ export class CategoryPropertyResolver {
 
     @Mutation(returns => CategoryPropertyType)
     @Method(Methods.POST, Paths.CATEGORY)
-    @UseGuards(IsUser)
+    @UseGuards(IsBroker)
     async updateCategory(
         @Args('id') id: string,
         @Args('inputData') inputData: CreateCategoryPropertyDto,
@@ -64,7 +65,7 @@ export class CategoryPropertyResolver {
 
     @Mutation(returns => CategoryPropertyType)
     @Method(Methods.DELETE, Paths.CATEGORY)
-    @UseGuards(IsUser)
+    @UseGuards(IsBroker)
     async deleteCategory(@Args('id') id: string) {
         return this.categoryPropertyService.deleteCategory({ id });
     }
