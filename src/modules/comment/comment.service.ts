@@ -1,4 +1,10 @@
 import {
+  Comment_BrokerCustom,
+  Comment_CompanyCustom,
+  Comment_ProjectCustom,
+  Comment_PropertyCustom,
+} from './types/news.type';
+import {
   Comment_Broker,
   Comment_Company,
   Comment_Project,
@@ -197,7 +203,7 @@ export class CommentService {
   }
 
   /// get all comments
-  async getAllBrokerComments(data: any): Promise<Comment_Broker[]> {
+  async getAllBrokerComments(data: any): Promise<Comment_BrokerCustom> {
     try {
       let { page, limit } = data;
       page = +page || 1;
@@ -207,14 +213,21 @@ export class CommentService {
         take: limit,
         skip: limit * (page - 1),
       });
-      return comment;
+      return {
+        comment,
+        pagination: {
+          page,
+          limit,
+          totalRows: comment.length,
+        },
+      };
     } catch (error) {
       this.logger.error(`${error.message}`);
       throw new BadRequestException(error.message);
     }
   }
 
-  async getAllCompanyComments(data: any): Promise<Comment_Company[]> {
+  async getAllCompanyComments(data: any): Promise<Comment_CompanyCustom> {
     try {
       let { page, limit } = data;
       page = +page || 1;
@@ -223,14 +236,21 @@ export class CommentService {
         take: limit,
         skip: limit * (page - 1),
       });
-      return comment;
+      return {
+        comment,
+        pagination: {
+          page,
+          limit,
+          totalRows: comment.length,
+        },
+      };
     } catch (error) {
       this.logger.error(`${error.message}`);
       throw new BadRequestException(error.message);
     }
   }
 
-  async getAllProjectComments(data: any): Promise<Comment_Project[]> {
+  async getAllProjectComments(data: any): Promise<Comment_ProjectCustom> {
     try {
       let { page, limit } = data;
       page = +page || 1;
@@ -239,14 +259,21 @@ export class CommentService {
         take: limit,
         skip: limit * (page - 1),
       });
-      return comment;
+      return {
+        comment,
+        pagination: {
+          page,
+          limit,
+          totalRows: comment.length,
+        },
+      };
     } catch (error) {
       this.logger.error(`${error.message}`);
       throw new BadRequestException(error.message);
     }
   }
 
-  async getAllPropertyComments(data: any): Promise<Comment_Property[]> {
+  async getAllPropertyComments(data: any): Promise<Comment_PropertyCustom> {
     try {
       let { page, limit } = data;
       page = +page || 1;
@@ -255,7 +282,14 @@ export class CommentService {
         take: limit,
         skip: limit * (page - 1),
       });
-      return comment;
+      return {
+        comment,
+        pagination: {
+          page,
+          limit,
+          totalRows: comment.length,
+        },
+      };
     } catch (error) {
       this.logger.error(`${error.message}`);
       throw new BadRequestException(error.message);
@@ -270,9 +304,7 @@ export class CommentService {
   ): Promise<Comment_Broker> {
     try {
       const existedComment = await this.getBrokerCommentById(where);
-      if (!existedComment) throw new Error('Comment not found');
-      if (existedComment.userId !== user.id) return;
-      if (existedComment.userId !== user.id) return;
+      this.checkCommenIsUser(existedComment, user);
       const comment = await this.prismaService.comment_Broker.update({
         data,
         where,
@@ -291,8 +323,7 @@ export class CommentService {
   ): Promise<Comment_Company> {
     try {
       const existedComment = await this.getCompanyCommentById(where);
-      if (!existedComment) throw new Error('Comment not found');
-      if (existedComment.userId !== user.id) return;
+      this.checkCommenIsUser(existedComment, user);
       const comment = await this.prismaService.comment_Company.update({
         data,
         where,
@@ -311,8 +342,7 @@ export class CommentService {
   ): Promise<Comment_Project> {
     try {
       const existedComment = await this.getProjectCommentById(where);
-      if (!existedComment) throw new Error('Comment not found');
-      if (existedComment.userId !== user.id) return;
+      this.checkCommenIsUser(existedComment, user);
       const comment = await this.prismaService.comment_Project.update({
         data,
         where,
@@ -331,8 +361,7 @@ export class CommentService {
   ): Promise<Comment_Property> {
     try {
       const existedComment = await this.getPropertyCommentById(where);
-      if (!existedComment) throw new Error('Comment not found');
-      if (existedComment.userId !== user.id) return;
+      this.checkCommenIsUser(existedComment, user);
       const comment = await this.prismaService.comment_Property.update({
         data,
         where,
@@ -346,12 +375,15 @@ export class CommentService {
 
   ///delete comment by id
   async deleteBrokerCommentById(
+    user: any,
     where: Prisma.Comment_BrokerWhereUniqueInput,
-  ): Promise<void> {
+  ): Promise<any> {
     try {
       const existedComment = await this.getBrokerCommentById(where);
-      if (!existedComment) throw new Error('Broker not found');
-      await this.prismaService.comment_Broker.delete({ where });
+
+      this.checkCommenIsUser(existedComment, user);
+      const result = await this.prismaService.comment_Broker.delete({ where });
+      return result;
     } catch (error) {
       this.logger.error(`${error.message}`);
       throw new BadRequestException(error.message);
@@ -359,12 +391,15 @@ export class CommentService {
   }
 
   async deleteCompanyCommentById(
+    user: any,
     where: Prisma.Comment_CompanyWhereUniqueInput,
-  ): Promise<void> {
+  ): Promise<any> {
     try {
       const existedComment = await this.getCompanyCommentById(where);
-      if (!existedComment) throw new Error('Company not found');
-      await this.prismaService.comment_Company.delete({ where });
+
+      this.checkCommenIsUser(existedComment, user);
+      const result = await this.prismaService.comment_Company.delete({ where });
+      return result;
     } catch (error) {
       this.logger.error(`${error.message}`);
       throw new BadRequestException(error.message);
@@ -372,12 +407,15 @@ export class CommentService {
   }
 
   async deleteProjectCommentById(
+    user: any,
     where: Prisma.Comment_ProjectWhereUniqueInput,
-  ): Promise<void> {
+  ): Promise<any> {
     try {
       const existedComment = await this.getProjectCommentById(where);
-      if (!existedComment) throw new Error('Project not found');
-      await this.prismaService.comment_Project.delete({ where });
+
+      this.checkCommenIsUser(existedComment, user);
+      const result = await this.prismaService.comment_Project.delete({ where });
+      return result;
     } catch (error) {
       this.logger.error(`${error.message}`);
       throw new BadRequestException(error.message);
@@ -385,15 +423,27 @@ export class CommentService {
   }
 
   async deletePropertyCommentById(
+    user: any,
     where: Prisma.Comment_PropertyWhereUniqueInput,
-  ): Promise<void> {
+  ): Promise<any> {
     try {
       const existedComment = await this.getPropertyCommentById(where);
-      if (!existedComment) throw new Error('Property not found');
-      await this.prismaService.comment_Property.delete({ where });
+
+      this.checkCommenIsUser(existedComment, user);
+      const result = await this.prismaService.comment_Property.delete({
+        where,
+      });
+      return result;
     } catch (error) {
       this.logger.error(`${error.message}`);
       throw new BadRequestException(error.message);
+    }
+  }
+
+  checkCommenIsUser(existedComment, user) {
+    if (!existedComment) throw new Error('Comment not found');
+    if (existedComment.userId !== user.id) {
+      throw new Error('This comment not that user');
     }
   }
 

@@ -1,4 +1,4 @@
-import { Field, ID, ObjectType } from '@nestjs/graphql';
+import { Field, ID, ObjectType, GraphQLISODateTime } from '@nestjs/graphql';
 
 import { Broker } from '../../broker/types/graph-model.type';
 
@@ -7,10 +7,10 @@ export class News {
   @Field((type) => ID)
   id: string;
 
-  @Field()
+  @Field((type) => GraphQLISODateTime)
   createdAt: string;
 
-  @Field()
+  @Field((type) => GraphQLISODateTime)
   updatedAt: string;
 
   @Field()

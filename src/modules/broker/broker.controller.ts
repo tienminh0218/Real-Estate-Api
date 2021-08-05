@@ -46,7 +46,7 @@ export class BrokerController {
   }
 
   @Post('create')
-  @ApiOkResponse({ description: 'register broker' })
+  @ApiOkResponse({ description: 'Register broker' })
   @ApiUnauthorizedResponse({ description: 'User not logged in' })
   async createBroker(
     @Req() req: RequestWithUser,
@@ -56,7 +56,7 @@ export class BrokerController {
   }
 
   @Put('update')
-  @ApiOkResponse({ description: 'update broker infomation' })
+  @ApiOkResponse({ description: 'Updated broker infomation' })
   @ApiUnauthorizedResponse({ description: 'User not logged in' })
   async updateBroker(
     @Req() req: RequestWithUser,
@@ -66,7 +66,7 @@ export class BrokerController {
   }
 
   @Delete('delete')
-  @ApiOkResponse({ description: 'delete broker' })
+  @ApiOkResponse({ description: 'Deleted broker' })
   @ApiUnauthorizedResponse({ description: 'User not logged in' })
   async deleteBroker(@Req() req: RequestWithUser) {
     return await this.brokerService.deleteBroker(req.user);

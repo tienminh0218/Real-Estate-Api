@@ -15,9 +15,17 @@ import {
 } from '@nestjs/common';
 import { CreateNewsDto } from './dto/create-news.dto';
 import { News } from '@prisma/client';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiUnauthorizedResponse,
+  ApiForbiddenResponse,
+  ApiCreatedResponse,
+  ApiBadRequestResponse,
+  ApiOkResponse,
+} from '@nestjs/swagger';
 import { IsBroker } from '../auth/guards/isBroker';
 import { RequestWithUser } from '../auth/interface/requestWithUser';
+import { NewsCustom } from './types/news.type';
 
 @Controller('news')
 @ApiTags('news')
@@ -25,6 +33,9 @@ export class NewsController {
   constructor(private newsService: NewsService) {}
   @Post('/:id')
   @UseGuards(IsBroker)
+  @ApiUnauthorizedResponse({ description: 'User not logged in' })
+  @ApiForbiddenResponse({ description: 'You need be a broker' })
+  @ApiCreatedResponse({ description: 'News has been created' })
   createNews(
     @Body() data: CreateNewsDto,
     @Req() req: RequestWithUser,
@@ -33,17 +44,23 @@ export class NewsController {
   }
 
   @Get()
-  getAllNews(@Query() data: any): Promise<News[]> {
+  @ApiOkResponse({ description: 'Get all News' })
+  getAllNews(@Query() data: any): Promise<NewsCustom> {
     return this.newsService.getAllNews(data);
   }
 
   @Get('/:id')
+  @ApiOkResponse({ description: 'Get news by id' })
+  @ApiBadRequestResponse({ description: 'News not found' })
   getNewsById(@Param('id') id: string): Promise<News> {
     return this.newsService.getNewsById({ id });
   }
 
   @Put('/:id')
   @UseGuards(IsBroker)
+  @ApiOkResponse({ description: 'Updated broker' })
+  @ApiUnauthorizedResponse({ description: 'User not logged in' })
+  @ApiBadRequestResponse({ description: 'News not found' })
   updateNews(
     @Param('id') id: string,
     @Body() data: UpdateNewsDto,
@@ -54,7 +71,10 @@ export class NewsController {
   @HttpCode(204)
   @Delete('/:id')
   @UseGuards(IsBroker)
-  deleteNews(@Param('id') id: string): Promise<void> {
+  @ApiOkResponse({ description: 'Deleted broker' })
+  @ApiUnauthorizedResponse({ description: 'User not logged in' })
+  @ApiBadRequestResponse({ description: 'News not found' })
+  deleteNews(@Param('id') id: string): Promise<News> {
     return this.newsService.deleteNews({ id });
   }
 }
