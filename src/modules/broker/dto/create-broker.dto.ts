@@ -1,22 +1,29 @@
+import { ApiProperty } from '@nestjs/swagger';
+import { InputType, Field } from '@nestjs/graphql';
 import {
   IsEmail,
-  IsISO8601,
   IsNotEmpty,
   IsString,
   Matches,
   MaxLength,
   MinLength,
 } from 'class-validator';
-
+@InputType()
 export class CreateBrokerDto {
+  @Field()
+  @ApiProperty()
   @IsString()
   @IsNotEmpty()
   district: string;
 
+  @Field()
+  @ApiProperty()
   @IsString()
   @IsNotEmpty()
   city: string;
 
+  @Field()
+  @ApiProperty()
   @IsNotEmpty()
   @IsString()
   @MinLength(9)
@@ -26,6 +33,8 @@ export class CreateBrokerDto {
   })
   phoneNumber: string;
 
+  @Field()
+  @ApiProperty()
   @IsNotEmpty()
   @Matches(
     /^(0[1-9]|[12][0-9]|3[01])[- /.](0[1-9]|1[012])[- /.](19|20)\d\d$/i,
@@ -35,6 +44,8 @@ export class CreateBrokerDto {
   )
   dob: string;
 
+  @Field()
+  @ApiProperty()
   @IsNotEmpty()
   @IsEmail()
   email: string;

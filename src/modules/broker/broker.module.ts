@@ -8,6 +8,7 @@ import { PrismaModule } from './../prisma/prisma.module';
 import { BrokerService } from './broker.service';
 import { BrokerController } from './broker.controller';
 import { UserService } from '../user/user.service';
+import { BrokerResolver } from './broker.resolver';
 
 @Module({
   imports: [PrismaModule, AuthModule, ConfigModule],
@@ -17,6 +18,7 @@ import { UserService } from '../user/user.service';
     ProjectsService,
     PropertyService,
     UserService,
+    BrokerResolver,
   ],
   controllers: [BrokerController],
 })

@@ -1,3 +1,5 @@
+import { Field, InputType } from '@nestjs/graphql';
+import { ApiProperty } from '@nestjs/swagger';
 import {
   IsOptional,
   IsString,
@@ -7,15 +9,22 @@ import {
   IsEmail,
 } from 'class-validator';
 
+@InputType()
 export class UpdateBrokerDto {
+  @Field()
+  @ApiProperty()
   @IsString()
   @IsOptional()
   district: string;
 
+  @Field()
+  @ApiProperty()
   @IsString()
   @IsOptional()
   city: string;
 
+  @Field()
+  @ApiProperty()
   @IsString()
   @IsOptional()
   @MinLength(9)
@@ -25,6 +34,8 @@ export class UpdateBrokerDto {
   })
   phoneNumber: string;
 
+  @Field()
+  @ApiProperty()
   @IsOptional()
   @Matches(
     /^(0[1-9]|[12][0-9]|3[01])[- /.](0[1-9]|1[012])[- /.](19|20)\d\d$/i,
@@ -34,6 +45,8 @@ export class UpdateBrokerDto {
   )
   dob: string;
 
+  @Field()
+  @ApiProperty()
   @IsOptional()
   @IsEmail()
   email: string;
