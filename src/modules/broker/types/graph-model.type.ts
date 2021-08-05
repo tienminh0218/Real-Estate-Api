@@ -1,4 +1,5 @@
-import { Field, ID, ObjectType } from '@nestjs/graphql';
+import { Comment_Broker } from './../../comment/types/graph-model.type';
+import { Field, GraphQLISODateTime, ID, ObjectType } from '@nestjs/graphql';
 
 import { User } from '../../user/types/graph-model.type';
 import { Property } from '../../property/types/graph-model.type';
@@ -10,14 +11,14 @@ export class Broker {
   @Field((type) => ID)
   id: string;
 
-  @Field()
-  createdAt: string;
+  @Field((type) => GraphQLISODateTime)
+  createdAt: Date;
 
-  @Field()
-  updatedAt: string;
+  @Field((type) => GraphQLISODateTime)
+  updatedAt: Date;
 
   @Field((type) => User)
-  user: string;
+  user: User;
 
   @Field()
   district: string;
@@ -25,14 +26,23 @@ export class Broker {
   @Field()
   city: string;
 
+  @Field()
+  phoneNumber: string;
+
+  @Field()
+  dob: string;
+
+  @Field()
+  email: string;
+
   @Field((type) => [Property])
   properties: Property[];
 
   @Field((type) => [News])
   news: News[];
 
-  @Field()
-  comments_Broker: string;
+  @Field((type) => [Comment_Broker])
+  comments_Broker: Comment_Broker;
 
   @Field((type) => Project)
   Project: Project;

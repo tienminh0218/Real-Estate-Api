@@ -1,6 +1,7 @@
 import { News, Prisma } from '@prisma/client';
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { NewsCustom } from './types/news.type';
 
 @Injectable()
 export class NewsService {
@@ -33,15 +34,23 @@ export class NewsService {
     }
   }
 
-  getAllNews(data: any): Promise<News[]> {
+  async getAllNews(data: any): Promise<NewsCustom> {
     try {
       let { page, limit } = data;
       page = +page || 1;
       limit = +limit || 2;
-      return this.prismaService.news.findMany({
+      const news = await this.prismaService.news.findMany({
         take: limit,
         skip: limit * (page - 1),
       });
+      return {
+        news,
+        pagination: {
+          page,
+          limit,
+          totalRows: news.length,
+        },
+      };
     } catch (error) {
       this.logger.error(`${error.message}`);
       throw new BadRequestException(error.message);
@@ -80,11 +89,12 @@ export class NewsService {
     }
   }
 
-  async deleteNews(where: Prisma.NewsWhereUniqueInput): Promise<void> {
+  async deleteNews(where: Prisma.NewsWhereUniqueInput): Promise<News> {
     try {
       const existedNews = await this.getNewsById(where);
       if (!existedNews) throw new Error('News not found');
-      await this.prismaService.news.delete({ where });
+      const result = await this.prismaService.news.delete({ where });
+      return result;
     } catch (error) {
       this.logger.error(`${error.message}`);
       throw new BadRequestException(error.message);

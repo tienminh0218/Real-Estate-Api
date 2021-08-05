@@ -23,6 +23,7 @@ export class BrokerService {
 
   async getBrokerOfProject(data: any) {
     try {
+      console.log(data);
       const { projectId } = data;
       let { page, limit } = data;
 
