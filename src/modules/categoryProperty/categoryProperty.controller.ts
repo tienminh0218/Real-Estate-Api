@@ -17,7 +17,8 @@ import { categoryPropertyCustom } from './types/category.type';
 import { OptionalQueryCategories } from './types/optional-query.type';
 import { Public } from '../auth/decorators/public.decorator';
 import { IsUser } from '../auth/guards/isUser';
-import { ApiBadRequestResponse, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiCreatedResponse, ApiForbiddenResponse, ApiOkResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { IsBroker } from '../auth/guards/isBroker';
 
 @ApiTags('CategoryProperty')
 @Controller('category')
@@ -43,14 +44,18 @@ export class CategoryPropertyController {
     }
 
     @Post()
-    @Public()
+    @UseGuards(IsBroker)
+    @ApiUnauthorizedResponse({ description: 'User not logged in' })
+    @ApiForbiddenResponse({ description: 'Not have role Broker or Admin' })
     @ApiCreatedResponse({ description: 'The category has been successfully created' })
     async createCategory(@Body() data: CreateCategoryPropertyDto): Promise<any> {
         return this.categoryPropertyService.createCategoryProperty(data);
     }
 
     @Put(':id')
-    @Public()
+    @UseGuards(IsBroker)
+    @ApiUnauthorizedResponse({ description: 'User not logged in' })
+    @ApiForbiddenResponse({ description: 'Not have role Broker or Admin' })
     @ApiOkResponse({ description: 'Updated success a category' })
     async updateCategoryById(
         @Param('id') id: string,
@@ -60,7 +65,9 @@ export class CategoryPropertyController {
     }
 
     @Delete('/:id')
-    @Public()
+    @UseGuards(IsBroker)
+    @ApiUnauthorizedResponse({ description: 'User not logged in' })
+    @ApiForbiddenResponse({ description: 'Not have role Broker or Admin' })
     @ApiOkResponse({ description: 'Delete success a category' })
     @ApiBadRequestResponse({ description: 'Not found id' })
     async deleteCategory(@Param('id') id: string): Promise<categoryProperty> {
