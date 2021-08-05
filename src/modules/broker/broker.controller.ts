@@ -26,7 +26,7 @@ import { RequestWithUser } from '../auth/interface/requestWithUser';
 @ApiTags('broker')
 @UseGuards(JwtAuthGuard)
 export class BrokerController {
-  constructor(private readonly brokerService: BrokerService) { }
+  constructor(private readonly brokerService: BrokerService) {}
 
   @Get('project/:id')
   @ApiOkResponse({ description: 'Get brokers of project' })

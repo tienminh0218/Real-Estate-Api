@@ -53,7 +53,7 @@ export class CategoryPropertyController {
     }
 
     @Delete('/:id')
-    @UseGuards(IsUser)
+    // @UseGuards(IsUser)
     async deleteCategory(@Param('id') id: string): Promise<categoryProperty> {
         return this.categoryPropertyService.deleteCategory({ id });
     }

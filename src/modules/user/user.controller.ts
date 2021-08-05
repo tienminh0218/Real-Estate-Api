@@ -1,4 +1,3 @@
-import { IsUser } from './../auth/guards/isUser';
 import {
   Body,
   Controller,
@@ -32,6 +31,7 @@ import { UpdateRoleUser } from './dto/update-role.dto';
 import { OptionalQueryUsers } from './types/optional-query.type';
 import { UserCustom } from './types/user.type';
 import { Public } from '../auth/decorators/public.decorator';
+import { IsUser } from './../auth/guards/isUser';
 
 @ApiTags('Users')
 @Controller('users')
@@ -53,11 +53,10 @@ export class UserController {
   @Public()
   @ApiOkResponse({ description: 'Get user by id' })
   async getUserById(@Param('id') id: string): Promise<User> {
-    const { password, ...rest } = await this.userService.user({
+    const { password, ...data } = await this.userService.user({
       where: { id },
     });
-
-    return rest as User;
+    return data as User;
   }
 
   @Put(':id')

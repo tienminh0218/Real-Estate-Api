@@ -14,7 +14,7 @@ export class BrokerService {
     private readonly logger: Logger,
     private readonly projectsService: ProjectsService,
     private readonly propertyService: PropertyService,
-  ) { }
+  ) {}
 
   async isBroker(user: any) {
     const IsBroker = await this.prismaService.broker.findFirst({
@@ -30,7 +30,7 @@ export class BrokerService {
     const brokers = await this.projectsService.project(id);
   }
 
-  async getBrokerOfproperty() { }
+  async getBrokerOfproperty() {}
 
   async getBrokerOfDistrictOrCity(data: any) {
     try {

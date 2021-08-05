@@ -9,7 +9,7 @@ import {
   Put,
   UseGuards,
   Req,
-  Query
+  Query,
 } from '@nestjs/common';
 import { CompaniesService } from './companies.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
@@ -20,15 +20,18 @@ import { JwtAuthGuard } from '../auth/guards/jwt';
 import { OptionalQueryCompanies } from './types/optional-query.type';
 import { CompanyCustom } from './types/company.type';
 import { Public } from '../auth/decorators/public.decorator';
+import { IsBroker } from '../auth/guards/isBroker';
 
 @Controller('companies')
 // @UseGuards(JwtAuthGuard)
 export class CompaniesController {
-  constructor(private companiesService: CompaniesService) { }
+  constructor(private companiesService: CompaniesService) {}
 
   @Get()
   @Public()
-  async getCompanies(@Query() optional: OptionalQueryCompanies,): Promise<CompanyCustom> {
+  async getCompanies(
+    @Query() optional: OptionalQueryCompanies,
+  ): Promise<CompanyCustom> {
     return await this.companiesService.companies({}, optional);
   }
 
@@ -39,7 +42,7 @@ export class CompaniesController {
   }
 
   @Post()
-  @UseGuards(IsUser)
+  @UseGuards(IsBroker)
   async createCompanycookies(
     @Req() req: RequestWithUser,
     @Body() data: CreateCompanyDto,

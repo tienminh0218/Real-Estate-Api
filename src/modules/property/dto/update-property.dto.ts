@@ -32,7 +32,6 @@ export class UpdatePropertyDto {
   @ApiProperty({ required: false })
   @IsOptional()
   @IsNumber()
-  @IsNotEmpty()
   price?: number;
 
   @Field({ nullable: true })
@@ -51,43 +50,43 @@ export class UpdatePropertyDto {
   @IsOptional()
   categoryId?: string;
 
-  @Field()
-  @ApiProperty()
+  @Field({ nullable: true })
+  @ApiProperty({ required: false })
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   address?: string;
 
   @Field({ nullable: true })
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   ward?: string;
 
   @Field({ nullable: true })
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   district?: string;
 
   @Field({ nullable: true })
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   city?: string;
 
   @Field({ nullable: true })
-  @ApiProperty()
-  @IsNotEmpty()
+  @ApiProperty({ required: false })
   @IsNumber(undefined, { message: 'Latitude must be a number' })
   @Min(-90, { message: 'Latitude must greater than or equal to -90' })
   @Max(90, { message: 'Latitude must less than or equal to 90' })
+  @IsOptional()
   lat?: number;
 
   @Field({ nullable: true })
-  @ApiProperty()
-  @IsNotEmpty()
+  @ApiProperty({ required: false })
   @IsNumber(undefined, { message: 'Longitude must be a number' })
   @Min(-180, { message: 'Longitude must greater than or equal to -180' })
   @Max(180, { message: 'Longitude must less than or equal to -180' })
+  @IsOptional()
   lng?: number;
 }

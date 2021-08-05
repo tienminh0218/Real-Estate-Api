@@ -10,7 +10,6 @@ import { GqlExecutionContext } from '@nestjs/graphql';
 
 import { PrismaService } from '../../prisma/prisma.service';
 import { RequestWithUser } from '../interface/requestWithUser';
-import { Role } from '../decorators/roles.decorator';
 import { METHOD_GRAPH } from '../decorators/method-graph.decorator';
 
 @Injectable()
@@ -79,7 +78,7 @@ export class IsBroker implements CanActivate {
     if (method === 'DELETE')
       return this.compareBroker(user.broker?.id, id, path);
 
-    this.logger.warn('Method not found in Graphql type');
+    this.logger.warn('"IsBroker Guard": Method not found in Graphql type ');
     return false;
   }
 
@@ -95,12 +94,8 @@ export class IsBroker implements CanActivate {
     if (method === 'DELETE')
       return this.compareBroker(user.broker?.id, paramId, path);
 
-    this.logger.warn('Method not found in Http type');
+    this.logger.warn('"IsBroker Guard": Method not found in Http type');
     return false;
-  }
-
-  isAdmin(request: RequestWithUser): boolean {
-    return request.user.role === Role.ADMIN;
   }
 
   canActivate(
@@ -115,19 +110,16 @@ export class IsBroker implements CanActivate {
         METHOD_GRAPH,
         ctx.getHandler(),
       );
-      request = ctx.getContext().req;
 
-      return (
-        this.isAdmin(request) ||
-        this.handleGraphType(request, ctx, path, method)
-      );
+      request = ctx.getContext().req;
+      return this.handleGraphType(request, ctx, path, method);
     }
     if (contextType === 'http') {
       request = context.switchToHttp().getRequest();
-      return this.isAdmin(request) || this.handleHttpType(request);
+      return this.handleHttpType(request);
     }
 
-    this.logger.warn('Context type not found');
+    this.logger.warn('"IsBroker Guard": Context type not found');
     return false;
   }
 }

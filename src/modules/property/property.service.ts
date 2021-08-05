@@ -17,14 +17,22 @@ export class PropertyService {
 
   async property(param: {
     where?: Prisma.PropertyWhereUniqueInput;
-  }): Promise<Property | null> {
+    include?: Prisma.PropertyInclude;
+  }): Promise<Property> {
     try {
-      const { where } = param;
+      const { where, include } = param;
 
       const result = await this.prismaService.property.findUnique({
         where,
         include: {
           location: true,
+          category: {
+            select: {
+              id: true,
+              nameCategory: true,
+            },
+          },
+          ...include,
         },
       });
       return result;
@@ -41,11 +49,12 @@ export class PropertyService {
       take?: number;
       cursor?: Prisma.PropertyWhereUniqueInput;
       orderBy?: Prisma.PropertyOrderByInput;
+      include?: Prisma.PropertyInclude;
     },
     optional: OptionalQueryProperties = {},
-  ): Promise<PropertyCustom> {
+  ): Promise<any> {
     try {
-      const { where, cursor, orderBy } = params;
+      const { where, cursor, orderBy, include } = params;
       let { page, limit } = optional;
       page = Number(page) || 1;
       limit = Number(limit) || 20;
@@ -58,6 +67,13 @@ export class PropertyService {
         orderBy,
         include: {
           location: true,
+          category: {
+            select: {
+              id: true,
+              nameCategory: true,
+            },
+          },
+          ...include,
         },
       });
 
@@ -126,14 +142,30 @@ export class PropertyService {
         {
           where: {
             broker: {
-              every: {
+              some: {
                 brokerId: id,
+              },
+            },
+          },
+          include: {
+            broker: {
+              where: {
+                brokerId: id,
+              },
+              select: {
+                owner: true,
               },
             },
           },
         },
         optional,
       );
+
+      /* convert property.broker: [{owner: true}] => property.broker = {owner: true} */
+      result.data.forEach((property) => {
+        property.broker = { ...property.broker[0] };
+      });
+
       return result;
     } catch (error) {
       this.logger.error(error);
@@ -141,7 +173,7 @@ export class PropertyService {
     }
   }
 
-  async getRangeProperties(data: FilterQuery) {
+  async filterProperties(data: FilterQuery) {
     try {
       const { filterPrice, city, orderBy: orderByPrice, ...optional } = data;
       let [min, max]: (string | number)[] = filterPrice?.split(',') || [];

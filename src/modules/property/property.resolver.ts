@@ -4,7 +4,7 @@ import { Property } from '@prisma/client';
 
 import { PropertyService } from './property.service';
 import { Property as PropertyGraphType } from './types/graph-model.type';
-import { PropertyCustom } from './types/property.type';
+import { PropertyCustom, PropertiesOfBroker } from './types/property.type';
 import { PaginationInput } from '../../common/types/pagination.type';
 import { Public } from '../auth/decorators/public.decorator';
 import { FilterQuery } from './dto/filter-property.dto';
@@ -43,7 +43,7 @@ export class PropertyResolver {
   filterProperties(
     @Args('filterInput') filterInput: FilterQuery,
   ): Promise<PropertyCustom> {
-    return this.propertyService.getRangeProperties(filterInput);
+    return this.propertyService.filterProperties(filterInput);
   }
 
   @Query(() => PropertyCustom)
@@ -64,7 +64,7 @@ export class PropertyResolver {
     return this.propertyService.getPropertiesOfProject(projectId, optional);
   }
 
-  @Query(() => PropertyCustom)
+  @Query(() => PropertiesOfBroker)
   @Public()
   getPropertiesOfBroker(
     @Args('id') brokerId: string,
