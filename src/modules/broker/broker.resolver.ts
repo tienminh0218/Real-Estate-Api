@@ -27,32 +27,23 @@ export class BrokerResolver {
     @Args('pagination') optional: PaginationInput,
     @Args('id') propertyId: string,
     @Args('name') propertyName: string,
-  ) {
+  ): Promise<BrokerCustom> {
     const { limit, page } = optional;
     const data = { limit, page, propertyId, propertyName };
-    return this.brokerService.getBrokerOfProperty(data);
-    // const result = await this.brokerService.getBrokerOfProperty(data);
-    // const { brokers, pagination } = result;
-    // let b = {};
-    // brokers.forEach(async function (e) {
-    //   b = e.broker;
-    // });
-    // console.log(b);
-    // console.log(result);
-    // return result;
+    const result = await this.brokerService.getBrokerOfProperty(data);
+    return result;
   }
 
   @Query(() => BrokerCustom)
   @Public()
   async getBrokersOfProject(
     @Args('pagination') optional: PaginationInput,
-    @Args('id') propertyId: string,
-    @Args('name') propertyName: string,
-  ) {
+    @Args('id') projectId: string,
+    @Args('name') projectName: string,
+  ): Promise<BrokerCustom> {
     const { limit, page } = optional;
-    const data = { limit, page, propertyId, propertyName };
+    const data = { limit, page, projectId, projectName };
     return this.brokerService.getBrokerOfProject(data);
-    /// chua xog
   }
 
   @Query(() => BrokerCustom)
