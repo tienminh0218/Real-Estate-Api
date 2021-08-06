@@ -9,7 +9,6 @@ import { GqlExecutionContext } from '@nestjs/graphql';
 import { Reflector } from '@nestjs/core';
 
 import { RequestWithUser, UserInterface } from '../interface/requestWithUser';
-import { Role } from '../decorators/roles.decorator';
 import { METHOD_GRAPH } from '../decorators/method-graph.decorator';
 
 @Injectable()
@@ -19,10 +18,10 @@ export class IsUser implements CanActivate {
     private readonly logger: Logger,
   ) {}
 
-  compareUser(user: UserInterface, paramId: string, key: string): boolean {
+  compareUser(user: UserInterface, paramId: string, path: string): boolean {
     let result: boolean = false;
 
-    switch (key) {
+    switch (path) {
       case 'companies':
         result = user.companies?.some((company) => company.id === paramId);
         break;
@@ -53,7 +52,7 @@ export class IsUser implements CanActivate {
       return this.compareUser(user, paramId, 'projects');
     }
 
-    this.logger.warn('Path not found');
+    this.logger.warn('"IsUser Guard": Path not found in post method');
     return false;
   }
 
@@ -67,7 +66,9 @@ export class IsUser implements CanActivate {
     if (path === 'projects') return this.compareUser(user, paramId, path);
     if (path === 'properties') return this.compareUser(user, paramId, path);
 
-    this.logger.warn('Path not found');
+    this.logger.warn(
+      '"IsUser Guard": Path not found in update or delete method',
+    );
     return false;
   }
 
@@ -83,7 +84,7 @@ export class IsUser implements CanActivate {
     if (method === 'PUT' || method === 'PATCH' || method === 'DELETE')
       return this.updateOrDeleteMethod(path, request.user, id);
 
-    this.logger.warn('Method not found in Graphql type');
+    this.logger.warn('"IsUser Guard": Method not found in Graphql type');
     return false;
   }
 
@@ -97,12 +98,8 @@ export class IsUser implements CanActivate {
     if (method === 'PUT' || method === 'PATCH' || method === 'DELETE')
       return this.updateOrDeleteMethod(path, user, paramId);
 
-    this.logger.warn('Method not found in Http type');
+    this.logger.warn('"IsUser Guard": Method not found in Http type');
     return false;
-  }
-
-  isAdmin(request: RequestWithUser): boolean {
-    return request.user.role === Role.ADMIN;
   }
 
   canActivate(
@@ -119,17 +116,14 @@ export class IsUser implements CanActivate {
       );
       request = ctx.getContext().req;
 
-      return (
-        this.isAdmin(request) ||
-        this.handleGraphType(request, ctx, path, method)
-      );
+      return this.handleGraphType(request, ctx, path, method);
     }
     if (contextType === 'http') {
       request = context.switchToHttp().getRequest();
-      return this.isAdmin(request) || this.handleHttpType(request);
+      return this.handleHttpType(request);
     }
 
-    this.logger.warn('Context type not found');
+    this.logger.warn('"IsUser Guard": Context type not found');
     return false;
   }
 }

@@ -5,47 +5,25 @@ import { PrismaService } from './../prisma/prisma.service';
 import { hashPassword } from '../../utils/hash-password';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { generateIncludeQuery } from '../../utils/generate-include';
-import {
-  OptionalQueryUsers,
-  OptionalQueryUser,
-} from './types/optional-query.type';
+import { OptionalQueryUsers } from './types/optional-query.type';
 import { UserCustom } from './types/user.type';
 
 @Injectable()
 export class UserService {
   constructor(private prisma: PrismaService, private readonly logger: Logger) {}
 
-  getIncludeUser(listIncludeQuery: string[]) {
-    if (!listIncludeQuery) return;
-
-    const listRelation = [
-      'broker',
-      'companies',
-      'comments_project',
-      'comments_Broker',
-      'comments_Company',
-      'comments_Property',
-      'properties',
-    ];
-
-    return generateIncludeQuery(listRelation, listIncludeQuery);
-  }
-
-  async user(
-    param: {
-      where?: Prisma.UserWhereUniqueInput;
-      include?: Prisma.UserInclude;
-    },
-    optional: OptionalQueryUser = {},
-  ): Promise<User | null> {
+  async user(param: {
+    where?: Prisma.UserWhereUniqueInput;
+    include?: Prisma.UserInclude;
+  }): Promise<User | null> {
     try {
-      const { where } = param;
-      const includeQuery = this.getIncludeUser(optional?.include?.split(','));
-      const include = param.include || includeQuery;
+      const { where, include } = param;
       const result = await this.prisma.user.findUnique({
         where,
-        include,
+        include: {
+          broker: true,
+          ...include,
+        },
       });
       return result;
     } catch (error) {
@@ -66,12 +44,10 @@ export class UserService {
     optional: OptionalQueryUsers = {},
   ): Promise<UserCustom> {
     try {
-      const { where, orderBy, cursor } = params;
-      let { page, limit, include: includeQuery } = optional;
+      const { where, orderBy, cursor, include } = params;
+      let { page, limit } = optional;
       page = Number(page) || 1;
       limit = Number(limit) || 20;
-      const include =
-        params.include || this.getIncludeUser(includeQuery?.split(','));
 
       const data = await this.prisma.user.findMany({
         take: limit,
@@ -79,7 +55,10 @@ export class UserService {
         where,
         orderBy,
         cursor,
-        include,
+        include: {
+          broker: true,
+          ...include,
+        },
       });
 
       return {

@@ -43,6 +43,7 @@ async function bootstrap() {
 
   await app.listen(PORT, () => {
     Logger.log(`Listening on port: http://localhost:${PORT}/${GLOBAL_PREFIX}`);
+    Logger.log(`Swagger Api: http://localhost:${PORT}/swagger`);
   });
 }
 bootstrap();

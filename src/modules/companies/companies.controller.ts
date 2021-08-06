@@ -9,7 +9,7 @@ import {
   Put,
   UseGuards,
   Req,
-  Query
+  Query,
 } from '@nestjs/common';
 import { CompaniesService } from './companies.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
@@ -21,18 +21,27 @@ import { OptionalQueryCompanies } from './types/optional-query.type';
 import { CompanyCustom } from './types/company.type';
 import { Public } from '../auth/decorators/public.decorator';
 import { IsBroker } from '../auth/guards/isBroker';
-import { ApiBadRequestResponse, ApiCreatedResponse, ApiForbiddenResponse, ApiOkResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import {
+  ApiBadRequestResponse,
+  ApiCreatedResponse,
+  ApiForbiddenResponse,
+  ApiOkResponse,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 
 @ApiTags('Companies')
 @Controller('companies')
 // @UseGuards(JwtAuthGuard)
 export class CompaniesController {
-  constructor(private companiesService: CompaniesService) { }
+  constructor(private companiesService: CompaniesService) {}
 
   @Get()
   @Public()
   @ApiOkResponse({ description: 'Get all companies' })
-  async getCompanies(@Query() optional: OptionalQueryCompanies,): Promise<CompanyCustom> {
+  async getCompanies(
+    @Query() optional: OptionalQueryCompanies,
+  ): Promise<CompanyCustom> {
     return await this.companiesService.companies({}, optional);
   }
 
@@ -48,7 +57,9 @@ export class CompaniesController {
   @UseGuards(IsBroker)
   @ApiUnauthorizedResponse({ description: 'User not logged in' })
   @ApiForbiddenResponse({ description: 'Not have role Broker or Admin' })
-  @ApiCreatedResponse({ description: 'The Company has been successfully created' })
+  @ApiCreatedResponse({
+    description: 'The Company has been successfully created',
+  })
   @ApiBadRequestResponse({ description: 'Not found relationship' })
   async createCompany(
     @Req() req: RequestWithUser,
