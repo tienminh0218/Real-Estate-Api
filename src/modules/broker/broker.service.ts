@@ -31,8 +31,17 @@ export class BrokerService {
 
       const brokers = await this.prismaService.broker.findMany({
         where: {
-          Project: {
-            OR: [{ id: projectId }, { projectName: { contains: projectName } }],
+          properties: {
+            some: {
+              property: {
+                project: {
+                  OR: [
+                    { id: projectId },
+                    { projectName: { contains: projectName } },
+                  ],
+                },
+              },
+            },
           },
         },
       });
@@ -75,10 +84,18 @@ export class BrokerService {
         where: {
           properties: {
             some: {
-              OR: [
-                { propertyId: { contains: propertyId } },
-                { property: { name: { contains: propertyName } } },
-              ],
+              property: {
+                is: {
+                  OR: [
+                    {
+                      id: propertyId,
+                    },
+                    {
+                      name: { contains: propertyName },
+                    },
+                  ],
+                },
+              },
             },
           },
         },
@@ -99,14 +116,6 @@ export class BrokerService {
       if (brokers.length === 0) {
         throw new BadRequestException('Brokers not found!!!!');
       }
-      // return {
-      //   brokers,
-      //   pagination: {
-      //     page,
-      //     limit,
-      //     totalRows: brokers.length,
-      //   },
-      // };
       return {
         brokers,
         pagination: {
