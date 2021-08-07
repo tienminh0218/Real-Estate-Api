@@ -9,8 +9,9 @@ import { Reflector } from '@nestjs/core';
 import { GqlExecutionContext } from '@nestjs/graphql';
 
 import { PrismaService } from '../../prisma/prisma.service';
-import { RequestWithUser } from '../interface/requestWithUser';
+import { RequestWithUser, UserInterface } from '../interface/requestWithUser';
 import { METHOD_GRAPH } from '../decorators/method-graph.decorator';
+import { IsUser } from './isUser';
 
 @Injectable()
 export class IsBroker implements CanActivate {
@@ -21,17 +22,18 @@ export class IsBroker implements CanActivate {
   ) {}
 
   async compareBroker(
-    brokerId: string,
+    user: UserInterface,
     paramId: string,
     path: string,
   ): Promise<boolean> {
-    let result: boolean = false;
+    const brokerId = user.broker?.id;
 
+    let result: boolean = false;
     if (!(brokerId && paramId)) return false;
 
     switch (path) {
       case 'properties':
-        const dataProp = await this.prismaService.brokerProperty
+        const dataPropBroker = await this.prismaService.brokerProperty
           .findFirst({
             where: {
               AND: [
@@ -44,7 +46,13 @@ export class IsBroker implements CanActivate {
           .catch((error) => {
             this.logger.error(error.message);
           });
-        result = !!dataProp;
+
+        const propOfProject: boolean = new IsUser(
+          this.reflector,
+          this.logger,
+        ).compareUser(user, paramId, path);
+
+        result = propOfProject || !!dataPropBroker;
         break;
 
       case 'news':
@@ -74,9 +82,8 @@ export class IsBroker implements CanActivate {
 
     if (method === 'POST') return user.broker !== null;
     if (method === 'PUT' || method === 'PATCH')
-      return this.compareBroker(user.broker?.id, id, path);
-    if (method === 'DELETE')
-      return this.compareBroker(user.broker?.id, id, path);
+      return this.compareBroker(user, id, path);
+    if (method === 'DELETE') return this.compareBroker(user, id, path);
 
     this.logger.warn('"IsBroker Guard": Method not found in Graphql type ');
     return false;
@@ -90,9 +97,8 @@ export class IsBroker implements CanActivate {
 
     if (method === 'POST') return user.broker !== null;
     if (method === 'PUT' || method === 'PATCH')
-      return this.compareBroker(user.broker?.id, paramId, path);
-    if (method === 'DELETE')
-      return this.compareBroker(user.broker?.id, paramId, path);
+      return this.compareBroker(user, paramId, path);
+    if (method === 'DELETE') return this.compareBroker(user, paramId, path);
 
     this.logger.warn('"IsBroker Guard": Method not found in Http type');
     return false;
