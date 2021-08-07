@@ -86,7 +86,7 @@ export class UpdatePropertyDto {
   @ApiProperty({ required: false })
   @IsNumber(undefined, { message: 'Longitude must be a number' })
   @Min(-180, { message: 'Longitude must greater than or equal to -180' })
-  @Max(180, { message: 'Longitude must less than or equal to -180' })
+  @Max(180, { message: 'Longitude must less than or equal to 180' })
   @IsOptional()
   lng?: number;
 }
