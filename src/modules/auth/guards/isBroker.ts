@@ -18,7 +18,7 @@ export class IsBroker implements CanActivate {
     private readonly prismaService: PrismaService,
     private readonly reflector: Reflector,
     private readonly logger: Logger,
-  ) {}
+  ) { }
 
   async compareBroker(
     brokerId: string,
@@ -26,12 +26,11 @@ export class IsBroker implements CanActivate {
     path: string,
   ): Promise<boolean> {
     let result: boolean = false;
-
     if (!(brokerId && paramId)) return false;
 
     switch (path) {
       case 'properties':
-        const dataProp = await this.prismaService.brokerProperty
+        const dataPropBroker = await this.prismaService.brokerProperty
           .findFirst({
             where: {
               AND: [
@@ -44,7 +43,19 @@ export class IsBroker implements CanActivate {
           .catch((error) => {
             this.logger.error(error.message);
           });
-        result = !!dataProp;
+
+        const dataPropProject: any = await this.prismaService.property
+          .findFirst({
+            where: {
+              id: paramId,
+            },
+          })
+          .catch((error) => {
+            this.logger.error(error.message);
+          });
+
+
+        result = !!dataPropProject.projectId || !!dataPropBroker;
         break;
 
       case 'news':
@@ -73,8 +84,9 @@ export class IsBroker implements CanActivate {
     const { id } = contextGraph.switchToWs().getData();
 
     if (method === 'POST') return user.broker !== null;
-    if (method === 'PUT' || method === 'PATCH')
+    if (method === 'PUT' || method === 'PATCH') {
       return this.compareBroker(user.broker?.id, id, path);
+    }
     if (method === 'DELETE')
       return this.compareBroker(user.broker?.id, id, path);
 
