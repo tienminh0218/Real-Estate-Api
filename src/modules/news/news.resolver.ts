@@ -36,7 +36,6 @@ export class NewsResolver {
   getAllNews(
     @Args('pagination') optional: PaginationInput,
   ): Promise<NewsCustom> {
-    console.log(optional);
     return this.newsService.getAllNews(optional);
   }
 
