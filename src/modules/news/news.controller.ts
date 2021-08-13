@@ -30,8 +30,8 @@ import { NewsCustom } from './types/news.type';
 @Controller('news')
 @ApiTags('news')
 export class NewsController {
-  constructor(private newsService: NewsService) {}
-  @Post('/:id')
+  constructor(private newsService: NewsService) { }
+  @Post()
   @UseGuards(IsBroker)
   @ApiUnauthorizedResponse({ description: 'User not logged in' })
   @ApiForbiddenResponse({ description: 'You need be a broker' })

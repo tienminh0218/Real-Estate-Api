@@ -26,11 +26,8 @@ export class IsBroker implements CanActivate {
     paramId: string,
     path: string,
   ): Promise<boolean> {
-<<<<<<< HEAD
-=======
     const brokerId = user.broker?.id;
 
->>>>>>> main
     let result: boolean = false;
     if (!(brokerId && paramId)) return false;
 
@@ -84,17 +81,9 @@ export class IsBroker implements CanActivate {
     const { id } = contextGraph.switchToWs().getData();
 
     if (method === 'POST') return user.broker !== null;
-<<<<<<< HEAD
-    if (method === 'PUT' || method === 'PATCH') {
-      return this.compareBroker(user.broker?.id, id, path);
-    }
-    if (method === 'DELETE')
-      return this.compareBroker(user.broker?.id, id, path);
-=======
     if (method === 'PUT' || method === 'PATCH')
       return this.compareBroker(user, id, path);
     if (method === 'DELETE') return this.compareBroker(user, id, path);
->>>>>>> main
 
     this.logger.warn('"IsBroker Guard": Method not found in Graphql type ');
     return false;
