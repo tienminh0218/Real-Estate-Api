@@ -33,6 +33,7 @@ import {
   ApiCreatedResponse,
   ApiForbiddenResponse,
 } from '@nestjs/swagger';
+import { Public } from '../auth/decorators/public.decorator';
 
 @Controller('comment')
 @ApiTags('comment')
@@ -86,6 +87,7 @@ export class CommentController {
 
   ///Get comment by id
   @Get('/broker/:id')
+  @Public()
   @ApiOkResponse({ description: 'Get broker comment by id' })
   @ApiBadRequestResponse({ description: 'Comment not found' })
   getBrokerCommentById(@Param('id') id: string): Promise<Comment_Broker> {
@@ -93,6 +95,7 @@ export class CommentController {
   }
 
   @Get('/company/:id')
+  @Public()
   @ApiOkResponse({ description: 'Get company comment by id' })
   @ApiBadRequestResponse({ description: 'Comment not found' })
   getCompanyCommentById(@Param('id') id: string): Promise<Comment_Company> {
@@ -100,6 +103,7 @@ export class CommentController {
   }
 
   @Get('/project/:id')
+  @Public()
   @ApiOkResponse({ description: 'Get project comment by id' })
   @ApiBadRequestResponse({ description: 'Comment not found' })
   getProjectCommentById(@Param('id') id: string): Promise<Comment_Project> {
@@ -107,6 +111,7 @@ export class CommentController {
   }
 
   @Get('/property/:id')
+  @Public()
   @ApiOkResponse({ description: 'Get property comment by id' })
   @ApiBadRequestResponse({ description: 'Comment not found' })
   getPropertyCommentById(@Param('id') id: string): Promise<Comment_Property> {
@@ -115,24 +120,28 @@ export class CommentController {
 
   ///Get all comments
   @Get('/broker')
+  @Public()
   @ApiOkResponse({ description: 'Get all broker comments' })
   getAllBrokerComments(@Query() data: any): Promise<Comment_BrokerCustom> {
     return this.commentService.getAllBrokerComments(data);
   }
 
   @Get('/company')
+  @Public()
   @ApiOkResponse({ description: 'Get all company comments' })
   getAllCompanyComments(@Query() data: any): Promise<Comment_CompanyCustom> {
     return this.commentService.getAllCompanyComments(data);
   }
 
   @Get('/project')
+  @Public()
   @ApiOkResponse({ description: 'Get all project comments' })
   getAllProjectComments(@Query() data: any): Promise<Comment_ProjectCustom> {
     return this.commentService.getAllProjectComments(data);
   }
 
   @Get('/property')
+  @Public()
   @ApiOkResponse({ description: 'Get all property comments' })
   getAllPropertyComments(@Query() data: any): Promise<Comment_PropertyCustom> {
     return this.commentService.getAllPropertyComments(data);
