@@ -35,7 +35,7 @@ export class PropertyResolver {
   @Query(() => PropertyGraphType)
   @Public()
   getPropertyById(@Args('id') id: string): Promise<Property> {
-    return this.propertyService.property({ where: { id } });
+    return this.propertyService.property({ id });
   }
 
   @Query(() => PropertyCustom)

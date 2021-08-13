@@ -394,9 +394,9 @@ Temporary Items
 
 =======
 # Local
-.env
 dist
 
 src/prisma/migrations/
 src/utils/data/
+data
 

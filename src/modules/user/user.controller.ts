@@ -8,16 +8,13 @@ import {
   Patch,
   Put,
   Query,
-  Res,
   UseGuards,
 } from '@nestjs/common';
 import { User } from '@prisma/client';
-import { Response } from 'express';
 import {
   ApiTags,
   ApiOkResponse,
   ApiCreatedResponse,
-  ApiCookieAuth,
   ApiForbiddenResponse,
   ApiUnauthorizedResponse,
   ApiBadRequestResponse,
@@ -42,25 +39,17 @@ export class UserController {
   @Public()
   @ApiOkResponse({ description: 'Get all users' })
   async getUsers(@Query() optional: OptionalQueryUsers): Promise<UserCustom> {
-    const { data, pagination } = await this.userService.users({}, optional);
-    data.forEach((user) => {
-      delete user.password;
-    });
-    return { data, pagination };
+    return this.userService.findUsers({}, optional);
   }
 
   @Get(':id')
   @Public()
   @ApiOkResponse({ description: 'Get user by id' })
   async getUserById(@Param('id') id: string): Promise<User> {
-    const { password, ...data } = await this.userService.user({
-      where: { id },
-    });
-    return data as User;
+    return this.userService.findUserById({ id });
   }
 
   @Put(':id')
-  @ApiCookieAuth('Auth')
   @ApiCreatedResponse({ description: 'Updated success user by id' })
   @ApiForbiddenResponse({ description: 'Incorrect userId' })
   @ApiUnauthorizedResponse({ description: 'User not login' })
@@ -98,15 +87,12 @@ export class UserController {
 
   @Delete(':id')
   @HttpCode(204)
+  @Public()
   @ApiForbiddenResponse({ description: 'Not have role Admin' })
   @ApiBadRequestResponse({ description: 'Not found id' })
   @Roles(Role.ADMIN)
   @UseGuards(RolesGuard)
-  async deleteUserById(
-    @Param('id') id: string,
-    @Res() res: Response,
-  ): Promise<any> {
-    const result = this.userService.deleteUser({ id });
-    if (result) return res.json({});
+  async deleteUserById(@Param('id') id: string): Promise<any> {
+    return this.userService.deleteUser({ id });
   }
 }

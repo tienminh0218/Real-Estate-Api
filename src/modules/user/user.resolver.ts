@@ -18,6 +18,7 @@ import {
 } from '../auth/decorators/method-graph.decorator';
 import { PaginationInput } from '../../common/types/pagination.type';
 import { UpdateRoleUser } from './dto/update-role.dto';
+
 @Resolver((of) => UserGraphType)
 export class UserResolver {
   constructor(private readonly userService: UserService) {}
@@ -27,13 +28,13 @@ export class UserResolver {
   async getUsers(
     @Args('pagination') pagination: PaginationInput = {},
   ): Promise<UserCustom> {
-    return this.userService.users({}, pagination);
+    return this.userService.findUsers({}, pagination);
   }
 
   @Query(() => UserGraphType)
   @Public()
   async getUserById(@Args('id') id: string): Promise<User> {
-    return await this.userService.user({ where: { id } });
+    return await this.userService.findUserById({ id });
   }
 
   @Mutation(() => UserGraphType)

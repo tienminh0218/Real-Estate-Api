@@ -51,7 +51,7 @@ export class CategoryPropertyController {
   }
 
   @Post()
-  @UseGuards(IsBroker)
+  // @UseGuards(IsBroker)
   @ApiUnauthorizedResponse({ description: 'User not logged in' })
   @ApiForbiddenResponse({ description: 'Not have role Broker or Admin' })
   @ApiCreatedResponse({

@@ -13,5 +13,5 @@ export async function comparePassword(
   rawPassword: string,
   passwordHashed: string,
 ): Promise<boolean> {
-  return await bcrypt.compare(rawPassword, passwordHashed);
+  return bcrypt.compare(rawPassword, passwordHashed);
 }
