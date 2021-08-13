@@ -8,7 +8,7 @@ import { AppModule } from './modules';
 import { PrismaService } from './modules/prisma/prisma.service';
 
 async function bootstrap() {
-  const PORT = process.env.PORT || 3000;
+  const PORT = process.env.PORT || 30000;
   const GLOBAL_PREFIX = process.env.GLOBAL_PREFIX || 'api';
 
   const app = await NestFactory.create(AppModule);

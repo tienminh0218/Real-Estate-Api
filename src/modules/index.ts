@@ -14,15 +14,12 @@ import { CompaniesModule } from './companies/companies.module';
 import { CatePropertyModule } from './categoryProperty/categoryProperty.module';
 import { PropertyModule } from './property/property.module';
 import { JwtAuthGuard } from './auth/guards/jwt';
+import { configService } from '../config/config.service';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
-    GraphQLModule.forRoot({
-      // autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
-      autoSchemaFile: true,
-      context: ({ req, res }) => ({ req, res }),
-    }),
+    GraphQLModule.forRoot(configService.getGraphQLConfig()),
     PrismaModule,
     UserModule,
     ProjectsModule,
