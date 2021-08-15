@@ -5,9 +5,11 @@ import { PrismaService } from '../prisma/prisma.service';
 import { PrismaModule } from '../prisma/prisma.module';
 import { ProjectsResolver } from './projects.resolver';
 import { ProjectRepository } from './repositories/projects.repository';
+import { CompanyRepository } from '../companies/repositories/companies.repository';
 @Module({
   imports: [PrismaModule],
-  providers: [ProjectsService, ProjectRepository, PrismaService, Logger, ProjectsResolver],
-  controllers: [ProjectsController]
+  providers: [ProjectsService, ProjectRepository, CompanyRepository, PrismaService, Logger, ProjectsResolver],
+  controllers: [ProjectsController],
+  exports: [ProjectsService, ProjectRepository]
 })
 export class ProjectsModule { }

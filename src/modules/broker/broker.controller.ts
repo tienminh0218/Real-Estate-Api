@@ -1,3 +1,4 @@
+import { Public } from './../auth/decorators/public.decorator';
 import { JwtAuthGuard } from './../auth/guards/jwt';
 import {
   ApiOkResponse,
@@ -25,21 +26,24 @@ import { RequestWithUser } from '../auth/interface/requestWithUser';
 @ApiTags('broker')
 @UseGuards(JwtAuthGuard)
 export class BrokerController {
-  constructor(private readonly brokerService: BrokerService) {}
+  constructor(private readonly brokerService: BrokerService) { }
 
   @Get('property')
+  @Public()
   @ApiOkResponse({ description: 'Get brokers of property' })
   async getBrokersOfProperty(@Query() data: any) {
     return this.brokerService.getBrokerOfProperty(data);
   }
 
   @Get('project')
+  @Public()
   @ApiOkResponse({ description: 'Get brokers of project' })
   async getBrokersOfProject(@Query() data: any) {
     return this.brokerService.getBrokerOfProject(data);
   }
 
   @Get('districtOrCity')
+  @Public()
   @ApiOkResponse({ description: 'Get brokers of district or city' })
   async getBrokerOfDistrictOrCity(@Query() data: any) {
     return await this.brokerService.getBrokerOfDistrictOrCity(data);

@@ -22,6 +22,7 @@ export class ProjectRepository {
     }
 
     async findMany(
+        id: string,
         params: FindManyDto,
         optional: OptionalQueryProjects,
     ): Promise<ProjectCustom> {

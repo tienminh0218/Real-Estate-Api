@@ -4,10 +4,12 @@ import { PrismaModule } from '../prisma/prisma.module';
 import { CategoryPropertyController } from './categoryProperty.controller';
 import { CategoryPropertyService } from './categoryProperty.service';
 import { CategoryPropertyResolver } from './categoryProperty.resolver';
+import { CategoryPropertyRepository } from './repositories/categoryProperty.repository';
 
 @Module({
     imports: [PrismaModule],
-    providers: [CategoryPropertyService, PrismaService, Logger, CategoryPropertyResolver],
-    controllers: [CategoryPropertyController]
+    providers: [CategoryPropertyService, CategoryPropertyRepository, CategoryPropertyResolver, PrismaService, Logger],
+    controllers: [CategoryPropertyController],
+    exports: [CategoryPropertyService, CategoryPropertyResolver]
 })
 export class CatePropertyModule { }

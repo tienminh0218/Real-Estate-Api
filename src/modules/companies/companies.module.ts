@@ -11,6 +11,7 @@ import { CompanyRepository } from './repositories/companies.repository';
 @Module({
   imports: [PrismaModule, AuthModule],
   providers: [CompaniesService, CompanyRepository, PrismaService, Logger, CompaniesResolver],
-  controllers: [CompaniesController]
+  controllers: [CompaniesController],
+  exports: [CompaniesService, CompanyRepository]
 })
 export class CompaniesModule { }

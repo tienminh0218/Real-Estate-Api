@@ -400,3 +400,4 @@ src/prisma/migrations/
 src/utils/data/
 data
 
+.env

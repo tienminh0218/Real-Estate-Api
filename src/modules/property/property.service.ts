@@ -14,7 +14,7 @@ export class PropertyService {
     private readonly propertyRepository: PropertyRepository,
     private readonly brokerPropertyRepository: BrokerPropertyRepository,
     private readonly logger: Logger,
-  ) {}
+  ) { }
 
   async property(where: Prisma.PropertyWhereUniqueInput): Promise<Property> {
     try {
@@ -93,7 +93,8 @@ export class PropertyService {
 
   async filterProperties(data: FilterQuery) {
     try {
-      return this.propertyRepository.filter(data);
+      const result = await this.propertyRepository.filter(data);
+      return result;
     } catch (error) {
       this.logger.error(error);
       throw new BadRequestException(error);
@@ -105,7 +106,8 @@ export class PropertyService {
     projectId: string = undefined,
   ): Promise<Property> {
     try {
-      return this.propertyRepository.create(payload, projectId);
+      const result = await this.propertyRepository.create(payload, projectId);
+      return result;
     } catch (error) {
       this.logger.error(error);
       this.logger.error(error.code);
@@ -135,7 +137,8 @@ export class PropertyService {
 
   async updateProperty(params: UpdateByIdDto): Promise<Property> {
     try {
-      return this.propertyRepository.updateById(params);
+      const result = await this.propertyRepository.updateById(params);
+      return result;
     } catch (error) {
       this.logger.error(error);
       if (error.code === 'P2025') {
@@ -148,7 +151,12 @@ export class PropertyService {
   async assignBroker(payload: { propertyId: string; brokerId: string }) {
     try {
       const { propertyId, brokerId } = payload;
-      return this.brokerPropertyRepository.create(propertyId, brokerId, false);
+      const result = await this.brokerPropertyRepository.create(
+        brokerId,
+        propertyId,
+        false,
+      );
+      return result;
     } catch (error) {
       this.logger.error(error);
       if (error.code === 'P2025') {

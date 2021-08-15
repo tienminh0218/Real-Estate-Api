@@ -7,6 +7,7 @@ import { ProjectCustom } from './types/project.type';
 import { ProjectRepository } from './repositories/projects.repository';
 import { FindManyDto, UpdateByIdDto } from './dto/repository.dto';
 import { CompanyRepository } from '../companies/repositories/companies.repository';
+import { identity } from 'rxjs';
 
 @Injectable()
 export class ProjectsService {
@@ -20,11 +21,13 @@ export class ProjectsService {
   }
 
   async projects(
+    id: string,
     params: FindManyDto,
-    optional: OptionalQueryProjects,
+    optional: OptionalQueryProjects = {},
   ): Promise<ProjectCustom> {
     try {
       const { data, pagination } = await this.projectRepository.findMany(
+        id,
         params,
         optional,
       );

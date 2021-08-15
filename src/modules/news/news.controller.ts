@@ -1,3 +1,4 @@
+import { Public } from './../auth/decorators/public.decorator';
 import { UpdateNewsDto } from './dto/update-news.dto';
 import { NewsService } from './news.service';
 import {
@@ -27,10 +28,26 @@ import { IsBroker } from '../auth/guards/isBroker';
 import { RequestWithUser } from '../auth/interface/requestWithUser';
 import { NewsCustom } from './types/news.type';
 
-@Controller('news')
 @ApiTags('news')
+@Controller('news')
 export class NewsController {
   constructor(private newsService: NewsService) { }
+
+  @Get()
+  @Public()
+  @ApiOkResponse({ description: 'Get all News' })
+  getAllNews(@Query() data: any): Promise<NewsCustom> {
+    return this.newsService.getAllNews(data);
+  }
+
+  @Get('/:id')
+  @Public()
+  @ApiOkResponse({ description: 'Get news by id' })
+  @ApiBadRequestResponse({ description: 'News not found' })
+  getNewsById(@Param('id') id: string): Promise<News> {
+    return this.newsService.getNewsById({ id });
+  }
+
   @Post()
   @UseGuards(IsBroker)
   @ApiUnauthorizedResponse({ description: 'User not logged in' })
@@ -41,19 +58,6 @@ export class NewsController {
     @Req() req: RequestWithUser,
   ): Promise<any> {
     return this.newsService.createNews(data, req.user);
-  }
-
-  @Get()
-  @ApiOkResponse({ description: 'Get all News' })
-  getAllNews(@Query() data: any): Promise<NewsCustom> {
-    return this.newsService.getAllNews(data);
-  }
-
-  @Get('/:id')
-  @ApiOkResponse({ description: 'Get news by id' })
-  @ApiBadRequestResponse({ description: 'News not found' })
-  getNewsById(@Param('id') id: string): Promise<News> {
-    return this.newsService.getNewsById({ id });
   }
 
   @Put('/:id')

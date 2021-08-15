@@ -20,6 +20,8 @@ import { categoryPropertyCustom } from './types/category.type';
 import { categoryProperty as categoryPropertyModel } from '@prisma/client';
 import { CreateCategoryPropertyDto } from './dto/create-categoryProperty.dto';
 import { IsBroker } from '../auth/guards/isBroker';
+import { Role, Roles } from '../auth/decorators/roles.decorator';
+import { RolesGuard } from '../auth/guards/role';
 
 @Resolver((of) => CategoryPropertyType)
 export class CategoryPropertyResolver {
@@ -38,12 +40,14 @@ export class CategoryPropertyResolver {
     async getCategoryById(
         @Args('id', { type: () => String }) id: string,
     ): Promise<categoryPropertyModel> {
-        return await this.categoryPropertyService.getCategoryById({ id });
+        return await this.categoryPropertyService.categoryProperty({ id });
     }
 
     @Mutation(returns => CategoryPropertyType)
-    @Method(Methods.POST, Paths.CATEGORY)
-    @UseGuards(IsBroker)
+    // @Method(Methods.POST, Paths.CATEGORY)
+    // @UseGuards(IsBroker)
+    @Roles(Role.ADMIN)
+    @UseGuards(RolesGuard)
     async createCategoryProperty(
         @Args('input') input: CreateCategoryPropertyDto,
     ): Promise<categoryPropertyModel> {
@@ -51,8 +55,9 @@ export class CategoryPropertyResolver {
     }
 
     @Mutation(returns => CategoryPropertyType)
-    @Method(Methods.POST, Paths.CATEGORY)
-    @UseGuards(IsBroker)
+    // @Method(Methods.POST, Paths.CATEGORY)
+    @Roles(Role.ADMIN)
+    @UseGuards(RolesGuard)
     async updateCategory(
         @Args('id') id: string,
         @Args('inputData') inputData: CreateCategoryPropertyDto,
@@ -64,8 +69,9 @@ export class CategoryPropertyResolver {
     }
 
     @Mutation(returns => CategoryPropertyType)
-    @Method(Methods.DELETE, Paths.CATEGORY)
-    @UseGuards(IsBroker)
+    // @Method(Methods.DELETE, Paths.CATEGORY)
+    @Roles(Role.ADMIN)
+    @UseGuards(RolesGuard)
     async deleteCategory(@Args('id') id: string) {
         return this.categoryPropertyService.deleteCategory({ id });
     }
