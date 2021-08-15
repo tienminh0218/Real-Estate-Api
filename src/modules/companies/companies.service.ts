@@ -5,54 +5,31 @@ import { CreateCompanyDto } from './dto/create-company.dto';
 import { JwtService } from '@nestjs/jwt';
 import { OptionalQueryCompanies } from './types/optional-query.type';
 import { CompanyCustom } from './types/company.type';
+import { CompanyRepository } from './repositories/companies.repository';
+import { FindManyDto, UpdateByIdDto } from './dto/repository.dto';
 
 @Injectable()
 export class CompaniesService {
   constructor(
     private logger: Logger,
-    private prisma: PrismaService,
-    private readonly jwtService: JwtService,
+    private readonly companyRepository: CompanyRepository,
   ) { }
 
 
   async company(companyWhereUniqueInput: Prisma.CompanyWhereUniqueInput): Promise<Company | null> {
-    return this.prisma.company.findUnique({
-      where: companyWhereUniqueInput,
-    })
+    return this.companyRepository.findOne(companyWhereUniqueInput)
   }
 
   async companies(
-    params: {
-      where?: Prisma.CompanyWhereInput;
-      skip?: number;
-      take?: number;
-      cursor?: Prisma.CompanyWhereUniqueInput;
-      orderBy?: Prisma.CompanyOrderByInput;
-      include?: Prisma.CompanyInclude;
-    },
+    params: FindManyDto,
     optional: OptionalQueryCompanies = {}
   ): Promise<CompanyCustom> {
     try {
-      const { where, orderBy, cursor } = params;
-      let { page, limit, include: includeQuery } = optional;
-
-      page = Number(page) || 1;
-      limit = Number(limit) || 20;
-      const data = await this.prisma.company.findMany({
-        take: limit,
-        skip: limit * (page - 1),
-        where,
-        orderBy,
-        cursor
-      });
-      return {
-        data,
-        pagination: {
-          page,
-          limit,
-          totalRows: data.length,
-        },
-      };
+      const { data, pagination } = await this.companyRepository.findMany(
+        params,
+        optional,
+      );
+      return { data, pagination };
     } catch (error) {
       this.logger.error(error);
       throw new BadRequestException(error);
@@ -61,38 +38,16 @@ export class CompaniesService {
 
   async createCompany(user: any, data: CreateCompanyDto) {
     try {
-      const { companyName, district, city } = data;
-      const existCompanyName = await this.company({ companyName })
-
-      if (existCompanyName) throw new Error('companyName already exist');
-      const createComp = this.prisma.company.create({
-        data: {
-          companyName,
-          district,
-          city,
-          user: { connect: { id: user.id } },
-        }
-      });
-      return createComp;
+      return await this.companyRepository.create(user, data);
     } catch (error) {
       this.logger.error(`${error.message}`);
       throw new BadRequestException(error.message);
-
     };
   }
 
-  async updateCompany(params: {
-    where: Prisma.CompanyWhereUniqueInput;
-    data: Prisma.CompanyUpdateInput;
-  }): Promise<Company> {
+  async updateCompany(params: UpdateByIdDto): Promise<Company> {
     try {
-      const { data, where } = params;
-      const existedCompany = await this.company(where);
-      if (!existedCompany) throw new Error('Company not found');
-      return this.prisma.company.update({
-        data,
-        where
-      })
+      return await this.companyRepository.update(params);
     } catch (error) {
       this.logger.error(`${error.message}`);
       throw new BadRequestException(error.message);
@@ -101,8 +56,6 @@ export class CompaniesService {
   }
 
   async deleteCompany(where: Prisma.CompanyWhereUniqueInput): Promise<Company> {
-    return this.prisma.company.delete({
-      where
-    })
+    return this.companyRepository.delete(where);
   }
 }

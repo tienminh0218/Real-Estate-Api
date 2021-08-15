@@ -88,7 +88,7 @@ export class PropertyController {
   @Public()
   @ApiOkResponse({ description: 'Get a property by id' })
   getPropertyById(@Param('id') id: string): Promise<Property> {
-    return this.propertyService.property({ where: { id } });
+    return this.propertyService.property({ id });
   }
 
   @Post('broker')

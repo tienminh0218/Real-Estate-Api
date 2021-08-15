@@ -1,41 +1,24 @@
 import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import { Prisma, Property } from '@prisma/client';
 
-import { PrismaService } from './../prisma/prisma.service';
 import { CreatePropertyDto } from './dto/create-property.dto';
 import { OptionalQueryProperties } from './types/optional-query.type';
-import { UpdatePropertyDto } from './dto/update-property.dto';
-import { PropertyCustom } from './types/property.type';
 import { FilterQuery } from './dto/filter-property.dto';
+import { PropertyRepository } from './repositories/property.repository';
+import { FindManyDto, UpdateByIdDto } from './dto/repository.dto';
+import { BrokerPropertyRepository } from './repositories/brokerProperty.repository';
 
 @Injectable()
 export class PropertyService {
   constructor(
-    private readonly prismaService: PrismaService,
+    private readonly propertyRepository: PropertyRepository,
+    private readonly brokerPropertyRepository: BrokerPropertyRepository,
     private readonly logger: Logger,
   ) {}
 
-  async property(param: {
-    where?: Prisma.PropertyWhereUniqueInput;
-    include?: Prisma.PropertyInclude;
-  }): Promise<Property> {
+  async property(where: Prisma.PropertyWhereUniqueInput): Promise<Property> {
     try {
-      const { where, include } = param;
-
-      const result = await this.prismaService.property.findUnique({
-        where,
-        include: {
-          location: true,
-          category: {
-            select: {
-              id: true,
-              nameCategory: true,
-            },
-          },
-          ...include,
-        },
-      });
-      return result;
+      return this.propertyRepository.findById(where);
     } catch (error) {
       this.logger.error(error);
       throw new BadRequestException(error.message);
@@ -43,48 +26,11 @@ export class PropertyService {
   }
 
   async properties(
-    params: {
-      where?: Prisma.PropertyWhereInput;
-      skip?: number;
-      take?: number;
-      cursor?: Prisma.PropertyWhereUniqueInput;
-      orderBy?: Prisma.PropertyOrderByInput;
-      include?: Prisma.PropertyInclude;
-    },
+    params: FindManyDto,
     optional: OptionalQueryProperties = {},
   ): Promise<any> {
     try {
-      const { where, cursor, orderBy, include } = params;
-      let { page, limit } = optional;
-      page = Number(page) || 1;
-      limit = Number(limit) || 20;
-
-      const data = await this.prismaService.property.findMany({
-        skip: limit * (page - 1),
-        take: limit,
-        where,
-        cursor,
-        orderBy,
-        include: {
-          location: true,
-          category: {
-            select: {
-              id: true,
-              nameCategory: true,
-            },
-          },
-          ...include,
-        },
-      });
-
-      return {
-        data,
-        pagination: {
-          page,
-          limit,
-          totalRows: data.length,
-        },
-      };
+      return this.propertyRepository.findMany(params, optional);
     } catch (error) {
       this.logger.error(error);
       throw new BadRequestException(error.message);
@@ -96,19 +42,10 @@ export class PropertyService {
     optional: OptionalQueryProperties = {},
   ) {
     try {
-      const result = await this.properties(
-        {
-          where: {
-            project: {
-              company: {
-                userId: id,
-              },
-            },
-          },
-        },
+      const result = await this.propertyRepository.findPropertiesOfUser(
+        id,
         optional,
       );
-
       return result;
     } catch (error) {
       this.logger.error(error);
@@ -121,11 +58,10 @@ export class PropertyService {
     optional: OptionalQueryProperties = {},
   ) {
     try {
-      const result = await this.properties(
-        { where: { projectId: id } },
+      const result = await this.propertyRepository.findPropertiesOfProject(
+        id,
         optional,
       );
-
       return result;
     } catch (error) {
       this.logger.error(error);
@@ -138,26 +74,8 @@ export class PropertyService {
     optional: OptionalQueryProperties = {},
   ) {
     try {
-      const result = await this.properties(
-        {
-          where: {
-            broker: {
-              some: {
-                brokerId: id,
-              },
-            },
-          },
-          include: {
-            broker: {
-              where: {
-                brokerId: id,
-              },
-              select: {
-                owner: true,
-              },
-            },
-          },
-        },
+      const result = await this.propertyRepository.findPropertiesOfBroker(
+        id,
         optional,
       );
 
@@ -175,32 +93,7 @@ export class PropertyService {
 
   async filterProperties(data: FilterQuery) {
     try {
-      const { filterPrice, city, orderBy: orderByPrice, ...optional } = data;
-      let [min, max]: (string | number)[] = filterPrice?.split(',') || [];
-      min = (min && Number(min)) || undefined;
-      max = (max && Number(max)) || undefined;
-
-      const result = await this.properties(
-        {
-          where: {
-            AND: [
-              { price: { gte: min, lte: max } },
-              {
-                location: {
-                  city: {
-                    contains: city,
-                  },
-                },
-              },
-            ],
-          },
-          orderBy: {
-            price: orderByPrice,
-          },
-        },
-        optional,
-      );
-      return result;
+      return this.propertyRepository.filter(data);
     } catch (error) {
       this.logger.error(error);
       throw new BadRequestException(error);
@@ -212,41 +105,7 @@ export class PropertyService {
     projectId: string = undefined,
   ): Promise<Property> {
     try {
-      const {
-        categoryId,
-        price,
-        name,
-        address,
-        ward,
-        city,
-        district,
-        lng,
-        lat,
-      } = payload;
-
-      const data = await this.prismaService.property.create({
-        data: {
-          name,
-          price,
-          location: {
-            create: {
-              address,
-              ward,
-              city,
-              district,
-              lat,
-              lng,
-            },
-          },
-          category: { connect: { id: categoryId } },
-          project: projectId && { connect: { id: projectId } },
-        },
-        include: {
-          location: true,
-        },
-      });
-
-      return data;
+      return this.propertyRepository.create(payload, projectId);
     } catch (error) {
       this.logger.error(error);
       this.logger.error(error.code);
@@ -262,13 +121,7 @@ export class PropertyService {
   ): Promise<Property> {
     try {
       const propertyData = await this.createProperty(payload);
-
-      await this.prismaService.brokerProperty.create({
-        data: {
-          property: { connect: { id: propertyData.id } },
-          broker: { connect: { id: brokerId } },
-        },
-      });
+      await this.brokerPropertyRepository.create(brokerId, propertyData.id);
 
       return propertyData;
     } catch (error) {
@@ -280,51 +133,9 @@ export class PropertyService {
     }
   }
 
-  async updateProperty(params: {
-    where: Prisma.PropertyWhereUniqueInput;
-    data: UpdatePropertyDto;
-  }): Promise<Property> {
+  async updateProperty(params: UpdateByIdDto): Promise<Property> {
     try {
-      const { where, data } = params;
-      const {
-        name,
-        categoryId,
-        price,
-        status,
-        userId,
-        lat,
-        lng,
-        address,
-        ward,
-        city,
-        district,
-      } = data;
-
-      const result = await this.prismaService.property.update({
-        where,
-        data: {
-          name,
-          price,
-          status,
-          location: {
-            update: {
-              lat,
-              lng,
-              address,
-              ward,
-              district,
-              city,
-            },
-          },
-          category: categoryId && { connect: { id: categoryId } },
-          user: userId && { connect: { id: userId } },
-        },
-        include: {
-          location: true,
-        },
-      });
-
-      return result;
+      return this.propertyRepository.updateById(params);
     } catch (error) {
       this.logger.error(error);
       if (error.code === 'P2025') {
@@ -337,15 +148,7 @@ export class PropertyService {
   async assignBroker(payload: { propertyId: string; brokerId: string }) {
     try {
       const { propertyId, brokerId } = payload;
-      const result = await this.prismaService.brokerProperty.create({
-        data: {
-          property: { connect: { id: propertyId } },
-          broker: { connect: { id: brokerId } },
-          owner: false,
-        },
-      });
-
-      return result;
+      return this.brokerPropertyRepository.create(propertyId, brokerId, false);
     } catch (error) {
       this.logger.error(error);
       if (error.code === 'P2025') {
@@ -358,15 +161,11 @@ export class PropertyService {
     }
   }
 
-  async deleteProperty(
-    where: Prisma.PropertyWhereUniqueInput,
-  ): Promise<boolean> {
+  async deleteProperty(where: Prisma.PropertyWhereUniqueInput): Promise<any> {
     try {
-      const result = await this.prismaService.property.delete({
-        where,
-      });
+      const result = await this.propertyRepository.deleteById(where);
 
-      return !!result;
+      return result;
     } catch (error) {
       this.logger.error(error);
       throw new BadRequestException(error.message);
