@@ -31,7 +31,7 @@ import { NewsCustom } from './types/news.type';
 @ApiTags('news')
 @Controller('news')
 export class NewsController {
-  constructor(private newsService: NewsService) {}
+  constructor(private newsService: NewsService) { }
 
   @Get()
   @Public()

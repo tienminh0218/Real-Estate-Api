@@ -34,7 +34,7 @@ import {
 @Controller('companies')
 // @UseGuards(JwtAuthGuard)
 export class CompaniesController {
-  constructor(private companiesService: CompaniesService) {}
+  constructor(private companiesService: CompaniesService) { }
 
   @Get()
   @Public()
@@ -69,7 +69,7 @@ export class CompaniesController {
   }
 
   @Put(':id')
-  @UseGuards(IsBroker)
+  @UseGuards(IsUser)
   @ApiBadRequestResponse({ description: 'Not found id' })
   @ApiForbiddenResponse({ description: 'Not have role Broker or Admin' })
   @ApiUnauthorizedResponse({ description: 'User not logged in' })
@@ -85,7 +85,7 @@ export class CompaniesController {
   }
 
   @Delete('/:id')
-  @UseGuards(IsBroker)
+  @UseGuards(IsUser)
   @ApiForbiddenResponse({ description: 'Not have role Admin' })
   @ApiUnauthorizedResponse({ description: 'User not logged in' })
   @ApiOkResponse({ description: 'Delete success a company' })

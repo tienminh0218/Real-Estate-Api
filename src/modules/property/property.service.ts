@@ -14,7 +14,7 @@ export class PropertyService {
     private readonly propertyRepository: PropertyRepository,
     private readonly brokerPropertyRepository: BrokerPropertyRepository,
     private readonly logger: Logger,
-  ) {}
+  ) { }
 
   async property(where: Prisma.PropertyWhereUniqueInput): Promise<Property> {
     try {

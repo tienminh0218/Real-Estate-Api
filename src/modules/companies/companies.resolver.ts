@@ -44,9 +44,7 @@ export class CompaniesResolver {
 
     @Mutation(returns => CompanyType)
     @Method(Methods.POST, Paths.COMPANY)
-    // @UseGuards(IsBroker)
-    @Roles(Role.ADMIN)
-    @UseGuards(RolesGuard)
+    @UseGuards(IsBroker)
     async createCompany(
         @Args('input') input: CreateCompanyDto,
         @Context() context: { req: RequestWithUser },

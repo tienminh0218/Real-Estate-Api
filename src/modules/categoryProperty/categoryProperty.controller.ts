@@ -26,12 +26,14 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { IsBroker } from '../auth/guards/isBroker';
+import { Role, Roles } from '../auth/decorators/roles.decorator';
+import { RolesGuard } from '../auth/guards/role';
 
 @ApiTags('CategoryProperty')
 @Controller('category')
 // @UseGuards(JwtAuthGuard)
 export class CategoryPropertyController {
-  constructor(private categoryPropertyService: CategoryPropertyService) {}
+  constructor(private categoryPropertyService: CategoryPropertyService) { }
 
   @Get()
   @Public()
@@ -47,11 +49,12 @@ export class CategoryPropertyController {
   @ApiOkResponse({ description: 'Get category by id' })
   @ApiBadRequestResponse({ description: 'Not found id' })
   async getCategoryById(@Param('id') id: string): Promise<categoryProperty> {
-    return this.categoryPropertyService.getCategoryById({ id });
+    return this.categoryPropertyService.categoryProperty({ id });
   }
 
   @Post()
-  // @UseGuards(IsBroker)
+  @Roles(Role.ADMIN)
+  @UseGuards(RolesGuard)
   @ApiUnauthorizedResponse({ description: 'User not logged in' })
   @ApiForbiddenResponse({ description: 'Not have role Broker or Admin' })
   @ApiCreatedResponse({
@@ -62,7 +65,8 @@ export class CategoryPropertyController {
   }
 
   @Put(':id')
-  @UseGuards(IsBroker)
+  @Roles(Role.ADMIN)
+  @UseGuards(RolesGuard)
   @ApiUnauthorizedResponse({ description: 'User not logged in' })
   @ApiForbiddenResponse({ description: 'Not have role Broker or Admin' })
   @ApiOkResponse({ description: 'Updated success a category' })
@@ -77,7 +81,8 @@ export class CategoryPropertyController {
   }
 
   @Delete('/:id')
-  @UseGuards(IsBroker)
+  @Roles(Role.ADMIN)
+  @UseGuards(RolesGuard)
   @ApiUnauthorizedResponse({ description: 'User not logged in' })
   @ApiForbiddenResponse({ description: 'Not have role Broker or Admin' })
   @ApiOkResponse({ description: 'Delete success a category' })

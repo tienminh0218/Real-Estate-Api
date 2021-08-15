@@ -29,7 +29,7 @@ export class ProjectsController {
   constructor(private readonly projectsService: ProjectsService) { }
 
   @Post(':id')
-  @UseGuards(IsBroker)
+  @UseGuards(IsUser)
   @ApiUnauthorizedResponse({ description: 'User not logged in' })
   @ApiForbiddenResponse({ description: 'Not have role Broker or Admin' })
   @ApiCreatedResponse({ description: 'Project has been successfully created' })
@@ -41,7 +41,7 @@ export class ProjectsController {
   }
 
   @Put(':id')
-  @UseGuards(IsBroker)
+  @UseGuards(IsUser)
   @ApiUnauthorizedResponse({ description: 'User not logged in' })
   @ApiForbiddenResponse({ description: 'Not have role Broker or Admin' })
   @ApiOkResponse({ description: 'Updated success a project' })
@@ -56,7 +56,7 @@ export class ProjectsController {
   }
 
   @Delete('/:id')
-  @UseGuards(IsBroker)
+  @UseGuards(IsUser)
   @ApiUnauthorizedResponse({ description: 'User not logged in' })
   @ApiForbiddenResponse({ description: 'Not have role Broker or Admin' })
   @ApiOkResponse({ description: 'Delete success a project' })

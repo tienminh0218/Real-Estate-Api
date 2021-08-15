@@ -20,6 +20,7 @@ import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { ProjectCustom } from './types/project.type';
 import { PaginationInput } from 'src/common/types/pagination.type';
+import { IsBroker } from '../auth/guards/isBroker';
 
 @Resolver((of) => ProjectType)
 export class ProjectsResolver {

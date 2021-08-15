@@ -14,10 +14,10 @@ import { BrokerRepository } from './repositories/broker.repository';
   providers: [
     BrokerService,
     Logger,
-    ProjectsService,
+    // ProjectsService,
     BrokerResolver,
     BrokerRepository,
   ],
   controllers: [BrokerController],
 })
-export class BrokerModule {}
+export class BrokerModule { }

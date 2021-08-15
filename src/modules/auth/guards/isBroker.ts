@@ -19,7 +19,7 @@ export class IsBroker implements CanActivate {
     private readonly prismaService: PrismaService,
     private readonly reflector: Reflector,
     private readonly logger: Logger,
-  ) {}
+  ) { }
 
   async compareBroker(
     user: UserInterface,
@@ -99,7 +99,6 @@ export class IsBroker implements CanActivate {
     if (method === 'PUT' || method === 'PATCH')
       return this.compareBroker(user, paramId, path);
     if (method === 'DELETE') return this.compareBroker(user, paramId, path);
-
     this.logger.warn('"IsBroker Guard": Method not found in Http type');
     return false;
   }
